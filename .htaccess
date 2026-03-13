@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# Rediriger https://dc-knowing.com/FLOW_COMPTA/ vers https://dc-knowing.com/FLOW_COMPTA/public/
+RewriteCond %{REQUEST_URI} ^/FLOW_COMPTA/?$
+RewriteRule ^(.*)$ https://dc-knowing.com/FLOW_COMPTA/public/ [L,R=301]

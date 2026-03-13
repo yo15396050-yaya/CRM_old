@@ -1,0 +1,56 @@
+{
+	"test": {
+		"type": "sftp",
+		"host": "ftp.dc-knowing.com",
+		"port": 22,
+		"username": "dc-kn2255957",
+		"password": "gM3!vRVcVg5VezA",
+		"proxy": false,
+		"upload_on_save": true,
+		"watch": false,
+		"submit_git_before_upload": false,
+		"submit_git_msg": "",
+		"build": "",
+		"compress": false,
+		"remote_unpacked": false,
+		"delete_remote_compress": false,
+		"delete_local_compress": false,
+		"deleteRemote": false,
+		"upload_to_root": false,
+		"distPath": [],
+		"remotePath": "/htdocs/CRM",
+		"excludePath": [],
+		"downloadPath": "",
+		"downloadExcludePath": [],
+		"default": false
+	}
+	// Configuration de référence
+	// Nom de l'environnement, le nom peut être personnalisé
+	// "test": { // Environnement de test
+	// "type": "", // (Obligatoire) Type de connexion, valeurs possibles : ftp, sftp, ssh
+	// "host": "0.0.0.0", // (Obligatoire) Adresse du serveur
+	// "port": 22, // (Optionnel) Port, par défaut 21 pour FTP, 22 pour SFTP et SSH
+	// "username": "username", // (Obligatoire) Nom d'utilisateur
+	// "password": "password", // Mot de passe (ou chemin de la clé privée, l'un ou l'autre)
+	// // "privateKeyPath": "/your_path/id_rsa", // (Configuration SFTP/SSH) Chemin de la clé privée (ou mot de passe, l'un ou l'autre), attention : évitez de stocker la clé dans le répertoire du code
+	// // "secretKeyPath": "/your_path/secret_key.txt", // Chemin de la clé secrète pour chiffrer le nom d'utilisateur et le mot de passe, attention : évitez de stocker la clé dans le répertoire du code
+	// "proxy": false, // Utiliser un proxy, par défaut false
+	// "upload_on_save": false, // Téléverser automatiquement après sauvegarde, recommandé pour le développement en solo. Si true, les options watch, submit_git_before_upload, compress, deleteRemote sont ignorées. Par défaut false
+	// "watch": false, // Surveiller les modifications des fichiers dans le répertoire de téléversement, par défaut false. Si upload_on_save est true, cette option est ignorée. Si distPath est configuré, seuls les fichiers dans distPath sont surveillés
+	// "submit_git_before_upload": false, // Pour le travail en équipe, valider les modifications Git avant le téléversement pour éviter d'écraser le code distant, par défaut false
+	// "submit_git_msg": "", // Message de commit Git, par défaut vide. Si submit_git_before_upload est true et que ce champ est vide, une boîte de dialogue apparaîtra pour saisir manuellement le message
+	// // "build": "yarn build:test", // (Optionnel) Commande de build pour les projets frontaux
+	// "compress": false, // Compresser avant téléversement et décompresser à distance (nécessite un accès SSH), par défaut false
+	// "remote_unpacked": true, // Décompresser à distance après téléversement, par défaut true pour SSH, false pour les autres
+	// "delete_remote_compress": true, // Supprimer le fichier compressé distant après téléversement, par défaut true pour SSH, false pour les autres
+	// "delete_local_compress": true, // Supprimer le fichier compressé local après téléversement, par défaut true
+	// "upload_to_root": false, // Si distPath contient un seul répertoire, téléverser à la racine de remotePath, utile pour le déploiement de code frontend, par défaut false
+	// "deleteRemote": false, // Supprimer le répertoire distant distPath avant téléversement, utile pour nettoyer le code déployé, par défaut false
+	// "distPath": [], // (Optionnel) Répertoire local à téléverser, chaîne ou tableau, par défaut la racine
+	// "remotePath": "/www/wwwroot/test", // (Configuration SFTP/SSH) Répertoire distant de téléversement
+	// "excludePath": [], // (Optionnel) Fichiers/répertoires à exclure pour cet environnement, fusionné avec excludePath du plugin. Si le plugin utilise .gitignore, fusionné avec .gitignore
+	// "downloadPath": "", // (Optionnel) Chemin de téléchargement, par défaut la racine du projet, utilisé pour télécharger manuellement des fichiers/dossiers
+	// "downloadExcludePath": [], // (Optionnel) Fichiers/répertoires à exclure lors du téléchargement
+	// "default": false // Environnement par défaut, si true, permet d'utiliser le menu contextuel pour téléverser rapidement des fichiers/dossiers ou comparer avec les fichiers distants, par défaut false
+	// }
+}

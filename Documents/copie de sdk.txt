@@ -1,0 +1,4 @@
+sdk.dir=C:\\Users\\DCK OFFICE MANAGER\\AppData\\Local\\Android\\Sdk
+ndk.dir=C:\\Users\\DCK OFFICE MANAGER\\AppData\\Local\\Android\\Sdk\\ndk\\29.0.14206865
+
+cmake.dir=C:\\Users\\DCK OFFICE MANAGER\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1
