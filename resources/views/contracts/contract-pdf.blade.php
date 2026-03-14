@@ -43,6 +43,9 @@ $watermarkText = date('Y');
 $watermark = addWatermark($watermarkText);
 
 $ct = $contract->contractType->name ?? '';
+$ctLower = strtolower($ct);
+$isRenouvellement = str_contains($ctLower, 'renouvellement');
+$isNouvelleAdhesion = str_contains($ctLower, 'nouvelle') && str_contains($ctLower, 'adh');
 $compagnie = $contract->client->clientDetails->numadh;
 $numadh = $contract->client->clientDetails->company_name;
 @endphp
@@ -359,7 +362,7 @@ $numadh = $contract->client->clientDetails->company_name;
 
 <body class="content-wrapper">    
     <div class="card-body">
-        @if($ct == 'Renouvellement d\'attestation d\'adhésion')
+        @if($isRenouvellement)
             <div class="row">
                 <div>
                     {!! $watermark !!}
@@ -466,7 +469,7 @@ $numadh = $contract->client->clientDetails->company_name;
                 </div>
                 <p></p>
             </div>
-        @elseif($ct == 'Nouvelle adhésion')
+        @elseif($isNouvelleAdhesion)
             <div class="row">
                 <div class="">
                     {!! $watermark !!} <!-- Injection du filigrane -->
@@ -539,7 +542,13 @@ $numadh = $contract->client->clientDetails->company_name;
                     <p style="text-align:center;"><span style="font-size:14pt;"><strong><u>ATTESTATION D&#8217;ADHESION AU CENTRE DE GESTION AGREE</u></strong></span></p>
                     <p>Nous soussign&#233;s,<br>Centre de Gestion Agr&#233;&#233; D&#233;nomm&#233;&#160;: <strong>DC-KNOWING CGA SARL </strong><br>Compte Contribuable&#160;: <strong>1864699 A</strong><br>Forme Juridique&#160;: <strong>SARL</strong><br>Siege social : <strong>COCODY II Plateaux 7<sup>&#232;me</sup> tranche</strong><br>Ayant obtenu l&#8217;agr&#233;ment pour exercer en qualit&#233; de Centre de Gestion Agr&#233;e sous le num&#233;ro&#160;: <strong>296/SEPMBPE/DGI DU 29 MARS 2018</strong></p>
                     
-                    <p>D&#233;clare que l&#8217;entit&#233; <strong>&#171; {{$contract->client->clientDetails->company_name}} &#187;</strong> est adh&#233;rente de notre &#233;tablissement depuis le <strong>{{ \Carbon\Carbon::parse($contract->start_date)->format('d-m-Y') }}</strong>&#160;sous le num&#233;ro d&#8217;enregistrement&#160;:<strong> {{$contract->client->clientDetails->numadh}}</strong></p>
+                    @php
+                        $startDate = \Carbon\Carbon::parse($contract->start_date);
+                        if ($startDate->month > 1) { // Si on est après Janvier
+                            $startDate = \Carbon\Carbon::create($startDate->year, 1, 31);
+                        }
+                    @endphp
+                    <p>D&#233;clare que l&#8217;entit&#233; <strong>&#171; {{$contract->client->clientDetails->company_name}} &#187;</strong> est adh&#233;rente de notre &#233;tablissement depuis le <strong>{{ $startDate->format('d-m-Y') }}</strong>&#160;sous le num&#233;ro d&#8217;enregistrement&#160;:<strong> {{$contract->client->clientDetails->numadh}}</strong></p>
                     <ol>
                     <li>&#8211; Nom commercial de l&#8217;adh&#233;rent&#160;<strong>: {{$contract->client->clientDetails->company_name}}</strong></li>
                     <li>&#8211; Localisation : <strong>{{$contract->client->clientDetails->address}}</strong></li>
@@ -555,7 +564,7 @@ $numadh = $contract->client->clientDetails->company_name;
                                 <td style="width:33.3333%; height:15px; border: none;"></td>
                                 <td style="width:33.3333%; height:15px; border: none;"></td>
                                 <td style="width:33.3333%; vertical-align:top; height:15px; border: none; text-align: right;">
-                                    <span style="font-size:10pt;"><strong>Fait à Abidjan, le {{ now()->format('d-m-Y') }}</strong></span>
+                                    <span style="font-size:10pt;"><strong>Fait à Abidjan, le {{ $startDate->format('d-m-Y') }}</strong></span>
                                 </td>
                             </tr>
                             <tr style="height:10px;">

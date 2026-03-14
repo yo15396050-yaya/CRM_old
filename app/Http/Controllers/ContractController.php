@@ -180,7 +180,8 @@ class ContractController extends AccountBaseController
         // Récupérer le type de contrat pour vérifier si c'est une "Nouvelle adhésion"
         $contractTypeId = $request->contract_type_id ?? $request->contract_type;
         $contractType = \App\Models\ContractType::find($contractTypeId);
-        $isNouvelleAdhesion = $contractType && preg_match('/nouvelle\s+adh[eé]sion/iu', $contractType->name);
+        $typeName = $contractType ? strtolower($contractType->name) : '';
+        $isNouvelleAdhesion = str_contains($typeName, 'nouvelle') && str_contains($typeName, 'adh');
 
         if ($isNouvelleAdhesion) {
             if ($now->month !== 1) { // Si on est après Janvier
@@ -274,8 +275,9 @@ class ContractController extends AccountBaseController
         $isNewContract = !$contract->exists;
         $contractType = \App\Models\ContractType::find($contract->contract_type_id);
         
-        // On vérifie le nom du type (insensible à la casse/accents)
-        $isNouvelleAdhesion = $contractType && preg_match('/nouvelle\s+adh[eé]sion/iu', $contractType->name);
+        // On vérifie le nom du type (plus robuste pour les accents/casse)
+        $typeName = $contractType ? strtolower($contractType->name) : '';
+        $isNouvelleAdhesion = str_contains($typeName, 'nouvelle') && str_contains($typeName, 'adh');
 
         if ($isNewContract && $isNouvelleAdhesion) {
             $now = now();

@@ -52,16 +52,18 @@ class NewContract extends BaseNotification
         $url = url()->temporarySignedRoute('front.contract.show', now()->addDays(GlobalSetting::SIGNED_ROUTE_EXPIRY), $this->contract->hash);
         $url = getDomainSpecificUrl($url, $this->company);
 
-        $content = __('email.newContract.text') . '<br>';
-
         $build
             ->subject(__('email.newContract.subject'))
-            ->markdown('mail.email', [
+            ->view('mail.contract.new-contract', [
                 'url' => $url,
-                'content' => $content,
-                'themeColor' => $this->company->header_color,
-                'actionText' => __('app.view') . ' ' . __('app.menu.contract'),
-                'notifiableName' => $notifiable->name]);
+                'notifiableName' => $notifiable->name,
+                'contractType' => $this->contract->contractType->name ?? __('app.menu.contract'),
+                'createdAt' => $this->contract->created_at->translatedFormat('d F Y'),
+                'contractNumber' => $this->contract->formatContractNumber(),
+                'supportEmail' => $this->company->company_email,
+                'supportPhone' => $this->company->company_phone,
+                'logo' => $this->company->logo_url,
+            ]);
 
         parent::resetLocale();
 
