@@ -63,6 +63,7 @@ class SmsSettingsController extends AccountBaseController
             $smsSetting->nexmo_status = 0;
             $smsSetting->msg91_status = 0;
             $smsSetting->telegram_status = 0;
+            $smsSetting->infobip_status = 0;
 
             if ($request->active_gateway == 'twilio') {
                 $smsSetting->account_sid = $request->account_sid;
@@ -97,6 +98,14 @@ class SmsSettingsController extends AccountBaseController
                 $smsSetting->telegram_status = 1;
                 $smsSetting->telegram_bot_token = $request->telegram_bot_token;
                 $smsSetting->telegram_bot_name = str($request->telegram_bot_name)->replace('@', '');
+            }
+
+            if ($request->active_gateway == 'infobip') {
+                $smsSetting->infobip_api_key = $request->infobip_api_key;
+                $smsSetting->infobip_base_url = $request->infobip_base_url;
+                $smsSetting->infobip_whatsapp_number = $request->infobip_whatsapp_number;
+                $smsSetting->infobip_from_number = $request->infobip_from_number;
+                $smsSetting->infobip_status = 1;
             }
 
             $smsSetting->save();
@@ -134,7 +143,8 @@ class SmsSettingsController extends AccountBaseController
         !$this->smsSettings->status
         /* && ! $this->smsSettings->nexmo_status
          && ! $this->smsSettings->msg91_status
-         && ! $this->smsSettings->telegram_status*/
+         && ! $this->smsSettings->telegram_status
+         && ! $this->smsSettings->infobip_status*/
         ) {
             return Reply::error(__('sms::modules.noGatewayEnabled'));
         }
@@ -171,6 +181,10 @@ class SmsSettingsController extends AccountBaseController
 
         if ($this->smsSettings->telegram_status) {
             User::find(user()->id)->notify(new TestMessage($request->toArray()));
+        }
+
+        if ($this->smsSettings->infobip_status) {
+            Notification::route('infobip', $number)->notify(new TestMessage($request->toArray()));
         }
 
         return Reply::success('Test message sent successfully');

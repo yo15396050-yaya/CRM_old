@@ -28,6 +28,11 @@
         </div>
     </div>
 </div>
+<div class="modal-footer">
+    <x-forms.button-cancel data-dismiss="modal" class="border-0 mr-3">@lang('app.cancel')</x-forms.button-cancel>
+    <x-forms.button-secondary id="save-task-without-notify" class="mr-3">Enregistrer sans notifier</x-forms.button-secondary>
+    <x-forms.button-primary id="confirm-notifications" icon="check">Confirmer et Envoyer</x-forms.button-primary>
+</div>
 
 <script>
     $(document).ready(function() {

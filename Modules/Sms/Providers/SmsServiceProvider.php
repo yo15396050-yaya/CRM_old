@@ -162,6 +162,10 @@ class SmsServiceProvider extends ServiceProvider
         if (Schema::hasTable('sms_settings')) {
             $this->setConfig();
         }
+
+        \Illuminate\Support\Facades\Notification::extend('infobip', function ($app) {
+            return new \Modules\Sms\Notifications\Channels\InfobipChannel();
+        });
     }
 
     /**

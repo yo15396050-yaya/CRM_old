@@ -51,6 +51,15 @@ class StoreSmsSetting extends FormRequest
             ];
         }
 
+        if ($gateway == 'infobip') {
+            return [
+                'infobip_api_key' => 'required',
+                'infobip_base_url' => 'required',
+                'infobip_whatsapp_number' => 'required',
+                'infobip_from_number' => 'required',
+            ];
+        }
+
         return [
 
         ];

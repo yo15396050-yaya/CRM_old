@@ -13,9 +13,13 @@ use App\Notifications\TaskCommunicationNotification;
 use App\Notifications\ProjectInitNotification;
 use Illuminate\Support\Facades\Log;
 use Twilio\Rest\Client;
+use Modules\Sms\Http\Traits\InfobipMessageTrait;
+use Illuminate\Support\Str;
 
 class ProNotificationService
 {
+    use InfobipMessageTrait;
+
     protected $twilio;
 
     public function __construct()
@@ -146,6 +150,51 @@ class ProNotificationService
     {
         $to = $this->formatE164($notifiable->whatsapp ?? $notifiable->mobile);
 
+        // Try Infobip first
+        $settings = sms_setting();
+        if ($settings->infobip_status || config('services.infobip.api_key')) {
+            Log::info("Tentative WhatsApp via Infobip pour {$to}");
+            
+            // Build rich content if not provided (similar to NewClientTaskSms)
+            if (!$content) {
+                $firstName = explode(' ', $notifiable->name)[0];
+                $description = $task->description ? trim(strip_tags($task->description)) : 'N/A';
+                $dueDate = $task->due_date ? $task->due_date->translatedFormat('d/m/Y à H:i') : 'Non définie';
+                $taskPriority = ['high' => 'Haute', 'medium' => 'Normale', 'low' => 'Basse'][$task->priority] ?? $task->priority;
+                $url = route('tasks.show', $task->id);
+                $companyName = $task->company->company_name ?? 'Notre équipe';
+
+                if ($type == 'type_1') {
+                    $content = trans('sms::template.new-client-task-whatsapp', [
+                        'name' => $firstName,
+                        'heading' => $task->heading,
+                        'description' => $description,
+                        'dueDate' => $dueDate,
+                        'priority' => $taskPriority,
+                        'url' => $url,
+                        'companyName' => $companyName
+                    ]);
+                    Log::info("Content traduit WhatsApp Type 1: " . Str::limit($content, 100));
+                } else {
+                    $content = "✅ Bonjour {$firstName},\n\nLa tâche \"{$task->heading}\" a été mise à jour.\n\nVous pouvez consulter les détails ici :\n🔗 {$url}";
+                }
+            }
+
+            $attachments = [];
+            foreach ($task->files as $file) {
+                $attachments[] = [
+                    'url' => $file->file_url,
+                    'name' => $file->filename
+                ];
+            }
+
+            if ($this->sendViaInfobip($notifiable, $content, 'whatsapp', $attachments)) {
+                $this->logNotification($task, $notifiable, $type, 'whatsapp', 'sent');
+                return;
+            }
+            Log::warning("Échec envoi Infobip WhatsApp, tentative Twilio...");
+        }
+
         if (!$to || !$this->twilio) {
             $this->logNotification($task, $notifiable, $type, 'whatsapp', 'failed', !$this->twilio ? 'Client Twilio non configuré' : 'Numéro manquant');
             return;
@@ -188,6 +237,45 @@ class ProNotificationService
     protected function sendSms(Task $task, User $notifiable, $type, $content = null)
     {
         $to = $this->formatE164($notifiable->mobile);
+
+        // Try Infobip first
+        $settings = sms_setting();
+        if ($settings->infobip_status || config('services.infobip.api_key')) {
+            Log::info("Tentative SMS via Infobip pour {$to}");
+
+            if (!$content) {
+                $description = $task->description ? trim(strip_tags($task->description)) : 'N/A';
+                $shortDescription = Str::limit($description, 50);
+                $dueDate = $task->due_date ? $task->due_date->translatedFormat('d/m/Y') : 'Non définie';
+                $url = route('tasks.show', $task->id);
+
+            if ($type == 'type_1') {
+                $content = trans('sms::template.new-client-task', [
+                    'heading' => $task->heading,
+                    'description' => $shortDescription,
+                    'dueDate' => $dueDate,
+                    'url' => $url
+                ]);
+                Log::info("Content traduit SMS Type 1: " . Str::limit($content, 100));
+            } else {
+                    $content = "Mise à jour tâche : {$task->heading}\nLien : {$url}";
+                }
+            }
+
+            $attachments = [];
+            foreach ($task->files as $file) {
+                $attachments[] = [
+                    'url' => $file->file_url,
+                    'name' => $file->filename
+                ];
+            }
+
+            if ($this->sendViaInfobip($notifiable, $content, 'sms', $attachments)) {
+                $this->logNotification($task, $notifiable, $type, 'sms', 'sent');
+                return;
+            }
+            Log::warning("Échec envoi Infobip SMS, tentative Twilio...");
+        }
 
         if (!$to || !$this->twilio) {
             $this->logNotification($task, $notifiable, $type, 'sms', 'failed', !$this->twilio ? 'Client Twilio non configuré' : 'Numéro manquant');
@@ -237,6 +325,21 @@ class ProNotificationService
     {
         $to = $this->formatE164($notifiable->whatsapp ?? $notifiable->mobile);
 
+        // Try Infobip first
+        $settings = sms_setting();
+        if ($settings->infobip_status || config('services.infobip.api_key')) {
+            Log::info("Tentative Project WhatsApp via Infobip pour {$to}");
+            
+            if (!$content) {
+                $content = "📢 Mise à jour de projet : " . $project->project_name . "\nConsultez les détails sur votre dashboard.";
+            }
+
+            if ($this->sendViaInfobip($notifiable, $content, 'whatsapp')) {
+                $this->logProjectNotification($project, $notifiable, $type, 'whatsapp', 'sent');
+                return;
+            }
+        }
+
         if (!$to || !$this->twilio) {
             $this->logProjectNotification($project, $notifiable, $type, 'whatsapp', 'failed', !$this->twilio ? 'Client Twilio non configuré' : 'Numéro manquant');
             return;
@@ -262,6 +365,21 @@ class ProNotificationService
     protected function sendProjectSms(Project $project, User $notifiable, $type, $content = null)
     {
         $to = $this->formatE164($notifiable->mobile);
+
+        // Try Infobip first
+        $settings = sms_setting();
+        if ($settings->infobip_status || config('services.infobip.api_key')) {
+            Log::info("Tentative Project SMS via Infobip pour {$to}");
+
+            if (!$content) {
+                $content = "📢 Projet : " . $project->project_name;
+            }
+
+            if ($this->sendViaInfobip($notifiable, $content, 'sms')) {
+                $this->logProjectNotification($project, $notifiable, $type, 'sms', 'sent');
+                return;
+            }
+        }
 
         if (!$to || !$this->twilio) {
             $this->logProjectNotification($project, $notifiable, $type, 'sms', 'failed', !$this->twilio ? 'Client Twilio non configuré' : 'Numéro manquant');

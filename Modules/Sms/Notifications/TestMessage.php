@@ -68,7 +68,26 @@ class TestMessage extends Notification implements ShouldQueue
             array_push($via, 'telegram');
         }
 
+        if (sms_setting()->infobip_status) {
+            array_push($via, 'infobip');
+        }
+
         return $via;
+    }
+
+    /**
+     * Get the Infobip representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toInfobip($notifiable)
+    {
+        return [
+            'body' => 'This is an Infobip test message from CRM.',
+            'type' => sms_setting()->whatsapp_status ? 'whatsapp' : 'sms',
+            'attachments' => []
+        ];
     }
 
     //phpcs:ignore

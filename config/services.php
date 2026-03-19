@@ -74,4 +74,10 @@ return [
         'app_id' => 'YOUR-APP-ID-HERE',
         'rest_api_key' => 'YOUR-REST-API-KEY-HERE',
     ],
+    'infobip' => [
+        'api_key' => env('INFOBIP_API_KEY'),
+        'base_url' => env('INFOBIP_BASE_URL'),
+        'sms_from' => env('INFOBIP_SMS_FROM', 'MonCRM'),
+        'whatsapp_from' => env('INFOBIP_WHATSAPP_FROM'),
+    ],
 ];

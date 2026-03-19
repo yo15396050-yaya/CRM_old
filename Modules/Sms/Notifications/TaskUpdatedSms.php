@@ -10,13 +10,14 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 use Modules\Sms\Entities\SmsNotificationSetting;
 use Modules\Sms\Http\Traits\WhatsappMessageTrait;
+use Modules\Sms\Http\Traits\InfobipMessageTrait;
 use NotificationChannels\Telegram\TelegramMessage;
 use NotificationChannels\Twilio\TwilioChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 
 class TaskUpdatedSms extends Notification implements ShouldQueue
 {
-    use Queueable, WhatsappMessageTrait;
+    use Queueable, WhatsappMessageTrait, InfobipMessageTrait;
 
     /**
      * Create a new notification instance.
@@ -75,7 +76,41 @@ class TaskUpdatedSms extends Notification implements ShouldQueue
             array_push($via, 'telegram');
         }
 
+        if (sms_setting()->infobip_status || config('services.infobip.api_key')) {
+            array_push($via, 'infobip');
+        }
+
         return $via;
+    }
+
+    public function toInfobip($notifiable)
+    {
+        $settings = sms_setting();
+        $priority = $settings->notification_priority ?? 'both';
+        
+        $firstName = explode(' ', $notifiable->name)[0];
+        $url = route('tasks.show', $this->task->id);
+        
+        $message = "✅ Bonjour {$firstName},\n\nLa tâche \"{$this->task->heading}\" a été mise à jour.\n\nVous pouvez consulter les détails ici :\n🔗 {$url}";
+
+        if ($priority == 'whatsapp_first') {
+            if ($this->sendViaInfobip($notifiable, $message, 'whatsapp')) {
+                return true;
+            }
+        }
+
+        if ($priority == 'sms_first') {
+            if ($this->sendViaInfobip($notifiable, $message, 'sms')) {
+                return true;
+            }
+            return $this->sendViaInfobip($notifiable, $message, 'whatsapp');
+        }
+
+        if ($priority == 'both') {
+            $this->sendViaInfobip($notifiable, $message, 'whatsapp');
+        }
+
+        return $this->sendViaInfobip($notifiable, $message, 'sms');
     }
 
     public function toTwilio($notifiable)

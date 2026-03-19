@@ -47,6 +47,8 @@
                        value="msg91"
                        @elseif ($smsSetting->telegram_status)
                        value="telegram"
+                       @elseif ($smsSetting->infobip_status)
+                       value="infobip"
                        @endif
                        name="active_gateway" id="active_gateway">
                 <div class="row">
@@ -378,6 +380,70 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="row pt-2">
+                    <div class="col-md-10">
+                        <h4 class="mb-4 f-21 font-weight-bold text-capitalize" style="color: #ff5a00;">
+                            Infobip
+                        </h4>
+                    </div>
+
+                    <div class="col-lg-2 mb-2">
+                        <div class="form-group text-right">
+                            <div class="d-flex mt-2 justify-content-end">
+                                <x-forms.checkbox fieldLabel=" " class="sms-gateway-status" fieldName="infobip-gateway"
+                                                  fieldId="infobip-gateway" fieldValue="infobip"
+                                                  :checked="$smsSetting->infobip_status"/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="infobip-form" class="col-lg-12 @if (!$smsSetting->infobip_status) d-none @endif">
+                        <div class="row">
+                            <div class="col-6">
+                                <x-forms.label class="mt-3" fieldId="infobip_api_key" fieldLabel="API Key"
+                                               fieldRequired="true">
+                                </x-forms.label>
+                                <x-forms.input-group>
+                                    <input type="password" name="infobip_api_key" id="infobip_api_key"
+                                           class="form-control height-35 f-14" value="{{ $smsSetting->infobip_api_key }}">
+
+                                    <x-slot name="preappend">
+                                        <button type="button" data-toggle="tooltip"
+                                                data-original-title="Click Here to View Key"
+                                                class="btn btn-outline-secondary border-grey height-35 toggle-password">
+                                            <i class="fa fa-eye"></i></button>
+                                    </x-slot>
+                                </x-forms.input-group>
+                            </div>
+                            <div class="col-6">
+                                <x-forms.label class="mt-3" fieldId="infobip_base_url" fieldLabel="Base URL"
+                                               fieldRequired="true">
+                                </x-forms.label>
+                                <x-forms.input-group>
+                                    <input type="text" name="infobip_base_url" id="infobip_base_url"
+                                           class="form-control height-35 f-14" value="{{ $smsSetting->infobip_base_url }}" placeholder="e.g. 4ke4d6.api.infobip.com">
+                                </x-forms.input-group>
+                            </div>
+                            <div class="col-6">
+                                <x-forms.tel fieldId="infobip_from_number"
+                                             :fieldLabel="'SMS ' . __('sms::app.fromNumber')"
+                                             fieldName="infobip_from_number"
+                                             fieldPlaceholder="ex: CRM_SMS"
+                                             fieldRequired="true"
+                                             :fieldValue="$smsSetting->infobip_from_number"></x-forms.tel>
+                            </div>
+                            <div class="col-6">
+                                <x-forms.tel fieldId="infobip_whatsapp_number"
+                                             :fieldLabel="'WhatsApp ' . __('sms::app.fromNumber')"
+                                             fieldName="infobip_whatsapp_number"
+                                             fieldPlaceholder="e.g. 447491163197"
+                                             fieldRequired="true"
+                                             :fieldValue="$smsSetting->infobip_whatsapp_number"></x-forms.tel>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="col-lg-12 py-5">
                     <div class="w-100 h-100 d-flex align-items-center justify-content-center">
                         <div>
@@ -458,7 +524,11 @@
                 $('#whatsappTemplates').removeClass('d-none');
             }
         })
-        $('#twilio-gateway, #nexmo-gateway, #msg91-gateway').change(function () {
+            }
+        })
+
+        $('#twilio-gateway, #nexmo-gateway, #msg91-gateway, #telegram-gateway, #infobip-gateway').change(function () {
+            var gateway = $(this).val();
             var gateway = $(this).val();
 
             $('#active_gateway').val('')

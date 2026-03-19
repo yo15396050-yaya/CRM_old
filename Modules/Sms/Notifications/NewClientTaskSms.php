@@ -10,13 +10,14 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Support\Str;
 use Modules\Sms\Entities\SmsNotificationSetting;
 use Modules\Sms\Http\Traits\WhatsappMessageTrait;
+use Modules\Sms\Http\Traits\InfobipMessageTrait;
 use NotificationChannels\Telegram\TelegramMessage;
 use NotificationChannels\Twilio\TwilioChannel;
 use NotificationChannels\Twilio\TwilioSmsMessage;
 
 class NewClientTaskSms extends Notification implements ShouldQueue
 {
-    use Queueable, WhatsappMessageTrait;
+    use Queueable, WhatsappMessageTrait, InfobipMessageTrait;
 
     /**
      * Create a new notification instance.
@@ -50,7 +51,7 @@ class NewClientTaskSms extends Notification implements ShouldQueue
             return [];
         }
 
-        $this->message = __('email.newClientTask.subject') . ' - ' . $this->task->heading;
+        $this->message = "🚀 " . __('email.newClientTask.subject') . "\n" . "Titre : " . $this->task->heading;
 
         $via = [];
 
@@ -70,6 +71,10 @@ class NewClientTaskSms extends Notification implements ShouldQueue
 
         if (sms_setting()->telegram_status && $notifiable->telegram_user_id) {
             array_push($via, 'telegram');
+        }
+
+        if (sms_setting()->infobip_status || config('services.infobip.api_key')) {
+            array_push($via, 'infobip');
         }
 
         return $via;
@@ -138,5 +143,66 @@ class NewClientTaskSms extends Notification implements ShouldQueue
             // Markdown supported.
             ->content($this->message)
             ->button(__('app.view'), route('tasks.show', $this->task->id));
+    }
+
+    public function toInfobip($notifiable)
+    {
+        $settings = sms_setting();
+        $priority = $settings->notification_priority ?? 'both';
+        
+        $firstName = explode(' ', $notifiable->name)[0];
+        $description = $this->task->description ? trim(strip_tags($this->task->description)) : 'N/A';
+        $shortDescription = Str::limit($description, 50);
+        $dueDate = $this->task->due_date ? $this->task->due_date->translatedFormat('d/m/Y à H:i') : 'Non définie';
+        $taskPriority = [
+            'high' => 'Haute',
+            'medium' => 'Normale',
+            'low' => 'Basse'
+        ][$this->task->priority] ?? $this->task->priority;
+        $url = route('tasks.show', $this->task->id);
+        $companyName = $this->company->company_name;
+
+        $params = [
+            'name' => $firstName,
+            'heading' => $this->task->heading,
+            'description' => $description,
+            'dueDate' => $dueDate,
+            'priority' => $taskPriority,
+            'url' => $url,
+            'companyName' => $companyName
+        ];
+
+        $messageSms = __('sms::template.new-client-task', array_merge($params, ['description' => $shortDescription]));
+        $messageWhatsapp = __('sms::template.new-client-task-whatsapp', $params);
+
+        $attachments = [];
+        foreach ($this->task->files as $file) {
+            $attachments[] = [
+                'url' => $file->file_url,
+                'name' => $file->filename
+            ];
+        }
+
+        if ($priority == 'whatsapp_first') {
+            if ($this->sendViaInfobip($notifiable, $messageWhatsapp, 'whatsapp', $attachments)) {
+                return true;
+            }
+        }
+
+        if ($priority == 'sms_first') {
+            if ($this->sendViaInfobip($notifiable, $messageSms, 'sms', $attachments)) {
+                return true;
+            }
+
+            if ($settings->infobip_status || config('services.infobip.api_key')) {
+                return $this->sendViaInfobip($notifiable, $messageWhatsapp, 'whatsapp', $attachments);
+            }
+        }
+
+        if ($priority == 'both') {
+            $this->sendViaInfobip($notifiable, $messageWhatsapp, 'whatsapp', $attachments);
+        }
+
+        return $this->sendViaInfobip($notifiable, $messageSms, 'sms', $attachments);
     }
 }
