@@ -97,6 +97,21 @@ class TaskCommunicationNotification extends BaseNotification
             // Auteur de la dernière modification
             $modifiedBy = user() ? user()->name : 'Système';
 
+            $clientName = 'N/A';
+            if ($project && $project->client) {
+                $clientName = $project->client->name;
+            } elseif ($project && $project->clientdetails) {
+                $clientName = $project->clientdetails->company_name;
+            }
+
+            // Mappage des priorités en français
+            $priorityMap = [
+                'high' => 'Haut',
+                'medium' => 'Moyen',
+                'low' => 'Faible'
+            ];
+            $translatedPriority = $priorityMap[strtolower($this->task->priority)] ?? ucfirst($this->task->priority);
+
             $build = $this->build($notifiable)
                 ->subject('[Mise à jour] ' . $this->task->task_short_code . ' – ' . $this->task->heading)
                 ->view('emails.collab_task_update', [
@@ -109,10 +124,11 @@ class TaskCommunicationNotification extends BaseNotification
                 'previousStatus' => $previousStatusName,
                 'modifiedBy' => $modifiedBy,
                 'recipientName' => $notifiable->name,
+                'priority' => $translatedPriority,
                 'dueDate' => $dueDate,
                 'noteContent' => $this->note ? $this->note->note : null,
-                'clientName' => ($project && $project->client) ? $project->client->name : ($project && $project->clientdetails ? $project->clientdetails->company_name : 'N/A'),
-                'projectName' => $project ? $project->project_name : 'N/A',
+                'clientName' => $clientName,
+                'projectName' => $project ? $project->project_name : 'Personnel / Hors projet',
                 'attachments' => $attachments,
                 'url' => $url,
                 'company' => $this->company,

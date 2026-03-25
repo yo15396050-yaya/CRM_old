@@ -216,6 +216,14 @@
             {{-- Détails tâche --}}
             <div class="info-grid">
                 <div class="info-row">
+                    <span class="info-label">🎯 Priorité</span>
+                    <span class="info-value">{{ $priority }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📋 Dossier / Tâche</span>
+                    <span class="info-value">{{ $taskHeading }}</span>
+                </div>
+                <div class="info-row">
                     <span class="info-label">👤 Client</span>
                     <span class="info-value">{{ $clientName }}</span>
                 </div>

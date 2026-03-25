@@ -180,7 +180,11 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">🎯 Priorité</span>
-                    <span class="info-value">{{ ucfirst($priority) }}</span>
+                    <span class="info-value">{{ $priority }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📋 Dossier / Tâche</span>
+                    <span class="info-value">{{ $taskHeading }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">📅 Échéance</span>

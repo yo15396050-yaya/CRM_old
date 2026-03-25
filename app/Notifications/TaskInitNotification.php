@@ -122,6 +122,14 @@ class TaskInitNotification extends BaseNotification
                 $clientName = $project->clientdetails->company_name;
             }
 
+            // Mappage des priorités en français
+            $priorityMap = [
+                'high' => 'Haut',
+                'medium' => 'Moyen',
+                'low' => 'Faible'
+            ];
+            $translatedPriority = $priorityMap[strtolower($this->task->priority)] ?? ucfirst($this->task->priority);
+
             $build = $this->build($notifiable)
                 ->subject('[Action requise] Tâche ' . $this->task->task_short_code . ' – ' . $this->task->heading)
                 ->view('emails.collab_task_init', [
@@ -132,11 +140,11 @@ class TaskInitNotification extends BaseNotification
                 'taskReference' => $this->task->task_short_code ?? 'N/A',
                 'taskStatus' => $this->task->boardColumn->column_name,
                 'recipientName' => $notifiable->name,
-                'priority' => $this->task->priority,
+                'priority' => $translatedPriority,
                 'dueDate' => $dueDate,
                 'description' => $this->task->description,
                 'clientName' => $clientName,
-                'projectName' => $project ? $project->project_name : 'N/A',
+                'projectName' => $project ? $project->project_name : 'Personnel / Hors projet',
                 'responsibleName' => $responsible ? $responsible->name : null,
                 'responsibleEmail' => $responsible ? $responsible->email : null,
                 'attachments' => $attachments,
