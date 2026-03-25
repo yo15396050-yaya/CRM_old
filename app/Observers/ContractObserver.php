@@ -69,7 +69,7 @@ class ContractObserver
             self::createEmployeeActivity(user()->id, 'contract-created', $contract->id, 'contract');
         }
         
-        event(new NewContractEvent($contract));
+        // event(new NewContractEvent($contract));
     }
 
     public function deleting(Contract $contract)

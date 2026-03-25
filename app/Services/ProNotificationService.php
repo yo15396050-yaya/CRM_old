@@ -11,6 +11,7 @@ use App\Notifications\TaskInitNotification;
 use App\Notifications\TaskProgressNotification;
 use App\Notifications\TaskCommunicationNotification;
 use App\Notifications\ProjectInitNotification;
+use App\Notifications\ContractInitNotification;
 use Illuminate\Support\Facades\Log;
 use Twilio\Rest\Client;
 use Modules\Sms\Http\Traits\InfobipMessageTrait;
@@ -24,8 +25,16 @@ class ProNotificationService
 
     public function __construct()
     {
-        $sid = env('TWILIO_SID');
-        $token = env('TWILIO_AUTH_TOKEN');
+        $sid = config('services.twilio.sid');
+        $token = config('services.twilio.auth_token');
+        
+        Log::info('DEBUG Twilio Config', [
+            'sid_start' => substr($sid, 0, 8),
+            'token_end' => substr($token, -4),
+            'has_sid' => !empty($sid),
+            'has_token' => !empty($token)
+        ]);
+
         if ($sid && $token && $token !== '[AuthToken]') {
             // Option pour ignorer SSL en local (nécessaire sur Windows/Laragon parfois)
             $options = [];
@@ -44,9 +53,9 @@ class ProNotificationService
     /**
      * Envoi de la notification d'initialisation (Type 1)
      */
-    public function sendTaskInit(Task $task, User $notifiable, array $channels = ['email', 'whatsapp'])
+    public function sendTaskInit(Task $task, User $notifiable, array $channels = ['email', 'whatsapp', 'sms'])
     {
-        Log::info("Début sendTaskInit pour {$notifiable->email} sur canaux: " . implode(',', $channels));
+        Log::info("Début sendTaskInit [ID:{$task->id}, Heading:{$task->heading}] pour {$notifiable->email}");
         try {
             // 1. Envoi Email & Database (Laravel par défaut)
             if (in_array('email', $channels)) {
@@ -77,9 +86,9 @@ class ProNotificationService
     /**
      * Envoi de la notification de processus / communication (Type 2 / Communication)
      */
-    public function sendTaskCommunication(Task $task, User $notifiable, TaskNote $note = null, array $channels = ['email', 'whatsapp'])
+    public function sendTaskCommunication(Task $task, User $notifiable, TaskNote $note = null, array $channels = ['email', 'whatsapp', 'sms'])
     {
-        Log::info("Début sendTaskCommunication pour {$notifiable->email}");
+        Log::info("Début sendTaskCommunication [ID:{$task->id}, Heading:{$task->heading}] pour {$notifiable->email}");
         try {
             $notification = new TaskCommunicationNotification($task, $note);
 
@@ -114,7 +123,7 @@ class ProNotificationService
     /**
      * Envoi de la notification d'initialisation de Projet (Type Init)
      */
-    public function sendProjectInit(Project $project, User $notifiable, array $channels = ['email', 'whatsapp'])
+    public function sendProjectInit(Project $project, User $notifiable, array $channels = ['email', 'whatsapp', 'sms'])
     {
         Log::info("Début sendProjectInit pour {$notifiable->email} sur canaux: " . implode(',', $channels));
         try {
@@ -146,12 +155,55 @@ class ProNotificationService
         }
     }
 
+    /**
+     * Envoi de la notification d'initialisation de Contrat
+     */
+    public function sendContractInit(\App\Models\Contract $contract, User $notifiable, array $channels = ['email', 'whatsapp', 'sms'])
+    {
+        Log::info("Début sendContractInit pour {$notifiable->email} sur canaux: " . implode(',', $channels));
+        try {
+            $notification = new ContractInitNotification($contract);
+
+            // 1. Envoi Email
+            if (in_array('email', $channels)) {
+                Log::info("Tentative envoi email (Contract Init) à {$notifiable->email}");
+                $notifiable->notifyNow($notification);
+                $this->logContractNotification($contract, $notifiable, 'contract_init', 'email', 'sent');
+                Log::info("Email (Contract Init) envoyé.");
+            }
+
+            // 2. WhatsApp
+            if (in_array('whatsapp', $channels)) {
+                Log::info("Tentative WhatsApp (Contract Init) à {$notifiable->email}");
+                $content = $notification->toWhatsAppContent($notifiable);
+                $this->sendContractWhatsApp($contract, $notifiable, 'contract_init', $content);
+            }
+
+            // 3. SMS
+            if (in_array('sms', $channels)) {
+                Log::info("Tentative SMS (Contract Init) à {$notifiable->email}");
+                $content = $notification->toSmsContent();
+                $this->sendContractSms($contract, $notifiable, 'contract_init', $content);
+            }
+
+        }
+        catch (\Throwable $e) {
+            Log::error("Erreur sendContractInit: " . $e->getMessage());
+        }
+    }
+
     protected function sendWhatsApp(Task $task, User $notifiable, $type, $content = null)
     {
         $to = $this->formatE164($notifiable->whatsapp ?? $notifiable->mobile);
 
         // Try Infobip first
         $settings = sms_setting();
+        
+        Log::info('DEBUG Infobip Attempt', [
+            'key_start' => substr(config('services.infobip.api_key') ?: $settings->infobip_api_key, 0, 8),
+            'base_url' => config('services.infobip.base_url') ?: $settings->infobip_base_url
+        ]);
+
         if ($settings->infobip_status || config('services.infobip.api_key')) {
             Log::info("Tentative WhatsApp via Infobip pour {$to}");
             
@@ -202,7 +254,7 @@ class ProNotificationService
 
         // WhatsApp nécessite le préfixe 'whatsapp:'
         $toWhatsApp = (strpos($to, 'whatsapp:') === false) ? 'whatsapp:' . $to : $to;
-        $fromWhatsApp = env('TWILIO_WHATSAPP_NUMBER', 'whatsapp:+14155238886');
+        $fromWhatsApp = config('services.twilio.whatsapp_from', 'whatsapp:+14155238886');
         $contentSid = env('TWILIO_WHATSAPP_CONTENT_SID');
 
         try {
@@ -284,7 +336,7 @@ class ProNotificationService
 
         try {
             $this->twilio->messages->create($to, [
-                'from' => env('TWILIO_SMS_NUMBER'),
+                'from' => config('services.twilio.sms_from'),
                 'body' => $content ?: "Mise à jour de tâche : " . $task->heading
             ]);
             $this->logNotification($task, $notifiable, $type, 'sms', 'sent');
@@ -426,6 +478,98 @@ class ProNotificationService
     }
 
     /**
+     * Journalisation pour les contrats
+     */
+    protected function logContractNotification($contract, $notifiable, $type, $channel, $status, $error = null)
+    {
+        try {
+            $to = ($channel == 'email') ? $notifiable->email : $this->formatE164($notifiable->whatsapp ?? $notifiable->mobile ?? 'N/A');
+
+            ProNotificationLog::create([
+                'company_id' => $contract->company_id,
+                'contract_id' => $contract->id,
+                'user_id' => $notifiable->id,
+                'type' => $type,
+                'channel' => $channel,
+                'to' => $to ?: 'N/A',
+                'status' => $status,
+                'content_summary' => "Contrat: " . ($contract->subject ?: $contract->id),
+                'error_details' => $error,
+                'sent_at' => now()
+            ]);
+        }
+        catch (\Throwable $e) {
+            Log::error("Échec logContractNotification: " . $e->getMessage());
+        }
+    }
+
+    protected function sendContractWhatsApp($contract, $notifiable, $type, $content = null)
+    {
+        $to = $this->formatE164($notifiable->whatsapp ?? $notifiable->mobile);
+        $settings = sms_setting();
+        
+        if ($settings->infobip_status || config('services.infobip.api_key')) {
+            Log::info("Tentative Contract WhatsApp via Infobip pour {$to}");
+            if ($this->sendViaInfobip($notifiable, $content, 'whatsapp')) {
+                $this->logContractNotification($contract, $notifiable, $type, 'whatsapp', 'sent');
+                return;
+            }
+        }
+
+        if (!$to || !$this->twilio) {
+            $this->logContractNotification($contract, $notifiable, $type, 'whatsapp', 'failed', !$this->twilio ? 'Client Twilio non configuré' : 'Numéro manquant');
+            return;
+        }
+
+        $toWhatsApp = (strpos($to, 'whatsapp:') === false) ? 'whatsapp:' . $to : $to;
+        $fromWhatsApp = config('services.twilio.whatsapp_from', 'whatsapp:+14155238886');
+
+        try {
+            $this->twilio->messages->create($toWhatsApp, [
+                'from' => $fromWhatsApp,
+                'body' => $content ?: "Nouveau contrat : " . $contract->subject
+            ]);
+            $this->logContractNotification($contract, $notifiable, $type, 'whatsapp', 'sent');
+        }
+        catch (\Throwable $e) {
+            Log::error("Erreur Twilio WhatsApp Contrat: " . $e->getMessage());
+            $this->logContractNotification($contract, $notifiable, $type, 'whatsapp', 'fallback_triggered', $e->getMessage());
+            $this->sendContractSms($contract, $notifiable, $type, $content);
+        }
+    }
+
+    protected function sendContractSms($contract, $notifiable, $type, $content = null)
+    {
+        $to = $this->formatE164($notifiable->mobile);
+        $settings = sms_setting();
+        
+        if ($settings->infobip_status || config('services.infobip.api_key')) {
+            Log::info("Tentative Contract SMS via Infobip pour {$to}");
+            if ($this->sendViaInfobip($notifiable, $content, 'sms')) {
+                $this->logContractNotification($contract, $notifiable, $type, 'sms', 'sent');
+                return;
+            }
+        }
+
+        if (!$to || !$this->twilio) {
+            $this->logContractNotification($contract, $notifiable, $type, 'sms', 'failed', !$this->twilio ? 'Client Twilio non configuré' : 'Numéro manquant');
+            return;
+        }
+
+        try {
+            $this->twilio->messages->create($to, [
+                'from' => config('services.twilio.sms_from'),
+                'body' => $content ?: "Nouveau contrat : " . $contract->subject
+            ]);
+            $this->logContractNotification($contract, $notifiable, $type, 'sms', 'sent');
+        }
+        catch (\Throwable $e) {
+            Log::error("Erreur Twilio SMS Contrat: " . $e->getMessage());
+            $this->logContractNotification($contract, $notifiable, $type, 'sms', 'failed', $e->getMessage());
+        }
+    }
+
+    /**
      * Formate un numéro de téléphone au format E.164 (ex: +225...)
      */
     private function formatE164($number)
@@ -445,10 +589,13 @@ class ProNotificationService
             return '+' . substr($number, 2);
         }
 
+        // Si le numéro commence déjà par 225 (sans +), on ajoute juste le +
+        if (strpos($number, '225') === 0) {
+            return '+' . $number;
+        }
+
         // Par défaut pour la Côte d'Ivoire (+225)
-        // On ajoute le préfixe si absent. 
-        // Si le numéro commence par un chiffre autre que 0, on ajoute +225 directly
-        // Si il commence par 0, on garde le 0 car en CI les nouveaux numéros à 10 chiffres commencent par 01, 05, 07 etc.
+        // Si le numéro commence par 0 (ex: 01...), on le garde et on ajoute +225
         return '+225' . $number;
     }
 }

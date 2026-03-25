@@ -312,6 +312,15 @@ class ContractController extends AccountBaseController
             $contract->updateCustomFieldData($request->custom_fields_data);
         }
 
+        // Dispatch pro notifications
+        try {
+            $dispatcher = new \App\Services\NotificationDispatcher();
+            $channels = $request->chosen_channels ?? ['email', 'whatsapp'];
+            $dispatcher->dispatchContractInit($contract, $channels);
+        } catch (\Throwable $e) {
+            \Log::error('Error dispatching contract notifications: ' . $e->getMessage());
+        }
+
         return $contract;
     }
 

@@ -189,6 +189,12 @@ $addClientPermission = user()->permission('add_clients');
                     <x-forms.custom-field :fields="$fields" :model="$contract" class="col-md-12"></x-forms.custom-field>
                 </div>
 
+                <div class="row p-20 pt-0">
+                    <div class="col-md-12">
+                        <x-forms.select-channels />
+                    </div>
+                </div>
+
                 <x-form-actions>
                     <x-forms.button-primary id="save-contract-form" class="mr-3" icon="check">
                         @lang('app.save')

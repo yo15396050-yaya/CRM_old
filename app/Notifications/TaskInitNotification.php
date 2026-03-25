@@ -19,6 +19,12 @@ class TaskInitNotification extends BaseNotification
         $this->task = $task;
         $this->taskId = $task->id;
         $this->company = $task->company;
+        
+        \Illuminate\Support\Facades\Log::info('DEBUG TaskInitNotification :: Construct', [
+            'task_id' => $this->taskId,
+            'task_heading' => $task->heading,
+            'is_new' => !$task->exists
+        ]);
     }
 
     public function via($notifiable)
@@ -31,10 +37,17 @@ class TaskInitNotification extends BaseNotification
     public function toMail($notifiable): MailMessage
     {
         // Recharger la tâche depuis la BDD pour garantir les données fraîches
-        $reloadedTask = Task::withoutGlobalScopes()->with(['project', 'boardColumn', 'company', 'users'])->find($this->taskId);
-        if ($reloadedTask) {
-            $this->task = $reloadedTask;
-            $this->company = $reloadedTask->company;
+        if ($this->taskId > 0) {
+            $reloadedTask = Task::withoutGlobalScopes()->with(['project', 'boardColumn', 'company', 'users'])->find($this->taskId);
+            
+            if ($reloadedTask) {
+                $this->task = $reloadedTask;
+                $this->company = $reloadedTask->company;
+            } else {
+                 \Illuminate\Support\Facades\Log::warning("DEBUG TaskInitNotification :: Reload FAILED for ID " . $this->taskId);
+            }
+        } else {
+            \Illuminate\Support\Facades\Log::error("DEBUG TaskInitNotification :: Cannot reload task with ID 0");
         }
 
         $url = route('tasks.show', $this->task->id);

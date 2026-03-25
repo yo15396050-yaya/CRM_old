@@ -124,11 +124,9 @@ class TaskObserver
                 }
                 else {
 
-                    /* Désactivation de l'ancienne notification client (Doublon)
-                    if ($task->project->client_id != null && $task->project->allow_client_notification == 'enable' && $task->project->client->status != 'deactive') {
+                    /* if ($task->project->client_id != null && $task->project->allow_client_notification == 'enable' && $task->project->client->status != 'deactive') {
                         event(new TaskEvent($task, $task->project->client, 'NewClientTask'));
-                    }
-                    */
+                    } */
 
                 }
 
@@ -200,7 +198,7 @@ class TaskObserver
             /* Désactivation de l'ancienne notification de mention (Update)
             if (!empty($newMention)) {
 
-                event(new TaskEvent($task, $newMentionMembers, 'TaskMention'));
+                // event(new TaskEvent($task, $newMentionMembers, 'TaskMention'));
 
             }
             */
@@ -257,19 +255,19 @@ class TaskObserver
                 }
 
                 // send task complete notification
-                event(new TaskEvent($task, $admins, $notification));
+                // event(new TaskEvent($task, $admins, $notification));
 
                 if ($task->addedByUser) {
                     $addedByUserRole = $task->addedByUser->roles->pluck('name')->toArray();
 
                     if (!is_null($task->added_by) && !in_array('client', $addedByUserRole) && !in_array($task->added_by, $admins->pluck('id')->toArray())) {
-                        event(new TaskEvent($task, $task->addedByUser, $notification));
+                        // event(new TaskEvent($task, $task->addedByUser, $notification));
                     }
                 }
 
                 $taskUser = $task->users->whereNotIn('id', $admins->pluck('id'))->whereNotIn('id', [$task->added_by]);
                 if (!$task->project_id || $task->project->allow_collaborator_notification == 'enable') {
-                    event(new TaskEvent($task, $taskUser, $notification));
+                    // event(new TaskEvent($task, $taskUser, $notification));
                 }
 
                 $timeLogs = ProjectTimeLog::with('user')->whereNull('end_time')
@@ -308,21 +306,35 @@ class TaskObserver
                 if ((request()->project_id && request()->project_id != 'all') || (!is_null($task->project_id))) {
                     $project = $task->project;
 
-                    if ($project->client_id != null && $project->allow_client_notification == 'enable' && $project->client->status != 'deactive') {
-                        event(new TaskEvent($task, $project->client, 'TaskCompletedClient'));
+                    /* if ($project->client_id != null && $project->allow_client_notification == 'enable' && $project->client->status != 'deactive') {
+                        // event(new TaskEvent($task, $project->client, 'TaskCompletedClient'));
 
                         // NOTIFICATION PRO MULTICANAL
                         $proService = new \App\Services\ProNotificationService();
                         $proService->sendTaskCommunication($task, $project->client, null, ['email', 'whatsapp']);
-                    }
+                    } */
                 }
 
                 // NOTIFICATION PRO AUX MEMBRES ASSIGNÉS (COLLABORATEURS)
-                if (!$task->project_id || ($task->project && $task->project->allow_collaborator_notification == 'enable')) {
+                /* 
+                if ($task->project && $task->project->client_id && $task->project->allow_client_notification == 'enable') {
+                    $task->project->client->notify(new NewClientTask($task));
+                }
+
+                if (request()->user_id) {
+                    foreach (request()->user_id as $userId) {
+                        $user = User::find($userId);
+
+                        if ($user->id != user()->id || config('app.env') == 'local') {
+                            $user->notify(new NewTask($task));
+                        }
+                    }
+                }
+                */
+                /* if (!$task->project_id || ($task->project && $task->project->allow_collaborator_notification == 'enable')) {
                     $proService = new \App\Services\ProNotificationService();
                     if ($task->users->count() > 0) {
                         foreach ($task->users as $user) {
-                            /** @var User $user */
                             $proService->sendTaskCommunication($task, $user, null, ['email', 'whatsapp']);
                         }
                     }
@@ -332,14 +344,14 @@ class TaskObserver
                             $proService->sendTaskCommunication($task, $responsible, null, ['email', 'whatsapp']);
                         }
                     }
-                }
+                } */
 
             }
 
             if (request('user_id')) {
                 if (($movingTaskId != '' && $task->id == $movingTaskId) || $movingTaskId == '') {
                     // Send notification to user
-                    event(new TaskEvent($task, $task->users, 'TaskUpdated'));
+                    // event(new TaskEvent($task, $task->users, 'TaskUpdated'));
                 }
             }
         }
@@ -602,6 +614,14 @@ class TaskObserver
                 else {
                     $results = $google->service('Calendar')->events->insert('primary', $eventData);
                 }
+
+                /*
+                foreach ($task->users as $user) {
+                    if ($user->id != user()->id || config('app.env') == 'local') {
+                        $user->notify(new NewTask($task));
+                    }
+                }
+                */
 
                 foreach ($events as $event) {
                     $event->event_id = $results->id;

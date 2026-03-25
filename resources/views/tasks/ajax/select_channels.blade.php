@@ -23,7 +23,7 @@
                 <x-forms.checkbox fieldId="notify_whatsapp" fieldLabel="WhatsApp" fieldName="notify_channels[]" fieldValue="whatsapp" checked="true"/>
             </div>
             <div class="form-group mb-3 text-dark-grey">
-                <x-forms.checkbox fieldId="notify_sms" fieldLabel="SMS" fieldName="notify_channels[]" fieldValue="sms"/>
+                <x-forms.checkbox fieldId="notify_sms" fieldLabel="SMS" fieldName="notify_channels[]" fieldValue="sms" checked="true"/>
             </div>
         </div>
     </div>

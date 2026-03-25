@@ -22,7 +22,7 @@ class NotificationDispatcher
     /**
      * Dispatch notifications for task notes
      */
-    public function dispatchTaskNoteNotification(Task $task, TaskNote $note = null, array $channels = ['email', 'whatsapp'])
+    public function dispatchTaskNoteNotification(Task $task, TaskNote $note = null, array $channels = ['email', 'whatsapp', 'sms'])
     {
         if (in_array('none', $channels)) {
             return;
@@ -69,7 +69,7 @@ class NotificationDispatcher
      * @param array $channels
      * @return void
      */
-    public function dispatchTaskDelegation(Task $task, array $channels = ['email', 'whatsapp'])
+    public function dispatchTaskDelegation(Task $task, array $channels = ['email', 'whatsapp', 'sms'])
     {
         if (in_array('none', $channels)) {
             return;
@@ -99,7 +99,7 @@ class NotificationDispatcher
     /**
      * Dispatch update notifications to all assigned members and the project client
      */
-    public function dispatchTaskUpdate(Task $task, array $channels = ['email', 'whatsapp'])
+    public function dispatchTaskUpdate(Task $task, array $channels = ['email', 'whatsapp', 'sms'])
     {
         if (in_array('none', $channels)) {
             return;
@@ -129,7 +129,7 @@ class NotificationDispatcher
      * @param array $channels
      * @return void
      */
-    public function dispatchManualNotifications(Task $task, array $employeeIds = [], array $clientIds = [], array $channels = ['email', 'whatsapp'])
+    public function dispatchManualNotifications(Task $task, array $employeeIds = [], array $clientIds = [], array $channels = ['email', 'whatsapp', 'sms'])
     {
         if (in_array('none', $channels)) {
             return;
@@ -169,7 +169,7 @@ class NotificationDispatcher
      * @param array $channels
      * @return void
      */
-    public function dispatchProjectInit(Project $project, array $channels = ['email', 'whatsapp'])
+    public function dispatchProjectInit(Project $project, array $channels = ['email', 'whatsapp', 'sms'])
     {
         if (in_array('none', $channels)) {
             return;
@@ -190,6 +190,25 @@ class NotificationDispatcher
             }
         } catch (\Throwable $e) {
             \Log::error('Error in dispatchProjectInit: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Dispatch notifications when a contract is created or updated
+     */
+    public function dispatchContractInit(\App\Models\Contract $contract, array $channels = ['email', 'whatsapp', 'sms'])
+    {
+        if (in_array('none', $channels)) {
+            return;
+        }
+
+        try {
+            // Notify Client
+            if ($contract->client) {
+                $this->proNotificationService->sendContractInit($contract, $contract->client, $channels);
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Error in dispatchContractInit: ' . $e->getMessage());
         }
     }
 }

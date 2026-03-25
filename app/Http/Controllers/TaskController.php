@@ -504,8 +504,14 @@ class TaskController extends AccountBaseController
         $task->save();
 
         // Save labels
+        if ($request->task_labels) {
+            $task->labels()->sync($request->task_labels);
+        }
 
-        $task->labels()->sync($request->task_labels);
+        // Save assignees
+        if ($request->user_id) {
+            $task->users()->sync($request->user_id);
+        }
 
 
         if (!is_null($request->taskId)) {
@@ -616,6 +622,14 @@ class TaskController extends AccountBaseController
             $task->load('project');
         }
 
+        DB::commit();
+
+        \Illuminate\Support\Facades\Log::info('DEBUG TaskController::store - After commit', [
+            'task_id' => $task->id,
+            'task_id_raw' => $task->getAttributes()['id'] ?? 'null',
+            'task_heading' => $task->heading
+        ]);
+
         // Dispatch pro notifications automatically
         $dispatcher = new \App\Services\NotificationDispatcher();
         $channels = $request->chosen_channels ?? ['email', 'whatsapp'];
@@ -625,8 +639,6 @@ class TaskController extends AccountBaseController
 
         // Additional manual notifications if any extra employees/clients selected
         $dispatcher->dispatchManualNotifications($task, $request->all_employees ?? [], $request->all_clients ?? [], $channels);
-
-        DB::commit();
 
         if (request()->add_more == 'true') {
             unset($request->project_id);

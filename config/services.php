@@ -80,4 +80,10 @@ return [
         'sms_from' => env('INFOBIP_SMS_FROM', 'MonCRM'),
         'whatsapp_from' => env('INFOBIP_WHATSAPP_FROM'),
     ],
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'whatsapp_from' => env('TWILIO_WHATSAPP_NUMBER'),
+        'sms_from' => env('TWILIO_SMS_NUMBER'),
+    ],
 ];
