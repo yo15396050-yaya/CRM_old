@@ -24,7 +24,9 @@ use App\Models\ClientCategory;
 use App\Models\SituationFiscale; 
 use App\Models\SituationSociale;
 use App\Models\PurposeConsent;
+use App\Models\Entreprise;
 use App\Models\LanguageSetting;
+use App\DataTables\EntreprisesDataTable;
 use App\Models\UniversalSearch;
 use App\Models\ClientSubCategory;
 use App\Models\PurposeConsentUser;
@@ -1400,6 +1402,50 @@ class ClientController extends AccountBaseController
         $this->view = 'clients.ajax.orders';
 
         return $dataTable->render('clients.show', $this->data);
+    }
+
+    public function clientEntreprises(EntreprisesDataTable $dataTable)
+    {
+        $viewPermission = user()->permission('view_clients');
+        $this->addClientPermission = user()->permission('add_clients');
+
+        abort_403(!in_array($viewPermission, ['all', 'added', 'both']));
+
+        if (!request()->ajax()) {
+            $this->clients = User::allClients(active:false);
+            $this->subcategories = ClientSubCategory::all();
+            $this->categories = ClientCategory::all();
+            $this->projects = Project::all();
+            $this->countries = countries();
+            $this->totalClients = count($this->clients);
+        }
+
+        return $dataTable->render('clients.ajax.entreprises', $this->data);
+    }
+
+    public function showEntreprise($id)
+    {
+        $viewPermission = user()->permission('view_clients');
+        abort_403(!in_array($viewPermission, ['all', 'added', 'both']));
+
+        $this->entreprise = Entreprise::with('user')->findOrFail($id);
+        $this->view = 'clients.ajax.show_entreprise';
+
+        if (request()->ajax()) {
+            return $this->returnAjax($this->view);
+        }
+
+        return view('clients.show', $this->data);
+    }
+
+    public function deleteEntreprise($id)
+    {
+        $deletePermission = user()->permission('delete_clients');
+        abort_403($deletePermission != 'all');
+
+        Entreprise::destroy($id);
+
+        return Reply::success(__('messages.deleteSuccess'));
     }
 
 }

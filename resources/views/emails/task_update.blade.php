@@ -111,7 +111,6 @@
             <div class="note-title">Détails de la mise à jour :</div>
             <div class="note-box" style="line-height: 2;">
                 <span style="color: #718096;">•</span> <strong>Tâche :</strong> {{ $taskHeading }}<br>
-                <span style="color: #718096;">•</span> <strong>Référence :</strong> {{ $taskReference }}<br>
                 <span style="color: #718096;">•</span> <strong>Nouveau statut :</strong> {{ $taskStatus }}<br>
                 <span style="color: #718096;">•</span> <strong>Date d'échéance :</strong> {{ $dueDate }}<br>
                 <span style="color: #718096;">•</span> <strong>Intervenant :</strong> {{ $specialistName }}

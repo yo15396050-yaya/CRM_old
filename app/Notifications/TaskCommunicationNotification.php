@@ -15,13 +15,15 @@ class TaskCommunicationNotification extends BaseNotification
     protected $taskId;
     protected $company;
     protected $note;
+    public $clientNameManual;
 
-    public function __construct(Task $task, TaskNote $note = null)
+    public function __construct(Task $task, TaskNote $note = null, $clientNameManual = null)
     {
         $this->task = $task;
         $this->taskId = $task->id;
         $this->company = $task->company;
         $this->note = $note;
+        $this->clientNameManual = $clientNameManual;
     }
 
     public function via($notifiable)
@@ -31,8 +33,8 @@ class TaskCommunicationNotification extends BaseNotification
 
     public function toMail($notifiable): MailMessage
     {
-        // Recharger la tâche depuis la BDD pour garantir les données fraîches
-        $reloadedTask = Task::withoutGlobalScopes()->with(['project', 'boardColumn', 'company', 'users', 'files'])->find($this->taskId);
+        // Recharger la tâche pour assurer la fraîcheur et charger les rôles pour la détection du client
+        $reloadedTask = Task::withoutGlobalScopes()->with(['project', 'boardColumn', 'company', 'users.roles', 'files'])->find($this->taskId);
         if ($reloadedTask) {
             $this->task = $reloadedTask;
             $this->company = $reloadedTask->company;
@@ -94,14 +96,23 @@ class TaskCommunicationNotification extends BaseNotification
                 $previousStatusName = $lastHistory->board_column_name ?? null;
             }
 
-            // Auteur de la dernière modification
-            $modifiedBy = user() ? user()->name : 'Système';
-
-            $clientName = 'N/A';
-            if ($project && $project->client) {
-                $clientName = $project->client->name;
-            } elseif ($project && $project->clientdetails) {
-                $clientName = $project->clientdetails->company_name;
+            $clientName = $this->clientNameManual ?: 'N/A';
+            if (!$this->clientNameManual) {
+                if ($project) {
+                    if ($project->client) {
+                        $clientName = $project->client->name;
+                    } elseif ($project->clientdetails) {
+                        $clientName = $project->clientdetails->company_name;
+                    }
+                } else {
+                    // Tâche autonome : recherche d'un client parmi les utilisateurs assignés
+                    $clientUser = $this->task->users->filter(function($user) {
+                        return $user->hasRole('client');
+                    })->first();
+                    if ($clientUser) {
+                        $clientName = $clientUser->name;
+                    }
+                }
             }
 
             // Mappage des priorités en français
@@ -119,7 +130,7 @@ class TaskCommunicationNotification extends BaseNotification
                 'date' => now($this->company->timezone)->format($this->company->date_format),
                 'heure' => now($this->company->timezone)->format('H:i'),
                 'taskHeading' => $this->task->heading,
-                'taskReference' => $this->task->task_short_code ?? 'N/A',
+                'taskReference' => $this->task->task_short_code ?: null, // null pour masquer dans Blade
                 'taskStatus' => $this->task->boardColumn->column_name,
                 'previousStatus' => $previousStatusName,
                 'modifiedBy' => $modifiedBy,
@@ -128,7 +139,7 @@ class TaskCommunicationNotification extends BaseNotification
                 'dueDate' => $dueDate,
                 'noteContent' => $this->note ? $this->note->note : null,
                 'clientName' => $clientName,
-                'projectName' => $project ? $project->project_name : 'Personnel / Hors projet',
+                'projectName' => $project ? $project->project_name : null, // null pour masquer dans Blade
                 'attachments' => $attachments,
                 'url' => $url,
                 'company' => $this->company,

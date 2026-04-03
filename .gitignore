@@ -4,7 +4,6 @@
 /public/user-uploads/*
 !public/user-uploads/.htaccess
 /storage/*.key
-/vendor
 .env.backup
 .phpunit.result.cache
 Homestead.json
@@ -20,6 +19,7 @@ yarn-error.log
 mix.js.map
 mix-manifest.json
 ngrok
+/vendor
 /storage/installed
 /storage/framework/laravel-excel/
 grumphp.yml

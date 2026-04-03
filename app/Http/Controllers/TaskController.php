@@ -635,7 +635,7 @@ class TaskController extends AccountBaseController
         $channels = $request->chosen_channels ?? ['email', 'whatsapp'];
 
         // Automatic dispatch (all assignees + project client - Type Init)
-        $dispatcher->dispatchTaskDelegation($task, $channels);
+        $dispatcher->dispatchTaskDelegation($task, $channels, $request->all_clients ?? []);
 
         // Additional manual notifications if any extra employees/clients selected
         $dispatcher->dispatchManualNotifications($task, $request->all_employees ?? [], $request->all_clients ?? [], $channels);
@@ -920,7 +920,7 @@ class TaskController extends AccountBaseController
         $channels = $request->chosen_channels ?? ['email', 'whatsapp'];
 
         // Automatic dispatch (all assignees + project client - Type Update)
-        $dispatcher->dispatchTaskUpdate($task, $channels);
+        $dispatcher->dispatchTaskUpdate($task, $channels, $request->all_clients ?? []);
 
         // Additional manual notifications if any extra employees/clients selected
         $dispatcher->dispatchManualNotifications($task, $request->all_employees ?? [], $request->all_clients ?? [], $channels);

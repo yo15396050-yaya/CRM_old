@@ -185,7 +185,7 @@
 
     <div class="main-card">
         <div class="card-header">
-            <div class="action-label">📌 Modification détectée – {{ $taskReference }}</div>
+            <div class="action-label">📌 Modification détectée @if($taskReference) – {{ $taskReference }}@endif</div>
             <div class="task-title">{{ $taskHeading }}</div>
         </div>
         <div class="card-content">
@@ -215,6 +215,12 @@
 
             {{-- Détails tâche --}}
             <div class="info-grid">
+                @if($taskReference)
+                <div class="info-row">
+                    <span class="info-label">🔖 Référence</span>
+                    <span class="info-value">{{ $taskReference }}</span>
+                </div>
+                @endif
                 <div class="info-row">
                     <span class="info-label">🎯 Priorité</span>
                     <span class="info-value">{{ $priority }}</span>
@@ -227,10 +233,12 @@
                     <span class="info-label">👤 Client</span>
                     <span class="info-value">{{ $clientName }}</span>
                 </div>
+                @if($projectName)
                 <div class="info-row">
                     <span class="info-label">🏗️ Projet</span>
                     <span class="info-value">{{ $projectName }}</span>
                 </div>
+                @endif
                 <div class="info-row">
                     <span class="info-label">📅 Échéance</span>
                     <span class="info-value">{{ $dueDate }}</span>

@@ -53,14 +53,14 @@ class ProNotificationService
     /**
      * Envoi de la notification d'initialisation (Type 1)
      */
-    public function sendTaskInit(Task $task, User $notifiable, array $channels = ['email', 'whatsapp', 'sms'])
+    public function sendTaskInit(Task $task, User $notifiable, array $channels = ['email', 'whatsapp', 'sms'], $clientNameManual = null)
     {
         Log::info("Début sendTaskInit [ID:{$task->id}, Heading:{$task->heading}] pour {$notifiable->email}");
         try {
             // 1. Envoi Email & Database (Laravel par défaut)
             if (in_array('email', $channels)) {
                 Log::info("Tentative envoi email (Init) à {$notifiable->email}");
-                $notifiable->notifyNow(new TaskInitNotification($task));
+                $notifiable->notifyNow(new TaskInitNotification($task, $clientNameManual));
                 $this->logNotification($task, $notifiable, 'type_1', 'email', 'sent');
                 Log::info("Email (Init) envoyé et loggé.");
             }
@@ -86,11 +86,11 @@ class ProNotificationService
     /**
      * Envoi de la notification de processus / communication (Type 2 / Communication)
      */
-    public function sendTaskCommunication(Task $task, User $notifiable, TaskNote $note = null, array $channels = ['email', 'whatsapp', 'sms'])
+    public function sendTaskCommunication(Task $task, User $notifiable, TaskNote $note = null, array $channels = ['email', 'whatsapp', 'sms'], $clientNameManual = null)
     {
         Log::info("Début sendTaskCommunication [ID:{$task->id}, Heading:{$task->heading}] pour {$notifiable->email}");
         try {
-            $notification = new TaskCommunicationNotification($task, $note);
+            $notification = new TaskCommunicationNotification($task, $note, $clientNameManual);
 
             // 1. Envoi Email
             if (in_array('email', $channels)) {

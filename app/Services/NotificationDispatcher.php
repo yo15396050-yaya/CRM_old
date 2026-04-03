@@ -69,23 +69,28 @@ class NotificationDispatcher
      * @param array $channels
      * @return void
      */
-    public function dispatchTaskDelegation(Task $task, array $channels = ['email', 'whatsapp', 'sms'])
+    public function dispatchTaskDelegation(Task $task, array $channels = ['email', 'whatsapp', 'sms'], array $clientIds = [])
     {
         if (in_array('none', $channels)) {
             return;
+        }
+
+        $clientNameManual = null;
+        if (!empty($clientIds)) {
+            $clientNameManual = User::whereIn('id', $clientIds)->pluck('name')->implode(', ');
         }
 
         // 1. Notify ALL assigned members (Type 1 - Init)
         if ($task->users->count() > 0) {
             foreach ($task->users as $user) {
                 /** @var User $user */
-                $this->proNotificationService->sendTaskInit($task, $user, $channels);
+                $this->proNotificationService->sendTaskInit($task, $user, $channels, $clientNameManual);
             }
         }
         elseif ($task->responsible_id) {
             $responsible = User::find($task->responsible_id);
             if ($responsible) {
-                $this->proNotificationService->sendTaskInit($task, $responsible, $channels);
+                $this->proNotificationService->sendTaskInit($task, $responsible, $channels, $clientNameManual);
             }
         }
 
@@ -99,17 +104,22 @@ class NotificationDispatcher
     /**
      * Dispatch update notifications to all assigned members and the project client
      */
-    public function dispatchTaskUpdate(Task $task, array $channels = ['email', 'whatsapp', 'sms'])
+    public function dispatchTaskUpdate(Task $task, array $channels = ['email', 'whatsapp', 'sms'], array $clientIds = [])
     {
         if (in_array('none', $channels)) {
             return;
+        }
+
+        $clientNameManual = null;
+        if (!empty($clientIds)) {
+            $clientNameManual = User::whereIn('id', $clientIds)->pluck('name')->implode(', ');
         }
 
         // 1. Notify ALL assigned members (Type 2 - Update)
         if ($task->users->count() > 0) {
             foreach ($task->users as $user) {
                 /** @var User $user */
-                $this->proNotificationService->sendTaskCommunication($task, $user, null, $channels);
+                $this->proNotificationService->sendTaskCommunication($task, $user, null, $channels, $clientNameManual);
             }
         }
 
@@ -140,12 +150,17 @@ class NotificationDispatcher
             $alreadyNotifiedIds[] = $task->responsible_id;
         }
 
+        $clientNameManual = null;
+        if (!empty($clientIds)) {
+            $clientNameManual = User::whereIn('id', $clientIds)->pluck('name')->implode(', ');
+        }
+
         if (!empty($employeeIds)) {
             $employees = User::whereIn('id', $employeeIds)->get();
             foreach ($employees as $employee) {
                 /** @var User $employee */
                 if (!in_array($employee->id, $alreadyNotifiedIds)) {
-                    $this->proNotificationService->sendTaskInit($task, $employee, $channels);
+                    $this->proNotificationService->sendTaskInit($task, $employee, $channels, $clientNameManual);
                 }
             }
         }

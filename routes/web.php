@@ -126,6 +126,7 @@ use App\Http\Controllers\InvoicePaymentDetailController;
 use App\Http\Controllers\PromotionController;
 use App\Http\Controllers\SituationFiscaleController;
 use App\Http\Controllers\SituationSocialeController;
+use App\Http\Controllers\RadiationRequestController;
 use App\Http\Controllers\AuthController;
 
 Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
@@ -171,6 +172,9 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account'], function () {
     Route::get('clients/ajax/editFiscale/{id?}', [ClientController::class , 'editFiscale'])->name('clients.editFiscale');
     Route::get('clients/ajax/deleteFiscale/{id?}', [ClientController::class , 'deleteFiscale'])->name('clients.deleteFiscale');
     Route::get('clients/ajax/sociale', [ClientController::class , 'clientSociale'])->name('clients.sociale');
+    Route::get('clients/ajax/entreprises', [ClientController::class , 'clientEntreprises'])->name('clients.entreprises');
+    Route::get('clients/ajax/show-entreprise/{id}', [ClientController::class , 'showEntreprise'])->name('clients.show_entreprise');
+    Route::delete('clients/ajax/delete-entreprise/{id}', [ClientController::class , 'deleteEntreprise'])->name('clients.delete_entreprise');
 
     Route::get('clients/client-details/{id}', [ClientController::class , 'clientDetails'])->name('clients.client_details');
     Route::post('clients/project-list/{id}', [ClientController::class , 'projectList'])->name('clients.project_list');

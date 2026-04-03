@@ -71,6 +71,9 @@
                     @if (!in_array('client', user_roles()) && in_array('clients', user_modules()) && $sidebarUserPermissions['view_clients'] != 5 && $sidebarUserPermissions['view_clients'] != 'none')
                         <x-sub-menu-item :link="route('clients.sociale')" :text="__('Situations sociales')" />
                     @endif
+                    @if (!in_array('client', user_roles()) && in_array('clients', user_modules()) && $sidebarUserPermissions['view_clients'] != 5 && $sidebarUserPermissions['view_clients'] != 'none')
+                        <x-sub-menu-item :link="route('clients.entreprises')" :text="__('Listes entreprises')" />
+                    @endif
                 </div>
             </x-menu-item>
         @endif

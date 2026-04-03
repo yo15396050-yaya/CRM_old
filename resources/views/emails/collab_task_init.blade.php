@@ -170,10 +170,12 @@
             </div>
 
             <div class="info-grid">
+                @if($taskReference)
                 <div class="info-row">
                     <span class="info-label">🔖 Référence</span>
                     <span class="info-value">{{ $taskReference }}</span>
                 </div>
+                @endif
                 <div class="info-row">
                     <span class="info-label">📊 Statut</span>
                     <span class="info-value">{{ $taskStatus }}</span>
@@ -194,10 +196,12 @@
                     <span class="info-label">👤 Client</span>
                     <span class="info-value">{{ $clientName }}</span>
                 </div>
+                @if($projectName)
                 <div class="info-row">
                     <span class="info-label">🏗️ Projet</span>
                     <span class="info-value">{{ $projectName }}</span>
                 </div>
+                @endif
                 @if($responsibleName)
                 <div class="info-row">
                     <span class="info-label">👨‍💼 Responsable</span>
