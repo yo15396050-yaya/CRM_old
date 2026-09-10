@@ -1,102 +1,108 @@
+{{--
+  Mise a jour d'une tache adressee a un collaborateur.
+  Rendu par TaskCommunicationNotification (branche collaborateur).
+
+  Le changement de statut est l'information utile : il est donc porte par la
+  transition de deux pastilles .dck-badge, la grise « en attente » vers la
+  bleue « actif ». Tables et styles inline uniquement.
+--}}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mise à jour Tâche</title>
+    <title>{{ $taskHeading }}</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f7fa; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f7fa; padding: 40px 0;">
-        <tr>
-            <td align="center">
-                <table border="0" cellpadding="0" cellspacing="0" width="520" style="background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
-                    <!-- Header Logo -->
-                    <tr>
-                        <td style="padding: 32px 40px 10px 40px; text-align: left;">
-                            <div style="font-size: 22px; font-weight: 700; color: #1e293b;">Flow<span style="color: #3b82f6;">Task</span></div>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content Area -->
-                    <tr>
-                        <td style="padding: 20px 40px 40px 40px;">
-                            <div style="display: inline-block; background-color: #f1f5f9; color: #64748b; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 40px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px;">Mise à jour Tâche</div>
-                            
-                            <div style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">Bonjour {{ $recipientName }},</div>
-                            <div style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 24px;">
-                                Une modification a été apportée à la tâche : <strong style="color: #1e293b;">« {{ $taskHeading }} »</strong>.
-                            </div>
+<body style="margin:0;padding:0;background:#f3f4f6;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;padding:32px 12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;">
 
-                            <!-- Comparison Block (Tables for side-by-side) -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="border: 1px solid #edf2f7; border-radius: 12px; overflow: hidden; margin-bottom: 30px;">
-                                <tr>
-                                    <td width="50%" style="padding: 16px; background-color: #fff1f2; border-right: 1px solid #edf2f7;">
-                                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #e11d48; margin-bottom: 4px;">Ancien Statut</div>
-                                        <div style="font-size: 13px; font-weight: 600; color: #1e293b;">{{ $previousStatus ?? 'N/A' }}</div>
-                                    </td>
-                                    <td width="50%" style="padding: 16px; background-color: #f0fdf4;">
-                                        <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #16a34a; margin-bottom: 4px;">Nouveau Statut</div>
-                                        <div style="font-size: 13px; font-weight: 600; color: #1e293b;">{{ $taskStatus }}</div>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            <!-- Info Table -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 16px; border: 1px solid #edf2f7; padding: 10px 20px;">
-                                <tr>
-                                    <td style="padding: 12px 0; border-bottom: 1px solid #edf2f7;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Référence</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">#{{ $taskReference }}</span>
-                                    </td>
-                                </tr>
-                                @if(isset($projectName) && $projectName != '')
-                                <tr>
-                                    <td style="padding: 12px 0; border-bottom: 1px solid #edf2f7;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Projet</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">{{ $projectName }}</span>
-                                    </td>
-                                </tr>
-                                @endif
-                                <tr>
-                                    <td style="padding: 12px 0; border-bottom: 1px solid #edf2f7;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Client</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">{{ $clientName }}</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px 0;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Priorité</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">{{ $priority }}</span>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            @if($noteContent)
-                            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; margin: 24px 0 8px 0;">Commentaire</div>
-                            <div style="background-color: #f8fafc; border: 1px solid #edf2f7; border-radius: 12px; padding: 20px; font-size: 14px; color: #475569; line-height: 1.6;">
-                                {!! $noteContent !!}
-                            </div>
-                            @endif
-
-                            <!-- Button -->
-                            <div style="padding: 40px 0 20px 0; text-align: center;">
-                                <a href="{{ $url }}" style="background-color: #1e293b; color: #ffffff; padding: 14px 32px; border-radius: 40px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">Accéder au CRM</a>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 32px 40px; background-color: #fafbfc; text-align: center; border-top: 1px solid #edf2f7;">
-                            <div style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-                                &copy; {{ date('Y') }} {{ $companyName }}. Notification Interne.<br>
-                                Ceci est une notification automatique de votre CRM.
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+    <tr><td style="padding:22px 28px;border-bottom:1px solid #e5e7eb;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td valign="middle">
+                {{-- Image embarquee (cid) : le logo ne depend alors plus de APP_URL --}}
+                <img src="{{ isset($message) && !empty($logoPath) && file_exists($logoPath) ? $message->embed($logoPath) : $logoUrlDark }}" alt="{{ $companyName }}" width="118" height="30" style="display:block;border:0;width:118px;height:30px;">
             </td>
-        </tr>
-    </table>
+            @if(!empty($taskReference))
+                <td align="right" valign="middle" style="font-family:Consolas,Menlo,monospace;font-size:12.5px;color:#9ca3af;">{{ $taskReference }}</td>
+            @endif
+        </tr></table>
+    </td></tr>
+
+    <tr><td style="padding:26px 28px 0 28px;">
+        <h1 style="margin:0;font-size:20px;line-height:1.3;color:#111827;font-weight:bold;letter-spacing:-.5px;">{{ $taskHeading }}</h1>
+        <p style="margin:10px 0 0;font-size:14.5px;line-height:1.65;color:#374151;">
+            Bonjour {{ $recipientName }}, le statut de cette tâche vient de changer.
+        </p>
+    </td></tr>
+
+    @if(!empty($previousStatus) && $previousStatus !== $taskStatus)
+        <tr><td style="padding:22px 28px 0 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;">
+                <tr><td style="padding:20px 22px;">
+                    <table cellpadding="0" cellspacing="0" border="0"><tr>
+                        <td>
+                            <table cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;border:1px solid #e5e7eb;border-radius:999px;"><tr>
+                                <td style="padding:4px 12px;font-size:12px;font-weight:600;color:#6b7280;">{{ $previousStatus }}</td>
+                            </tr></table>
+                        </td>
+                        <td style="padding:0 12px;font-size:15px;color:#9ca3af;">&rarr;</td>
+                        <td>
+                            <table cellpadding="0" cellspacing="0" border="0" style="background:#eff8ff;border:1px solid #b3ddf7;border-radius:999px;"><tr>
+                                <td style="padding:4px 12px;font-size:12px;font-weight:600;color:#0369a1;">{{ $taskStatus }}</td>
+                            </tr></table>
+                        </td>
+                    </tr></table>
+                </td></tr>
+            </table>
+        </td></tr>
+    @endif
+
+    @if(!empty($noteContent))
+        <tr><td style="padding:22px 28px 0 28px;">
+            <div style="font-size:11.5px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-bottom:9px;">Note de mise à jour</div>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb;border-radius:12px;">
+                <tr><td style="padding:16px 18px;font-size:14px;line-height:1.65;color:#374151;">{!! nl2br(e($noteContent)) !!}</td></tr>
+                <tr><td style="padding:0 18px 14px 18px;font-size:12px;color:#9ca3af;">
+                    {{ $modifiedBy }} · aujourd'hui à {{ $heure }}
+                </td></tr>
+            </table>
+        </td></tr>
+    @endif
+
+    <tr><td style="padding:22px 28px 0 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Client</td>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $clientName }}</td>
+            </tr>
+            @if(!empty($projectName))
+                <tr>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Dossier</td>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $projectName }}</td>
+                </tr>
+            @endif
+            <tr>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Échéance</td>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $dueDate }}@if(!empty($dueLabel))<span style="color:{{ $dueOverdue ? '#b42318' : '#a16207' }};font-weight:600;"> · {{ $dueLabel }}</span>@endif</td>
+            </tr>
+        </table>
+    </td></tr>
+
+    <tr><td style="padding:26px 28px 30px 28px;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="background:#000000;border-radius:8px;">
+                <a href="{{ $url }}" style="display:inline-block;padding:12px 22px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;">Voir la tâche</a>
+            </td>
+        </tr></table>
+    </td></tr>
+
+    <tr><td style="padding:18px 28px;background:#f9fafb;border-top:1px solid #e5e7eb;border-radius:0 0 12px 12px;font-size:12px;line-height:1.7;color:#6b7280;">
+        Vous recevez ce message car vous êtes affecté à cette tâche.
+    </td></tr>
+</table>
+</td></tr>
+</table>
 </body>
 </html>

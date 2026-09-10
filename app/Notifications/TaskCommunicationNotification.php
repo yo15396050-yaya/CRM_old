@@ -33,8 +33,7 @@ class TaskCommunicationNotification extends BaseNotification
 
     public function toMail($notifiable): MailMessage
     {
-        // Attendre 10 secondes pour laisser le temps aux fichiers de s'uploader
-        sleep(10);
+        $this->waitForUploads();
 
         // Recharger la tâche pour assurer la fraîcheur et charger les rôles pour la détection du client
         $reloadedTask = Task::withoutGlobalScopes()->with(['project', 'boardColumn', 'company', 'users.roles', 'files'])->find($this->taskId);
@@ -127,10 +126,14 @@ class TaskCommunicationNotification extends BaseNotification
             $translatedPriority = $priorityMap[strtolower($this->task->priority)] ?? ucfirst($this->task->priority);
             $modifiedBy = user() ? user()->name : 'Système';
 
-            $build = $this->build($notifiable)
-                ->subject('[Mise à jour] ' . $this->task->task_short_code . ' – ' . $this->task->heading)
-                ->view('emails.collab_task_update', [
+            $dueBadge = $this->dueBadge($this->task->due_date);
+
+            $data = [
                 'companyName' => $this->company->company_name,
+                'logoUrlDark' => $this->emailLogoUrl(),
+                'logoPath' => $this->emailLogoPath(),
+                'dueLabel' => $dueBadge['label'],
+                'dueOverdue' => $dueBadge['overdue'],
                 'date' => now($this->company->timezone)->format($this->company->date_format),
                 'heure' => now($this->company->timezone)->format('H:i'),
                 'taskHeading' => $this->task->heading,
@@ -147,7 +150,12 @@ class TaskCommunicationNotification extends BaseNotification
                 'attachments' => $attachments,
                 'url' => $url,
                 'company' => $this->company,
-            ]);
+            ];
+
+            $build = $this->build($notifiable)
+                ->subject('[Mise à jour] ' . $this->task->task_short_code . ' – ' . $this->task->heading)
+                ->view('emails.collab_task_update', $data)
+                ->text('emails.txt.collab_task_update', $data);
         }
 
         // Physically attach files

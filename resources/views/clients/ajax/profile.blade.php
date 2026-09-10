@@ -19,15 +19,6 @@
 
     <!--  USER CARDS START -->
     <div class="col-xl-7 col-lg-12 col-md-12 mb-4 mb-xl-0 mb-lg-4 mb-md-0">
-        <div class="row">
-
-            <div
-                @class([
-                    'col-lg-6 col-md-6 mb-4 mb-lg-0',
-                    'col-xl-12' => !in_array('projects', user_modules()),
-                    'col-xl-7' => in_array('projects', user_modules())
-                ])>
-
                 <x-cards.user :image="$client->image_url">
                     <div class="row">
                         <div class="col-10">
@@ -73,34 +64,34 @@
 
 
                 </x-cards.user>
-
-            </div>
-            @if(in_array('projects', user_modules()))
-                <div class="col-xl-5 col-lg-6 col-md-6">
-                    <x-cards.widget :title="__('modules.dashboard.totalProjects')" :value="$clientStats->totalProjects"
-                        icon="layer-group" />
-                </div>
-            @endif
-        </div>
     </div>
     <!--  USER CARDS END -->
 
-    <!--  WIDGETS START -->
+    {{-- Indicateurs du dossier. Ils remplacent les chiffres de
+         facturation : le cabinet ne pilote pas ses clients au revenu
+         mais a l'avancement des diligences et au respect des delais. --}}
     <div class="col-xl-5 col-lg-12 col-md-12">
-        <div class="row">
-
-            <div class="col-lg-6 col-md-6 col-sm-12 mb-4 mb-lg-0 mb-md-0">
-                <x-cards.widget :title="__('modules.dashboard.totalEarnings')"
-                    :value="$earningTotal" icon="coins" />
-            </div>
-
-            <div class="col-lg-6 col-md-6 col-sm-12">
-                <x-cards.widget :title="__('modules.dashboard.totalUnpaidInvoices')"
-                    :value="$clientStats->totalUnpaidInvoices" icon="file-invoice-dollar" />
+        <div class="dck-emp-kpi">
+            <div class="dck-emp-kpi__row">
+                <span class="dck-emp-kpi__c">
+                    <label>@lang('Diligences en cours')</label>
+                    <p>{{ $k->diligencesOuvertes }}<span class="dck-emp-kpi__u">/ {{ $k->diligences }}</span></p>
+                </span>
+                <span class="dck-emp-kpi__c">
+                    <label>@lang('Tâches en cours')</label>
+                    <p>{{ $k->taches }}</p>
+                </span>
+                <span class="dck-emp-kpi__c {{ $k->retard > 0 ? 'is-alerte' : '' }}">
+                    <label>@lang('En retard')</label>
+                    <p>{{ $k->retard }}</p>
+                </span>
+                <span class="dck-emp-kpi__c">
+                    <label>@lang('Contrats actifs')</label>
+                    <p>{{ $k->contratsActifs }}<span class="dck-emp-kpi__u">/ {{ $k->contrats }}</span></p>
+                </span>
             </div>
         </div>
     </div>
-    <!--  WIDGETS END -->
 </div>
 <!-- ROW END -->
 
@@ -212,20 +203,6 @@
                     <x-pie-chart id="project-chart" :labels="$projectChart['labels']" :values="$projectChart['values']"
                         :colors="$projectChart['colors']" height="220" width="220" />
                 </x-cards.data>
-            </div>
-        </div>
-        <div class="row mt-4">
-            <div class="col-md-12">
-                <div class="card bg-white border-0 b-shadow-4">
-                    <x-cards.data :title="__('app.menu.invoices')">
-                        @if (array_sum($invoiceChart['values']) > 0)
-                            <a href="javascript:;" class="text-darkest-grey f-w-500 piechart-full-screen" data-chart-id="invoice-chart" data-chart-data="{{ json_encode($invoiceChart) }}"><i class="fas fa-expand float-right mr-3"></i></a>
-                        @endif
-                        <x-pie-chart id="invoice-chart" :labels="$invoiceChart['labels']"
-                            :values="$invoiceChart['values']" :colors="$invoiceChart['colors']" height="230"
-                            width="220" />
-                    </x-cards.data>
-                </div>
             </div>
         </div>
     </div>

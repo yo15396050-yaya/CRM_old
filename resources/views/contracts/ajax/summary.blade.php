@@ -107,7 +107,7 @@
                             <tbody>
                             <tr>
                             <td style="width:50%;">
-                            <p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
+                            <p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
                             </td>
                             <td style="width:50%;">
                             <p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p>
@@ -188,7 +188,7 @@
                             <tbody>
                             <tr>
                             <td style="width:50%;">
-                            <p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
+                            <p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
                             </td>
                             <td style="width:50%;">
                             <p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p>
@@ -239,7 +239,7 @@
                             <tbody>
                             <tr>
                             <td style="width:50%;">
-                            <p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
+                            <p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
                             </td>
                             <td style="width:50%;">
                             <p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p>
@@ -477,7 +477,7 @@
                         <tbody>
                         <tr>
                         <td style="width:50%;">
-                        <p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
+                        <p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
                         </td>
                         <td style="width:50%;">
                         <p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p>
@@ -527,7 +527,7 @@
                         <tbody>
                         <tr>
                         <td style="width:50%;">
-                        <p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
+                        <p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
                         </td>
                         <td style="width:50%;">
                         <p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p>

@@ -5,7 +5,7 @@
 
 <link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <x-form id="save-product-form">
             @include('sections.password-autocomplete-hide')
@@ -15,6 +15,8 @@
                     @lang('app.menu.addProducts')</h4>
                 <div class="row p-20">
                     <div class="col-lg-12">
+                    <x-dck.form-section :titre="__('app.dckSection.identification')" />
+
                         <div class="row">
 
                             <input type="hidden" id="hiddenProductId">

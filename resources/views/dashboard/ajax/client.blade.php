@@ -234,7 +234,7 @@
 
     $('#totalLeads').click(function () {
         var dateRange = getDateRange();
-        var url = `{{ route('lead-contact.index') }}`;
+        var url = `{{ (Route::has('lead-contact.index') ? route('lead-contact.index') : '') }}`;
 
         string = `?start=${dateRange.startDate}&end=${dateRange.endDate}`;
         url += string;
@@ -244,7 +244,7 @@
 
     $('#totalLeadConversions').click(function () {
         var dateRange = getDateRange();
-        var url = `{{ route('deals.index') }}`;
+        var url = `{{ (Route::has('deals.index') ? route('deals.index') : '') }}`;
 
         string = `?start=${dateRange.startDate}&end=${dateRange.endDate}`;
         url += string;
@@ -253,7 +253,7 @@
     });
 
     $('#totalDeals').click(function () {
-        var url = `{{ route('deals.index') }}`;
+        var url = `{{ (Route::has('deals.index') ? route('deals.index') : '') }}`;
         window.location.href = url;
     });
 

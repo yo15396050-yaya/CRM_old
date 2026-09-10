@@ -139,7 +139,7 @@ $manageProjectTemplatePermission = user()->permission('manage_project_template')
 
 @section('content')
     <!-- CONTENT WRAPPER START -->
-    <div class="content-wrapper">
+    <div class="content-wrapper dck-front">
         <!-- Add Task Export Buttons Start -->
         <div class="d-grid d-lg-flex d-md-flex action-bar">
             <div id="table-actions" class="flex-grow-1 align-items-center">

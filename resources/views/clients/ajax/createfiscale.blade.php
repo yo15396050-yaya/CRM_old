@@ -1,6 +1,6 @@
 <link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <form id="save-client-data-form">
             @csrf
@@ -8,6 +8,8 @@
                 <h4 class="mb-0 p-20 f-21 font-weight-normal  border-bottom-grey">@lang('Détails du paiement')</h4>
                 <div class="row p-20">
                     <div class="col-lg-12">
+                    <x-dck.form-section :titre="__('app.dckSection.identification')" />
+
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group" id="client_list_ids">

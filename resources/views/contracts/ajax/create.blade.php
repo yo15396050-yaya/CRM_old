@@ -2,7 +2,7 @@
     $manageContractTypePermission = user()->permission('manage_contract_type');
 @endphp
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
 
         <x-form id="save-contract-data-form">
@@ -12,6 +12,15 @@
                 <input type="hidden" name="template_id" value="{{ $contractTemplate->id ?? '' }}">
 
                 <div class="row p-20">
+
+                        <!-- OBJET DU CONTRAT : champ obligatoire cote validation
+                             (StoreRequest : 'subject' => 'required'). Il etait masque,
+                             ce qui bloquait la creation hors modele. -->
+                        <div class="col-md-12">
+                                <x-forms.text fieldId="subject" :fieldLabel="__('app.subject')" fieldName="subject"
+                                :fieldValue="($contractTemplate ? $contractTemplate->subject : '')"
+                                fieldRequired="true"></x-forms.text>
+                        </div>
 
                         <!-- CONTRACT NUMBER START -->
                         <div class="col-md-2 col-lg-2">
@@ -64,13 +73,11 @@
                         </div>
 
                         <!-- CONTRACT NUMBER END -->
-                        <div class="col-md-6 col-lg-3" style="margin-top: -16px; display: none;">   
-                                <x-forms.text fieldId="subject" :fieldLabel="__('app.subject')" fieldName="subject"
-                                :fieldValue="($contractTemplate ? $contractTemplate->subject : '')"
-                                fieldRequired="true"></x-forms.text>
-                        </div>
-                    {{--
-                    <div class="col-md-6">
+
+                    <!-- DILIGENCE RATTACHEE : storeUpdate() affecte deja
+                         $contract->project_id, le champ etait seulement absent
+                         de l'affichage. -->
+                    <div class="col-md-6 col-lg-3">
                         <div class="form-group c-inv-select mb-4">
                             <x-forms.label fieldId="project_id" :fieldLabel="__('app.project')">
                             </x-forms.label>
@@ -86,7 +93,7 @@
                             </div>
                         </div>
                     </div>
-                    --}}
+
                     <div class="col-md-6 col-lg-3">
                         <x-forms.label class="mb-12" fieldId="amount"
                                        :fieldLabel="__('modules.contracts.contractValue')"
@@ -96,6 +103,30 @@
                                    class="form-control height-35 f-14"/>
                         </x-forms.input-group>
                     </div>
+
+                    <!-- CURRENCY START -->
+                    <div class="col-md-6 col-lg-3">
+                        <div class="form-group c-inv-select mb-lg-0 mb-md-0 mb-4">
+                            <x-forms.label class="mb-12" fieldId="currency_id"
+                                           :fieldLabel="__('modules.invoices.currency')">
+                            </x-forms.label>
+
+                            <div class="select-others height-35 rounded">
+                                <select class="form-control select-picker" name="currency_id" id="currency_id">
+                                    @foreach ($currencies as $currency)
+                                        <option @if(isset($contractTemplate))
+                                            @if ($contractTemplate && $currency->id == $contractTemplate->currency_id) selected @endif
+                                            @elseif ($currency->id == company()->currency_id) selected
+                                            @endif
+                                            value="{{ $currency->id }}">
+                                            {{ $currency->currency_code . ' (' . $currency->currency_symbol . ')' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- CURRENCY END -->
 
                     <div class="col-md-6 col-lg-5">
                         <x-forms.datepicker fieldId="start_date" fieldRequired="true"
@@ -119,31 +150,6 @@
                                           fieldName="without_duedate" fieldId="without_duedate" fieldValue="yes"/>
                     </div>
 
-
-                    <!-- CURRENCY START -->
-                    <div class="col-md-6 col-lg-3" style="display:none;">
-                        <div class="form-group c-inv-select mb-lg-0 mb-md-0 mb-4">
-                            <x-forms.label class="mt-3" fieldId="currency_id"
-                                           :fieldLabel="__('modules.invoices.currency')">
-                            </x-forms.label>
-
-                            <div class="select-others height-35 rounded">
-                                <select class="form-control select-picker" name="currency_id" id="currency_id">
-                                    @foreach ($currencies as $currency)
-                                        <option @if(isset($contractTemplate))
-                                            @if ($contractTemplate && $currency->id == $contractTemplate->currency_id) selected @endif
-                                            @elseif ($currency->id == company()->currency_id) selected
-                                            @endif
-                                            value="{{ $currency->id }}">
-                                            {{ $currency->currency_code . ' (' . $currency->currency_symbol . ')' }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- CURRENCY END -->
-
                     <div class="col-md-12">
                         <div class="form-group my-3">
                             <x-forms.label fieldId="description" :fieldLabel="__('app.description')">
@@ -156,10 +162,13 @@
 
                 </div>
 
-                {{--<h4 class="mb-0 p-20 f-21 font-weight-normal  border-top-grey">
-                    @lang('modules.client.clientDetails')</h4>--}}
-                <div class="row p-20" style="display:none;">
-                    
+                {{-- Coordonnees du signataire et champs personnalises.
+                     Ce bloc etait masque (display:none) alors que storeUpdate()
+                     enregistre bien cell, office, city, state, country,
+                     postal_code, alternate_address et note : les champs
+                     existaient en base mais restaient inaccessibles a la saisie. --}}
+                <div class="row p-20">
+
 
                     <div class="col-md-6 col-lg-4">
                         <x-forms.text fieldId="cell" :fieldLabel="__('modules.client.cell')"

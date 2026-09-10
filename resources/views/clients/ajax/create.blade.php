@@ -41,7 +41,7 @@
 
 <link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <x-form id="save-client-data-form">
 
@@ -55,6 +55,8 @@
                 <div class="row p-20">
                     <div class="col-lg-9">
                         <div class="row">
+                            <x-dck.form-section :titre="__('app.dckSection.firmRefs')" />
+
                             <div class="col-md-4">                        
                                 <x-forms.label class="mt-3" fieldId="formjurid"
                                     :fieldLabel="__('Forme juridique')">
@@ -182,6 +184,8 @@
                                 </x-forms.input-group>
                                 <small class="form-text text-muted">@lang('placeholders.password')</small>
                             </div>
+                            <x-dck.form-section :titre="__('app.dckSection.company')" />
+
                             <div class="col-md-4" id="name_ese">
                                 <div class="form-group my-3">
                                     <x-forms.text class="mb-3 mt-3 mt-lg-0 mt-md-0" fieldId="company_name"
@@ -220,6 +224,9 @@
                                     fieldRequired="true" :fieldPlaceholder="__('Nom du dirigeant')"
                                     :fieldValue="$lead->client_name ?? ''"></x-forms.text>
                             </div>
+
+                            <x-dck.form-section :titre="__('app.dckSection.contact')" />
+
                             <div class="col-md-4">
                                 <x-forms.select fieldId="country" :fieldLabel="__('app.country')" fieldName="country"
                                     search="true">
@@ -335,6 +342,8 @@
                 <h4 class="mb-0 p-20 f-21 font-weight-normal  border-top-grey">
                     @lang('modules.client.companyDetails')</h4>
                 <div class="row p-20">
+                    <x-dck.form-section :titre="__('app.dckSection.taxRefs')" />
+
                     
                     <div class="col-md-3">
                         <x-forms.text class="mb-3 mt-3 mt-lg-0 mt-md-0" fieldId="website"
@@ -596,6 +605,8 @@
                     @endif
 
                     @if ($addClientNotePermission == 'all' || $addClientNotePermission == 'added' || $addClientNotePermission == 'both')
+                    <x-dck.form-section :titre="__('app.dckSection.misc')" />
+
                     <div class="col-md-12">
                         <div class="form-group my-3">
                             <x-forms.label class="my-3" fieldId="note" :fieldLabel="__('app.note')">

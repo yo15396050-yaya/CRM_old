@@ -1,5 +1,5 @@
 <!-- SIDEBAR START -->
-<aside class="{{ !user()->dark_theme ? 'sidebar-' . $appTheme->sidebar_theme : '' }}">
+<aside class="dck-chrome {{ !user()->dark_theme ? 'sidebar-' . $appTheme->sidebar_theme : '' }}">
     <!-- MOBILE CLOSE SIDEBAR PANEL START -->
     <div class="mobile-close-sidebar-panel w-100 h-100" onclick="closeMobileMenu()" id="mobile_close_panel"></div>
     <!-- MOBILE CLOSE SIDEBAR PANEL END -->
@@ -7,16 +7,16 @@
     <!-- MAIN SIDEBAR START -->
     <div class="main-sidebar" id="mobile_menu_collapse">
         <!-- SIDEBAR BRAND START -->
-        <div class="sidebar-brand-box dropdown cursor-pointer {{ user()->dark_theme ? 'bg-dark' : '' }}">
-            <div class="dropdown-toggle sidebar-brand d-flex align-items-center justify-content-between  w-100"
-                type="link" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {{-- Le bloc de marque ne porte plus le menu du profil : celui-ci est
+             passe au pied de la barre, comme dans la maquette dck-flow-task. --}}
+        <div class="sidebar-brand-box {{ user()->dark_theme ? 'bg-dark' : '' }}">
+            <div class="sidebar-brand d-flex align-items-center justify-content-between w-100">
 
                 @if (companyOrGlobalSetting()->sidebar_logo_style !== 'full')
                     <!-- SIDEBAR BRAND NAME START -->
                     <div class="sidebar-brand-name">
                         <h1 class="mb-0 f-16 f-w-500 text-white-shade mt-0" data-placement="bottom" data-toggle="tooltip"
                             data-original-title="{{ $appName }}">{{ $appName }}
-                            <i class="icon-arrow-down icons pl-2"></i>
                         </h1>
                         <div class="mb-0 position-relative pro-name">
                             <span class="bg-light-green rounded-circle"></span>
@@ -39,59 +39,17 @@
                         </h1>
                     </div>
                     <!-- SIDEBAR BRAND NAME END -->
-                    <!-- SIDEBAR BRAND LOGO START -->
-                    <div class="sidebar-brand-logo text-white-shade f-12">
-                        <i class="icon-arrow-down icons pl-2"></i>
-                    </div>
-                    <!-- SIDEBAR BRAND LOGO END -->
-                @endif
-            </div>
-            <!-- DROPDOWN - INFORMATION -->
-            <div class="dropdown-menu dropdown-menu-right sidebar-brand-dropdown ml-3"
-                aria-labelledby="dropdownMenuLink" tabindex="0">
-                <div class="d-flex justify-content-between align-items-center profile-box">
-                    <a @if(!in_array('client', user_roles())) href="{{ route('employees.show', user()->id) }}" @endif >
-                            <div class="profileInfo d-flex align-items-center mr-1 flex-wrap">
-                                <div class="profileImg mr-2">
-                                    <img class="h-100" src="{{ $user->image_url }}"
-                                        alt="{{ user()->name }}">
-                                </div>
-                                <div class="ProfileData">
-                                    <h3 class="f-15 f-w-500 text-dark" data-placement="bottom" data-toggle="tooltip"
-                                        data-original-title="{{ user()->name }}">{{ user()->name }}</h3>
-                                    <p class="mb-0 f-12 text-dark-grey">{{ user()->employeeDetail->designation->name ?? '' }}</p>
-                                </div>
-                        </div>
-                    </a>
-                    <a href="{{ route('profile-settings.index') }}" data-toggle="tooltip"
-                        data-original-title="{{ __('app.menu.profileSettings') }}">
-                            <i class="side-icon bi bi-pencil-square"></i>
-                    </a>
-                </div>
 
-                @if (!in_array('client', user_roles()) && ($sidebarUserPermissions['add_employees'] == 4 || $sidebarUserPermissions['add_employees'] == 1) && in_array('employees', user_modules()))
-                    <a class="dropdown-item d-flex justify-content-between align-items-center f-15 text-dark invite-member"
-                        href="javascript:;">
-                        <span>@lang('app.inviteMember') {{ $companyName }}</span>
-                        <i class="side-icon bi bi-person-plus"></i>
-                    </a>
-                @endif
-
-                <a class="dropdown-item d-flex justify-content-between align-items-center f-15 text-dark"
-                    href="javascript:;">
-                    <label for="dark-theme-toggle">@lang('app.darkTheme')</label>
-                    <div class="custom-control custom-switch">
-                        <input type="checkbox" class="custom-control-input" id="dark-theme-toggle"
-                            @if (user()->dark_theme) checked @endif>
-                        <label class="custom-control-label f-14" for="dark-theme-toggle"></label>
+                    {{-- Marque carree, visible seulement quand la barre est repliee.
+                         Le repli ramene la barre a 60 px : le logo horizontal y
+                         serait ecrase et son texte coupe. On reutilise le favicon,
+                         qui est deja la version carree de la marque — inutile
+                         d'ajouter un reglage pour la meme image. --}}
+                    <div class="dck-marque">
+                        <img src="{{ companyOrGlobalSetting()->favicon_url }}"
+                             alt="{{ $appName }}">
                     </div>
-                </a>
-                <a class="dropdown-item d-flex justify-content-between align-items-center f-15 text-dark"
-                    href="{{ route('logout') }}" onclick="event.preventDefault();
-                document.getElementById('logout-form').submit();">
-                    @lang('app.logout')
-                    <i class="side-icon bi bi-power"></i>
-                </a>
+                @endif
             </div>
         </div>
         <!-- SIDEBAR BRAND END -->
@@ -101,6 +59,93 @@
             @include('sections.menu')
         </div>
         <!-- SIDEBAR MENU END -->
+
+        {{-- PIED DE LA BARRE — identite et menu du profil.
+             La maquette ouvre ce menu depuis le bloc utilisateur, en bas :
+             le menu remonte donc (dropup) au lieu de descendre. --}}
+        <div class="dck-foot dropup">
+            {{-- Un bouton, pas un lien : il n'y a pas de destination. Avec
+                 href="javascript:;", le navigateur affichait cette valeur
+                 dans sa barre d'etat au survol. --}}
+            {{-- data-display="static" ecarte Popper. Sans cela il ecrit
+                 top:0, left:0 et une transformation EN STYLE INLINE, qui
+                 l'emportent sur la feuille : le menu se dessinait alors
+                 par-dessus le nom au lieu de remonter. Bootstrap applique
+                 dans ce mode le positionnement de .dropup, celui voulu. --}}
+            <button type="button" class="dck-user" id="dropdownMenuLink"
+                data-toggle="dropdown" data-display="static"
+                aria-haspopup="true" aria-expanded="false"
+                aria-label="{{ __('Menu du compte') }}">
+                @php
+                    $initiales = collect(preg_split('/\s+/', trim(user()->name)))
+                        ->filter()
+                        ->take(2)
+                        ->map(fn ($mot) => mb_strtoupper(mb_substr($mot, 0, 1)))
+                        ->implode('');
+                @endphp
+                <span class="dck-user__av">{{ $initiales ?: '?' }}</span>
+                <span class="dck-user__txt">
+                    <b>{{ user()->name }}</b>
+                    <small>{{ user()->employeeDetail->designation->name ?? __('app.menu.profile') }}</small>
+                </span>
+            </button>
+
+            <div class="dropdown-menu sidebar-brand-dropdown"
+                aria-labelledby="dropdownMenuLink" tabindex="0">
+                {{-- Disposition conforme au menu de profil de dck-flow-task :
+                     un intitule de section, l'adresse du compte, puis les
+                     actions a icone. L'entree « Prevalisualiser en tant que »
+                     de la maquette n'est pas reprise : elle simule un
+                     changement de role, fonction que l'application n'a pas. --}}
+
+                <div class="dck-pop__lab">@lang('Connecté en tant que')</div>
+                <div class="dck-pop__mail">{{ user()->email }}</div>
+
+                <div class="dck-pop__sep"></div>
+
+                {{-- [ENTREES RETIREES] Mon profil et Parametres : le module
+                     Parametres porte deja « Parametres de profil » et « Les
+                     parametres de securite ». Trois chemins menaient au meme
+                     endroit.
+                @if (!in_array('client', user_roles()))
+                    <a class="dck-pop__item" href="{{ route('employees.show', user()->id) }}">
+                        <i class="bi bi-person"></i>@lang('Mon profil')
+                    </a>
+                @endif
+                --}}
+
+                {{-- [ENTREE RETIREE] Parametres : la barre laterale porte deja
+                     son propre acces, en bas du menu. Deux chemins vers le meme
+                     ecran n'apportaient rien.
+                <a class="dck-pop__item" href="{{ route('profile-settings.index') }}">
+                    <i class="bi bi-gear"></i>@lang('Paramètres')
+                </a>
+                --}}
+
+                {{-- Le libelle porte le for= de l'interrupteur, reste cache :
+                     cliquer l'entree declenche donc le gestionnaire existant,
+                     sans qu'une ligne de JavaScript soit modifiee. --}}
+                <label class="dck-pop__item" for="dark-theme-toggle">
+                    <i class="bi bi-moon"></i>@lang('Changer de thème')
+                </label>
+                <input type="checkbox" class="dck-pop__bascule" id="dark-theme-toggle"
+                    @if (user()->dark_theme) checked @endif>
+
+                @if (!in_array('client', user_roles()) && ($sidebarUserPermissions['add_employees'] == 4 || $sidebarUserPermissions['add_employees'] == 1) && in_array('employees', user_modules()))
+                    <button type="button" class="dck-pop__item invite-member">
+                        <i class="bi bi-person-plus"></i>@lang('app.inviteMember') {{ $companyName }}
+                    </button>
+                @endif
+
+                <div class="dck-pop__sep"></div>
+
+                <a class="dck-pop__item is-danger" href="{{ route('logout') }}"
+                    onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                    <i class="bi bi-box-arrow-right"></i>@lang('Se déconnecter')
+                </a>
+            </div>
+        </div>
+        <!-- PIED DE LA BARRE END -->
     </div>
     <!-- MAIN SIDEBAR END -->
     <!-- Sidebar Toggler -->

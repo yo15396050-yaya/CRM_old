@@ -11,10 +11,15 @@ use App\Models\TaskCategory;
 use App\Models\TaskLabelList;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\RapportHebdomadaireExport;
+use App\Traits\RapportHebdomadaire;
 use Illuminate\Support\Facades\DB;
 
 class TaskReportController extends AccountBaseController
 {
+
+    use RapportHebdomadaire;
 
     public function __construct()
     {
@@ -36,6 +41,106 @@ class TaskReportController extends AccountBaseController
         }
 
         return $dataTable->render('reports.tasks.index', $this->data);
+    }
+
+    /**
+     * Perimetre du rapport pour l'utilisateur connecte.
+     *
+     * « all » donne tout le cabinet, « owned » restreint aux taches ou
+     * la personne est affectee. Tout autre niveau refuse l'acces : la
+     * decision est prise ici, et nulle part ailleurs, pour que l'ecran,
+     * l'export Excel et le PDF ne puissent pas diverger.
+     *
+     * @return int|null identifiant auquel restreindre, null pour tout voir
+     */
+    private function perimetreRapport(): ?int
+    {
+        $niveau = user()->permission('view_task_report');
+
+        abort_403(!in_array($niveau, ['all', 'owned'], true));
+
+        return $niveau === 'all' ? null : user()->id;
+    }
+
+    /**
+     * Rapport hebdomadaire : synthese de la semaine, activite par
+     * collaborateur et detail des taches.
+     *
+     * Deuxieme regard sur les memes donnees que index(), d'ou l'onglet
+     * plutot qu'une entree de menu. Meme permission, meme controleur :
+     * aucune regle d'acces nouvelle.
+     */
+    public function hebdomadaire(Request $request)
+    {
+        $this->rapport = $this->rapportHebdomadaire(
+            $request->query('semaine'),
+            $this->perimetreRapport()
+        );
+
+        /* Semaines voisines, calculees ici pour que la vue n'ait aucune
+           date a manipuler. */
+        $this->semainePrecedente = $this->rapport->debut->copy()->subWeek()->format('o-\WW');
+        $this->semaineSuivante = $this->rapport->debut->copy()->addWeek()->format('o-\WW');
+        $this->semaineCourante = now(company()->timezone)->format('o-\WW');
+
+        $this->pageTitle = __('Rapport hebdomadaire');
+
+        return view('reports.tasks.hebdomadaire', $this->data);
+    }
+
+    /**
+     * Export Excel du rapport hebdomadaire.
+     *
+     * Reutilise maatwebsite/excel, deja present, et le meme calcul que
+     * l'ecran : l'export ne peut pas diverger de ce qui est affiche.
+     */
+    public function exportHebdomadaire(Request $request)
+    {
+        $rapport = $this->rapportHebdomadaire(
+            $request->query('semaine'),
+            $this->perimetreRapport()
+        );
+
+        $nom = 'rapport-hebdomadaire-' . $rapport->debut->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new RapportHebdomadaireExport($rapport), $nom);
+    }
+
+    /**
+     * Export PDF du rapport hebdomadaire.
+     *
+     * Reutilise dompdf, deja present, et le meme calcul que l'ecran.
+     * La vue PDF est distincte car dompdf ne connait ni flexbox ni
+     * grid : sa mise en page repose sur des tableaux.
+     */
+    public function pdfHebdomadaire(Request $request)
+    {
+        $limiteA = $this->perimetreRapport();
+
+        $this->rapport = $this->rapportHebdomadaire($request->query('semaine'), $limiteA);
+        $this->societe = company();
+        $this->pourQui = $limiteA ? user()->name : null;
+
+        /* Le logo du cabinet, tel que le reste de l'application le sert.
+           dompdf lit les fichiers locaux, pas les URL : on lui donne donc
+           le chemin sur le disque lorsqu'on le connait. Tant qu'aucun
+           logo n'est televerse, logo_url renvoie celui de l'editeur du
+           CRM : on prefere alors n'en afficher aucun. */
+        $this->logo = null;
+        $url = companyOrGlobalSetting()->logo_url;
+
+        if ($url && !str_contains($url, 'worksuite-logo')) {
+            $chemin = public_path(parse_url($url, PHP_URL_PATH) ?? '');
+            $this->logo = is_file($chemin) ? $chemin : $url;
+        }
+
+        $pdf = app('dompdf.wrapper');
+        $pdf->loadView('reports.tasks.pdf.hebdomadaire', $this->data);
+        $pdf->setPaper('a4', 'portrait');
+
+        $nom = 'rapport-hebdomadaire-' . $this->rapport->debut->format('Y-m-d') . '.pdf';
+
+        return $pdf->download($nom);
     }
 
     public function taskChartData(Request $request)

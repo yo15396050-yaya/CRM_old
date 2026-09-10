@@ -33,8 +33,6 @@ use App\Models\LeaveType;
 use App\Models\Module;
 use App\Models\Notification;
 use App\Models\Passport;
-use App\Models\ProjectTimeLog;
-use App\Models\ProjectTimeLogBreak;
 use App\Models\Role;
 use App\Models\RoleUser;
 use App\Models\Skill;
@@ -48,6 +46,7 @@ use App\Models\UserInvitation;
 use App\Models\VisaDetail;
 use App\Scopes\ActiveScope;
 use App\Traits\ImportExcel;
+use App\Traits\PilotageEmploye;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -62,6 +61,8 @@ class EmployeeController extends AccountBaseController
 {
 
     use ImportExcel;
+    use PilotageEmploye;
+    use \App\Traits\PilotageEmployes;
 
     public function __construct()
     {
@@ -91,6 +92,7 @@ class EmployeeController extends AccountBaseController
             $this->designations = Designation::allDesignations();
             $this->totalEmployees = count($this->employees);
             $this->roles = Role::where('name', '<>', 'client')->orderBy('id')->get();
+            $this->empKpis = $this->employesIndicateurs();
         }
 
         return $dataTable->render('employees.index', $this->data);
@@ -606,7 +608,6 @@ class EmployeeController extends AccountBaseController
 
         $this->employee = User::with('leaveTypes.leaveType')->withoutGlobalScope(ActiveScope::class)
             ->withOut('clientDetails')
-            ->withCount(['member', 'agents', 'openTasks'])
             ->findOrFail($id);
 
 
@@ -636,19 +637,13 @@ class EmployeeController extends AccountBaseController
                 $this->fromDate = now()->timezone($this->company->timezone)->startOfMonth()->toDateString();
                 $this->toDate = now()->timezone($this->company->timezone)->endOfMonth()->toDateString();
 
-                $this->lateAttendance = Attendance::whereBetween(DB::raw('DATE(`clock_in_time`)'), [$this->fromDate, $this->toDate])
-                    ->where('late', 'yes')->where('user_id', $id)->count();
-
-                $this->leavesTaken = Leave::selectRaw('count(*) as count, SUM(if(duration="half day", 1, 0)) AS halfday')
-                    ->where('user_id', $id)
-                    ->where('status', 'approved')
-                    ->whereBetween(DB::raw('DATE(`leave_date`)'), [$this->fromDate, $this->toDate])
-                    ->first();
-
-                $this->leavesTaken = (!is_null($this->leavesTaken)) ? $this->leavesTaken->count - ($this->leavesTaken->halfday * 0.5) : 0;
+                /* Indicateurs de la fiche : charge, retards, respect des
+                   echeances et diligences. Ils remplacent les chiffres de
+                   pointage et de conges, dont les modules ne sont pas
+                   utilises par le cabinet. */
+                $this->k = $this->employeIndicateurs((int) $id);
 
                 $this->taskChart = $this->taskChartData($id);
-                $this->ticketChart = $this->ticketChartData($id);
 
                 if (!is_null($this->employee->employeeDetail)) {
                     $this->employeeDetail = $this->employee->employeeDetail->withCustomFields();
@@ -660,19 +655,6 @@ class EmployeeController extends AccountBaseController
                     }
                 }
 
-                $taskBoardColumn = TaskboardColumn::completeColumn();
-
-                $this->taskCompleted = Task::join('task_users', 'task_users.task_id', '=', 'tasks.id')
-                    ->where('task_users.user_id', $id)
-                    ->where('tasks.board_column_id', $taskBoardColumn->id)
-                    ->count();
-
-                $hoursLogged = ProjectTimeLog::where('user_id', $id)->sum('total_minutes');
-                $breakMinutes = ProjectTimeLogBreak::userBreakMinutes($id);
-
-                $timeLog = intdiv($hoursLogged - $breakMinutes, 60);
-
-                $this->hoursLogged = $timeLog;
             }
 
         }
@@ -950,20 +932,6 @@ class EmployeeController extends AccountBaseController
      *
      * @return array
      */
-    public function ticketChartData($id)
-    {
-        $labels = ['open', 'pending', 'resolved', 'closed'];
-        $data['labels'] = [__('app.open'), __('app.pending'), __('app.resolved'), __('app.closed')];
-        $data['colors'] = ['#D30000', '#FCBD01', '#2CB100', '#1d82f5'];
-        $data['values'] = [];
-
-        foreach ($labels as $label) {
-            $data['values'][] = Ticket::where('agent_id', $id)->where('status', $label)->count();
-        }
-
-        return $data;
-    }
-
     public function byDepartment($id)
     {
         $users = User::withoutGlobalScope(ActiveScope::class)->join('employee_details', 'employee_details.user_id', '=', 'users.id');

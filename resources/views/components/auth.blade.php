@@ -13,7 +13,7 @@
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('vendor/css/all.min.css') }}" defer="defer">
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
 
     <!-- Template CSS -->
     <link href="{{ asset('vendor/froiden-helper/helper.css') }}" rel="stylesheet" defer="defer">
@@ -62,87 +62,66 @@
 <body
     class="{{ $globalSetting->auth_theme == 'dark' ? 'dark-theme' : '' }} {{ isRtl() ? (session('changedRtl') === false ? '' : 'rtl') : (session('changedRtl') == true ? 'rtl' : '') }}">
 
-<header class="px-4 sticky-top d-flex justify-content-center align-items-center login_header" style="background-color:#fff;">
-    <img class="mr-2 rounded" src="{{ $globalSetting->logo_url }}" alt="Logo"/>
-    {{--@if ($globalSetting->sidebar_logo_style != 'full')
-        <h3 class="mb-0 pl-1 {{ $globalSetting->auth_theme_text == 'light' ? ($globalSetting->auth_theme == 'dark' ? 'text-dark' : 'text-white') : '' }}">{{ $globalSetting->global_app_name ?? $globalSetting->app_name }}</h3>
-    @endif--}}
-</header>
+<div class="auth-split">
 
+    {{-- Volet gauche : visuel et accroche. Masque sous 1024px. --}}
+    <div class="auth-visual">
+        @if ($globalSetting->login_background_url)
+            {{-- Le WebP pese environ la moitie du JPEG a rendu identique. Le
+                 <img> reste la source de verite : si le WebP est absent du
+                 serveur, le navigateur retombe sur le JPEG sans rien casser.
+                 Le nom de fichier vient de la base, seule l'extension change. --}}
+            {{-- display:contents : .auth-visual est un conteneur flex, et
+                 <picture> y deviendrait une boite supplementaire. Ainsi il
+                 n'en cree aucune, la mise en page reste celle d'avant. --}}
+            <picture style="display: contents;">
+                <source type="image/webp"
+                        srcset="{{ preg_replace('/\.(jpe?g|png)$/i', '.webp', $globalSetting->login_background_url) }}">
+                <img class="auth-visual__img" src="{{ $globalSetting->login_background_url }}"
+                     alt="" width="2560" height="1709" decoding="async">
+            </picture>
+        @endif
+        <div class="auth-visual__veil"></div>
 
-<section class="py-4 bg-grey login_section"
-        @if ($globalSetting->login_background_url) style="background: url('{{ $globalSetting->login_background_url }}') center center/cover no-repeat;" @endif>
-    <div class="container">
-        <div class="row justify-content-center justify-content-lg-end w-100 mx-0">
-            {{-- Colonne vide : ne sert qu'a decaler le formulaire sur grand ecran --}}
-            <div class="d-none d-lg-block col-lg-7 col-xl-8">
-            </div>
-            <div class="text-center col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4 px-0 px-sm-3" align="center">
-                <div class="mx-auto text-center bg-white rounded login_box">
-                    {{ $slot }}
-                </div>
-
-                {{ $outsideLoginBox ?? '' }}
-                @if($languages->count() > 1)
-                    <div class="my-3 d-flex flex-column flex-grow-1">
-                        <div class="d-flex flex-wrap align-items-center justify-content-center">
-                            @foreach($languages->take(4) as $index => $language)
-                                <span class="mx-3 my-10 f-12">
-                                    <a href="javascript:;" class="text-dark-grey change-lang d-flex align-items-center"
-                                       data-lang="{{ $language->language_code }}">
-                                        <span class="mr-2 flag-icon flag-icon-{{ $language->flag_code === 'en' ? 'gb' : $language->flag_code }} flag-icon-squared"></span>
-                                        {{ \App\Models\LanguageSetting::LANGUAGES_TRANS[$language->language_code] ?? $language->language_name }}
-                                    </a>
-                                </span>
-                            @endforeach
-
-                            @if($languages->count() > 4)
-                                <div class="dropdown" style="z-index:10000">
-                                    <a class="btn btn-lg f-14 px-2 py-1 text-dark-grey  rounded dropdown-toggle"
-                                       type="button" id="languageDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        <i class="fa fa-ellipsis-h"></i>
-                                    </a>
-
-                                    <div class="dropdown-menu dropdown-menu-right border-grey rounded b-shadow-4 p-0"
-                                         aria-labelledby="languageDropdown" style="max-height: 600px; overflow-y: auto;">
-                                        @foreach($languages->slice(4) as $language)
-                                            <a class="dropdown-item change-lang" href="javascript:;"
-                                               data-lang="{{ $language->language_code }}">
-                                                <span class="mr-2 flag-icon flag-icon-{{ $language->flag_code === 'en' ? 'gb' : $language->flag_code }} flag-icon-squared"></span>
-                                                {{ \App\Models\LanguageSetting::LANGUAGES_TRANS[$language->language_code] ?? $language->language_name }}
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endif
-
-                {{--                @if($languages->count() >1)--}}
-                {{--                    <div class="my-3 d-flex flex-column flex-grow-1">--}}
-                {{--                        <div class="flex-wrap align-items-center d-flex flex-grow-1 justify-content-center">--}}
-                {{--                            @foreach($languages as $language)--}}
-                {{--                                <span class="mx-1 my-10 f-12 ">--}}
-                {{--                                    <a href="javascript:;" class="text-dark-grey change-lang d-flex align-items-center"--}}
-                {{--                                       data-lang="{{$language->language_code}}">--}}
-                {{--                                        <span--}}
-                {{--                                            class='mr-2 flag-icon flag-icon-{{ ($language->flag_code == 'en') ? 'gb' : $language->flag_code }} flag-icon-squared'></span>--}}
-                {{--                                        {{\App\Models\LanguageSetting::LANGUAGES_TRANS[$language->language_code] ?? $language->language_name}}--}}
-                {{--                                    </a>--}}
-                {{--                                </span>--}}
-                {{--                            @endforeach--}}
-                {{--                        </div>--}}
-                {{--                    </div>--}}
-                {{--                @endif--}}
-
-
-            </div>
+        <div class="auth-visual__body">
+            <h1>Optimisez votre flux de travail quotidien.</h1>
+            <p>Rejoignez les professionnels qui gèrent leurs projets et leurs tâches avec DC-KNOWING.</p>
         </div>
-
     </div>
 
-</section>
+    {{-- Volet droit : formulaire --}}
+    <div class="auth-panel">
+        <div class="auth-box">
+
+            <div class="auth-brand">
+                @if ($globalSetting->logo_url)
+                    <img class="auth-brand__logo mb-2" src="{{ $globalSetting->logo_url }}"
+                         alt="{{ $globalSetting->global_app_name ?? $globalSetting->app_name }}">
+                @else
+                    <div class="auth-brand__name">DC-<span>KNOWING</span></div>
+                @endif
+                <div class="auth-brand__rule"></div>
+            </div>
+
+            {{ $slot }}
+
+            {{ $outsideLoginBox ?? '' }}
+
+            @if ($languages->count() > 1)
+                <div class="auth-langs">
+                    @foreach ($languages->take(4) as $language)
+                        <a href="javascript:;" class="text-dark-grey change-lang d-inline-flex align-items-center"
+                           data-lang="{{ $language->language_code }}">
+                            <span class="mr-2 flag-icon flag-icon-{{ $language->flag_code === 'en' ? 'gb' : $language->flag_code }} flag-icon-squared"></span>
+                            {{ \App\Models\LanguageSetting::LANGUAGES_TRANS[$language->language_code] ?? $language->language_name }}
+                        </a>
+                    @endforeach
+                </div>
+            @endif
+
+        </div>
+    </div>
+</div>
 <!-- Global Required Javascript -->
 {{--<script src="{{ asset('vendor/bootstrap/javascript/bootstrap-native.js') }}" defer="defer"></script>--}}
 
@@ -150,7 +129,7 @@
 <script src="{{ asset('vendor/jquery/all.min.js') }}" defer="defer"></script>
 
 <!-- Template JS -->
-<script src="{{ asset('js/main.js') }}"></script>
+<script src="{{ asset('js/main.js') }}?v={{ @filemtime(public_path('js/main.js')) }}"></script>
 <script>
     document.loading = '@lang('app.loading')';
     const MODAL_DEFAULT = '#myModalDefault';

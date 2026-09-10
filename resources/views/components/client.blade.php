@@ -11,7 +11,7 @@ if (!is_null($user) && $user->session) {
 }
 @endphp
 
-<div class="media align-items-center mw-250 @if($user->status != 'active') inactive @endif">
+<div class="media align-items-center mw-250 @if(!is_null($user) && $user->status != 'active') inactive @endif">
     @if (!is_null($user))
         @if(in_array('employee', user_roles()) && !in_array('admin', user_roles()))
             @if(user()->permission('view_clients') == 'all')

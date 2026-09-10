@@ -44,6 +44,18 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register(IdeHelperServiceProvider::class);
         }
 
+        // Garde-fou de developpement : si MAIL_REDIRECT_TO est renseigne dans
+        // le .env, TOUS les mails sortants sont rediriges vers cette seule
+        // adresse, quels que soient leurs destinataires reels. Permet de tester
+        // la chaine d'envoi complete sans ecrire aux clients ni aux
+        // collaborateurs. La variable est absente en production : la condition
+        // est alors fausse et le comportement normal s'applique.
+        $redirection = env('MAIL_REDIRECT_TO');
+
+        if (!empty($redirection)) {
+            \Illuminate\Support\Facades\Mail::alwaysTo($redirection);
+        }
+
         CarbonInterval::macro('formatHuman', function ($totalMinutes, $seconds = false): string {
 
             if ($seconds) {

@@ -59,7 +59,7 @@ class NewContract extends BaseNotification
                 'notifiableName' => $notifiable->name,
                 'contractType' => $this->contract->contractType->name ?? __('app.menu.contract'),
                 'createdAt' => $this->contract->created_at->translatedFormat('d F Y'),
-                'contractNumber' => $this->contract->formatContractNumber(),
+                'contractNumber' => $this->contract->contract_number,
                 'supportEmail' => $this->company->company_email,
                 'supportPhone' => $this->company->company_phone,
                 'logo' => $this->company->logo_url,

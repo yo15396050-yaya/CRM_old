@@ -13,6 +13,7 @@ use App\Models\Task;
 use App\Models\TaskboardColumn;
 use App\Models\TaskUser;
 use App\Traits\ProjectProgress;
+use App\Traits\NotificationStatutTache;
 use App\Models\UniversalSearch;
 use App\Models\User;
 use App\Services\Google;
@@ -31,6 +32,7 @@ class TaskObserver
 
     use ProjectProgress;
     use EmployeeActivityTrait;
+    use NotificationStatutTache;
 
     public function saving(Task $task)
     {
@@ -220,54 +222,21 @@ class TaskObserver
 
             if ($task->isDirty('board_column_id')) {
 
-                if ($task->boardColumn->slug == 'completed') {
-                    $notification = 'TaskCompleted';
-                }
-                elseif ($task->boardColumn->slug == 'waiting_approval') {
-                    $notification = 'TaskApproval';
-                }
-                else {
-                    $notification = 'TaskStatusUpdated';
-                }
+                /* On ne previent que les passages qui demandent une reaction :
+                   demande d'approbation, verdict rendu, retour en arriere, ou
+                   cloture faite par un tiers. L'avancement ordinaire — a faire,
+                   en cours, en test — se lit sur le tableau et reste silencieux.
+                   L'auteur du geste n'est jamais notifie de son propre clic.
+                   Le detail des regles est dans NotificationStatutTache. */
+                $colonneQuittee = TaskboardColumn::find($task->getOriginal('board_column_id'));
 
-                if ($task->boardColumn->slug == 'waiting_approval') {
+                [$destinataires, $notification] = $this->destinatairesChangementStatut(
+                    $task,
+                    optional($colonneQuittee)->slug
+                );
 
-                    $admins = User::allAdmins($task->company->id);
-
-                    $users = $task->taskUsers;
-
-                    $projectAdmintask = Task::with('project')
-                        ->whereHas('project', function ($query) {
-                        $query->whereNotNull('project_admin');
-                    })
-                        ->get()
-                        ->pluck('project.projectAdmin');
-
-                    $admins = $users->merge($admins);
-
-                    if (!$projectAdmintask->isEmpty()) {
-                        $admins = $admins->merge($projectAdmintask);
-                    }
-
-                }
-                else {
-                    $admins = User::allAdmins($task->company->id);
-                }
-
-                // send task complete notification
-                // event(new TaskEvent($task, $admins, $notification));
-
-                if ($task->addedByUser) {
-                    $addedByUserRole = $task->addedByUser->roles->pluck('name')->toArray();
-
-                    if (!is_null($task->added_by) && !in_array('client', $addedByUserRole) && !in_array($task->added_by, $admins->pluck('id')->toArray())) {
-                        // event(new TaskEvent($task, $task->addedByUser, $notification));
-                    }
-                }
-
-                $taskUser = $task->users->whereNotIn('id', $admins->pluck('id'))->whereNotIn('id', [$task->added_by]);
-                if (!$task->project_id || $task->project->allow_collaborator_notification == 'enable') {
-                    // event(new TaskEvent($task, $taskUser, $notification));
+                if ($destinataires && $destinataires->isNotEmpty() && $notification) {
+                    event(new TaskEvent($task, $destinataires, $notification));
                 }
 
                 $timeLogs = ProjectTimeLog::with('user')->whereNull('end_time')

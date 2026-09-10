@@ -100,34 +100,34 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
 
     Route::get('currency-settings/update-currency-format', [CurrencySettingController::class, 'updateCurrencyFormat'])->name('currency_settings.update_currency_format');
     Route::resource('currency-settings', CurrencySettingController::class);
-    Route::resource('payment-gateway-settings', PaymentGatewayCredentialController::class);
+    // Route::resource('payment-gateway-settings', PaymentGatewayCredentialController::class);
     /* End Currency Settings routes */
 
-    Route::resource('offline-payment-setting', OfflinePaymentSettingController::class);
+    // Route::resource('offline-payment-setting', OfflinePaymentSettingController::class);
 
     /* Invoice Setting Routes */
-    Route::post('invoice-settings/update-template/{id}', [InvoiceSettingController::class, 'updateTemplate'])->name('invoice_settings.update_template');
-    Route::post('invoice-settings/update-prefix/{id}', [InvoiceSettingController::class, 'updatePrefix'])->name('invoice_settings.update_prefix');
-    Route::resource('invoice-settings', InvoiceSettingController::class);
+    // Route::post('invoice-settings/update-template/{id}', [InvoiceSettingController::class, 'updateTemplate'])->name('invoice_settings.update_template');
+    // Route::post('invoice-settings/update-prefix/{id}', [InvoiceSettingController::class, 'updatePrefix'])->name('invoice_settings.update_prefix');
+    // Route::resource('invoice-settings', InvoiceSettingController::class);
 
     /* unitType */
-    Route::resource('unit-type', UnitTypeController::class);
-    Route::post('unit-types/set-default', [UnitTypeController::class, 'setDefaultUnit'])->name('unit-type.set_default');
+    // Route::resource('unit-type', UnitTypeController::class);
+    // Route::post('unit-types/set-default', [UnitTypeController::class, 'setDefaultUnit'])->name('unit-type.set_default');
 
     /* Start Ticket settings routes */
-    Route::post('ticket-agents/update-group/{id}', [TicketAgentController::class, 'updateGroup'])->name('ticket_agents.update_group');
-    Route::resource('ticket-agents', TicketAgentController::class);
-    Route::get('agent-groups', [TicketAgentController::class, 'agentGroups'])->name('ticket_agents.agent_groups');
+    // Route::post('ticket-agents/update-group/{id}', [TicketAgentController::class, 'updateGroup'])->name('ticket_agents.update_group');
+    // Route::resource('ticket-agents', TicketAgentController::class);
+    // Route::get('agent-groups', [TicketAgentController::class, 'agentGroups'])->name('ticket_agents.agent_groups');
 
-    Route::resource('ticket-settings', TicketSettingController::class);
-    Route::post('/ticket-agent-settings/{companyId}', [TicketSettingController::class, 'updateTicketSettingForAgent'])->name('ticket-agent-settings.update');
-    Route::resource('ticket-groups', TicketGroupController::class);
-    Route::resource('ticketTypes', TicketTypeController::class);
-    Route::resource('ticketChannels', TicketChannelController::class);
-    Route::resource('ticket-email-settings', TicketEmailSettingController::class);
+    // Route::resource('ticket-settings', TicketSettingController::class);
+    // Route::post('/ticket-agent-settings/{companyId}', [TicketSettingController::class, 'updateTicketSettingForAgent'])->name('ticket-agent-settings.update');
+    // Route::resource('ticket-groups', TicketGroupController::class);
+    // Route::resource('ticketTypes', TicketTypeController::class);
+    // Route::resource('ticketChannels', TicketChannelController::class);
+    // Route::resource('ticket-email-settings', TicketEmailSettingController::class);
 
-    Route::get('replyTemplates/fetch-template', [TicketReplyTemplatesController::class, 'fetchTemplate'])->name('replyTemplates.fetchTemplate');
-    Route::resource('replyTemplates', TicketReplyTemplatesController::class);
+    // Route::get('replyTemplates/fetch-template', [TicketReplyTemplatesController::class, 'fetchTemplate'])->name('replyTemplates.fetchTemplate');
+    // Route::resource('replyTemplates', TicketReplyTemplatesController::class);
     /* End Ticket settings routes */
     Route::get('project-settings/create-category', [ProjectSettingController::class, 'createCategory'])->name('project-settings.createCategory');
     Route::post('project-settings/save-project-category', [ProjectSettingController::class, 'saveProjectCategory'])->name('project-settings.saveProjectCategory');
@@ -135,27 +135,27 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::post('project-settings/{id?}', [ProjectSettingController::class, 'statusUpdate'])->name('project-settings.statusUpdate');
     Route::put('project-settings/change-status/{id?}', [ProjectSettingController::class, 'changeStatus'])->name('project-settings.changeStatus');
     Route::post('project-settings/set-default/{id?}', [ProjectSettingController::class, 'setDefault'])->name('project-settings.setDefault');
-    Route::get('check-qr-login', [AttendanceSettingController::class, 'qrClockInOut'])->name('settings.qr-login');
-    Route::post('change-qr-code-status', [AttendanceSettingController::class, 'qrCodeStatus'])->name('settings.change-qr-code-status');
+    // Route::get('check-qr-login', [AttendanceSettingController::class, 'qrClockInOut'])->name('settings.qr-login');
+    // Route::post('change-qr-code-status', [AttendanceSettingController::class, 'qrCodeStatus'])->name('settings.change-qr-code-status');
 
-    Route::resource('attendance-settings', AttendanceSettingController::class);
+    // Route::resource('attendance-settings', AttendanceSettingController::class);
 
     // Shift Rotation routes
-    Route::post('shift-rotations/change-status', [ShiftRotationController::class, 'changeStatus'])->name('shift-rotations.change_status');
-    Route::get('shift-rotations/automate-shift', [ShiftRotationController::class, 'automateShift'])->name('shift-rotations.automate_shift');
-    Route::post('shift-rotations/remove_employee', [ShiftRotationController::class, 'removeEmployee'])->name('shift-rotations.remove_employee');
-    Route::post('shift-rotations/store-automate-shift', [ShiftRotationController::class, 'storeAutomateShift'])->name('shift-rotations.store_automate_shift');
-    Route::get('shift-rotations/manage-rotation-employee/{id}', [ShiftRotationController::class, 'manageEmployees'])->name('shift-rotations.manage_rotation_employee');
-    Route::post('shift-rotations/change-employee-rotation', [ShiftRotationController::class, 'changeEmployeeRotation'])->name('shift-rotations.change_employee_rotation');
-    Route::get('shift-rotations/run-rotation', [ShiftRotationController::class, 'runRotation'])->name('shift-rotations.run_rotation_get');
-    Route::post('shift-rotations/run-rotation', [ShiftRotationController::class, 'runRotation'])->name('shift-rotations.run_rotation_post');
-    Route::resource('shift-rotations', ShiftRotationController::class);
+    // Route::post('shift-rotations/change-status', [ShiftRotationController::class, 'changeStatus'])->name('shift-rotations.change_status');
+    // Route::get('shift-rotations/automate-shift', [ShiftRotationController::class, 'automateShift'])->name('shift-rotations.automate_shift');
+    // Route::post('shift-rotations/remove_employee', [ShiftRotationController::class, 'removeEmployee'])->name('shift-rotations.remove_employee');
+    // Route::post('shift-rotations/store-automate-shift', [ShiftRotationController::class, 'storeAutomateShift'])->name('shift-rotations.store_automate_shift');
+    // Route::get('shift-rotations/manage-rotation-employee/{id}', [ShiftRotationController::class, 'manageEmployees'])->name('shift-rotations.manage_rotation_employee');
+    // Route::post('shift-rotations/change-employee-rotation', [ShiftRotationController::class, 'changeEmployeeRotation'])->name('shift-rotations.change_employee_rotation');
+    // Route::get('shift-rotations/run-rotation', [ShiftRotationController::class, 'runRotation'])->name('shift-rotations.run_rotation_get');
+    // Route::post('shift-rotations/run-rotation', [ShiftRotationController::class, 'runRotation'])->name('shift-rotations.run_rotation_post');
+    // Route::resource('shift-rotations', ShiftRotationController::class);
 
-    Route::resource('leaves-settings', LeaveSettingController::class);
-    Route::post('leaves-settings/change-permission', [LeaveSettingController::class, 'changePermission'])->name('leaves-settings.changePermission');
+    // Route::resource('leaves-settings', LeaveSettingController::class);
+    // Route::post('leaves-settings/change-permission', [LeaveSettingController::class, 'changePermission'])->name('leaves-settings.changePermission');
 
     // LeaveType Resource
-    Route::resource('leaveType', LeaveTypeController::class);
+    // Route::resource('leaveType', LeaveTypeController::class);
 
     // Custom Fields Settings
     Route::resource('custom-fields', CustomFieldController::class);
@@ -164,7 +164,7 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::resource('taxes', TaxSettingController::class);
 
     // Message settings
-    Route::resource('message-settings', MessageSettingController::class);
+    // Route::resource('message-settings', MessageSettingController::class);
 
     // Storage settings
     Route::get('storage-settings/aws-local-to-aws-modal', [StorageSettingController::class, 'awsLocalToAwsModal'])->name('storage-settings.aws_local_to_aws_modal');
@@ -185,26 +185,26 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::resource('task-settings', TaskSettingController::class, ['only' => ['index', 'store']]);
 
     // Time Log Settings
-    Route::resource('timelog-settings', TimeLogSettingController::class);
+    // Route::resource('timelog-settings', TimeLogSettingController::class);
 
     // Social Auth Settings
     Route::resource('social-auth-settings', SocialAuthSettingController::class, ['only' => ['index', 'update']]);
 
     /* Lead Settings */
-    Route::resource('lead-settings', LeadSettingController::class);
-    Route::post('lead-settings-status/update-status/{companyId}', [LeadSettingController::class, 'updateLeadSettingStatus'])->name('lead-setting.update_status');
-    Route::resource('lead-source-settings', LeadSourceSettingController::class);
+    // Route::resource('lead-settings', LeadSettingController::class);
+    // Route::post('lead-settings-status/update-status/{companyId}', [LeadSettingController::class, 'updateLeadSettingStatus'])->name('lead-setting.update_status');
+    // Route::resource('lead-source-settings', LeadSourceSettingController::class);
 
-    Route::get('lead-stage-update/{statusId}', [LeadStageSettingController::class, 'statusUpdate'])->name('lead-stage-setting.stageUpdate');
-    Route::resource('lead-stage-setting', LeadStageSettingController::class);
+    // Route::get('lead-stage-update/{statusId}', [LeadStageSettingController::class, 'statusUpdate'])->name('lead-stage-setting.stageUpdate');
+    // Route::resource('lead-stage-setting', LeadStageSettingController::class);
 
-    Route::get('lead-pipeline-update/{statusId}', [LeadPipelineSettingController::class, 'statusUpdate'])->name('lead-pipeline-update.stageUpdate');
-    Route::resource('lead-pipeline-setting', LeadPipelineSettingController::class);
+    // Route::get('lead-pipeline-update/{statusId}', [LeadPipelineSettingController::class, 'statusUpdate'])->name('lead-pipeline-update.stageUpdate');
+    // Route::resource('lead-pipeline-setting', LeadPipelineSettingController::class);
 
-    Route::resource('lead-agent-settings', LeadAgentSettingController::class);
-    Route::post('lead-agent-settings/update-category/{id}', [LeadAgentSettingController::class, 'updateCategory'])->name('lead_agents.update_category');
-    Route::post('lead-agent-settings/update-status/{id}', [LeadAgentSettingController::class, 'updateStatus'])->name('lead_agents.update_status');
-    Route::get('agent-category', [LeadAgentSettingController::class, 'agentCategories'])->name('lead_agent.categories');
+    // Route::resource('lead-agent-settings', LeadAgentSettingController::class);
+    // Route::post('lead-agent-settings/update-category/{id}', [LeadAgentSettingController::class, 'updateCategory'])->name('lead_agents.update_category');
+    // Route::post('lead-agent-settings/update-status/{id}', [LeadAgentSettingController::class, 'updateStatus'])->name('lead_agents.update_status');
+    // Route::get('agent-category', [LeadAgentSettingController::class, 'agentCategories'])->name('lead_agent.categories');
 
     /* Contract Setting */
     Route::resource('contract-settings', ContractSettingController::class);
@@ -246,10 +246,10 @@ Route::group(['middleware' => 'auth', 'prefix' => 'account/settings'], function 
     Route::post('business-address/set-default', [BusinessAddressController::class, 'setDefaultAddress'])->name('business-address.set_default');
     Route::resource('business-address', BusinessAddressController::class);
 
-    Route::post('employee-shifts/set-default', [EmployeeShiftController::class, 'setDefaultShift'])->name('employee-shifts.set_default');
-    Route::resource('employee-shifts', EmployeeShiftController::class);
+    // Route::post('employee-shifts/set-default', [EmployeeShiftController::class, 'setDefaultShift'])->name('employee-shifts.set_default');
+    // Route::resource('employee-shifts', EmployeeShiftController::class);
 
-    Route::resource('quickbooks-settings', QuickbookSettingsController::class);
+    // Route::resource('quickbooks-settings', QuickbookSettingsController::class);
 
     Route::resource('custom-link-settings', CustomLinkSettingController::class);
 

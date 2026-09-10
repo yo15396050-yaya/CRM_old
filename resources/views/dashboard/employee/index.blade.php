@@ -64,13 +64,14 @@
 
 @section('content')
     <!-- CONTENT WRAPPER START -->
-    <div class="px-4 py-2 border-top-0 emp-dashboard">
+    <div class="px-4 py-2 border-top-0 emp-dashboard dck-front">
+
         <!-- WELOCOME START -->
         @if (!is_null($checkTodayLeave))
             <div class="row pt-4">
                 <div class="col-md-12">
                     <x-alert type="info" icon="info-circle">
-                        <a href="{{ route('leaves.show', $checkTodayLeave->id) }}" class="openRightModal text-dark-grey">
+                        <a href="{{ (Route::has('leaves.show') ? route('leaves.show', $checkTodayLeave->id) : '') }}" class="openRightModal text-dark-grey">
                             <u>@lang('messages.youAreOnLeave') </u>
                         </a>
                     </x-alert>
@@ -80,7 +81,7 @@
             <div class="row pt-4">
                 <div class="col-md-12">
                     <x-alert type="info" icon="info-circle">
-                        <a href="{{ route('holidays.show', $checkTodayHoliday->id) }}" class="openRightModal text-dark-grey">
+                        <a href="{{ (Route::has('holidays.show') ? route('holidays.show', $checkTodayHoliday->id) : '') }}" class="openRightModal text-dark-grey">
                             <u>@lang('messages.holidayToday')</u>
                         </a>
                     </x-alert>
@@ -113,7 +114,9 @@
                     <input type="hidden" id="current-latitude" name="current_latitude">
                     <input type="hidden" id="current-longitude" name="current_longitude">
 
-                    <span id="dashboard-clock">{!! now()->timezone(company()->timezone)->translatedFormat(company()->time_format) . '</span><span class="f-10 font-weight-normal">' . now()->timezone(company()->timezone)->translatedFormat('l') . '</span>' !!}
+                    {{-- Date complete plutot que le seul jour de la semaine :
+                         « jeudi 03 septembre 2026 » au lieu de « jeudi ». --}}
+                    <span id="dashboard-clock">{!! now()->timezone(company()->timezone)->translatedFormat(company()->time_format) . '</span><span class="f-10 font-weight-normal">' . now()->timezone(company()->timezone)->translatedFormat('l d F Y') . '</span>' !!}
 
                     @if (!is_null($currentClockIn))
                         <span class="f-11 font-weight-normal text-lightest">
@@ -167,23 +170,26 @@
 
 
                 @endphp
-                @if (in_array('attendance', user_modules()))
-                    @if(!in_array('apporteurs', user_roles()))
-                        @if (is_null($currentClockIn) && $checkJoiningDate == true || (is_null($currentClockIn) && $flagbtn == false))
-                            <button type="button" class="btn-primary rounded f-15 ml-4" id="clock-in"
-                                @if (($cannotLogin || !is_null($msg)) && ($user->isAdmin($user->id) || $user->isEmployee($user->id)))
-                                    disabled
-                                    data-toggle="tooltip" data-placement="top" title="{{__($msg)}}"
-                                @endif
-                            ><i
-                            class="icons icon-login mr-2"></i>@lang('modules.attendance.clock_in')</button>
-                        @endif
+                {{-- [BOUTONS RETIRES] Pointage d'arrivee et de depart.
+                     Le module de presence continue de fonctionner : seuls
+                     les boutons disparaissent de l'espace personnel. Le JS
+                     associe teste l'existence de l'element avant de s'y
+                     accrocher, il reste donc sans effet. --}}
+                @if (false)
+                    @if (is_null($currentClockIn) && $checkJoiningDate == true || (is_null($currentClockIn) && $flagbtn == false))
+                        <button type="button" class="btn-primary rounded f-15 ml-4" id="clock-in"
+                            @if (($cannotLogin || !is_null($msg)) && ($user->isAdmin($user->id) || $user->isEmployee($user->id)))
+                                disabled
+                                data-toggle="tooltip" data-placement="top" title="{{__($msg)}}"
+                            @endif
+                        ><i
+                        class="icons icon-login mr-2"></i>@lang('modules.attendance.clock_in')</button>
                     @endif
-                @endif
 
-                @if (!is_null($currentClockIn) && is_null($currentClockIn->clock_out_time) || (!is_null($currentClockIn) && $flagbtn == true))
-                    <button type="button" class="btn-danger rounded f-15 ml-4" id="clock-out"><i
-                            class="icons icon-login mr-2"></i>@lang('modules.attendance.clock_out')</button>
+                    @if (!is_null($currentClockIn) && is_null($currentClockIn->clock_out_time) || (!is_null($currentClockIn) && $flagbtn == true))
+                        <button type="button" class="btn-danger rounded f-15 ml-4" id="clock-out"><i
+                                class="icons icon-login mr-2"></i>@lang('modules.attendance.clock_out')</button>
+                    @endif
                 @endif
 
                 @if (in_array('admin', user_roles()))
@@ -231,6 +237,20 @@
             <!-- CLOCK IN CLOCK OUT END -->
         </div>
         <!-- WELOCOME END -->
+
+        {{-- Bloc de pilotage, place apres le bandeau de bienvenue et de
+             pointage : l'ecran se lit alors de haut en bas, du contexte
+             personnel vers l'activite. Restreint aux diligences dont le
+             collaborateur est membre (voir PilotageDiligences). --}}
+        @include('dashboard.employee.mon-espace')
+
+        {{-- Les widgets historiques ne sont affiches que si au moins un
+             reste actif. Leurs deux conteneurs — la rangee emp-dash-detail
+             et la colonne de droite — n'ont aucune condition propre : sans
+             cette garde, ils laisseraient une zone vide sous le bloc de
+             pilotage. Rallumer un widget depuis les reglages fait
+             reapparaitre la section. --}}
+        @if (count($activeWidgets) > 0)
          <!-- EMPLOYEE DASHBOARD DETAIL START -->
          <div class="row emp-dash-detail">
             <!-- EMP DASHBOARD INFO NOTICES START -->
@@ -285,7 +305,7 @@
                                                 <label class="f-12 text-dark-grey mb-12 " for="usr">
                                                     @lang('modules.dashboard.totalOpenTickets') </label>
                                                 <p class="mb-0 f-18 f-w-500">
-                                                    <a href="{{ route('tickets.index') . '?agent=me&status=open' }}"
+                                                    <a href="{{ (Route::has('tickets.index') ? route('tickets.index') : '') . '?agent=me&status=open' }}"
                                                         class="text-dark">{{ $totalOpenTickets }}</a>
                                                 </p>
                                             </span>
@@ -435,6 +455,7 @@
             <!-- EMP DASHBOARD TASKS PROJECTS EVENTS END -->
         </div>
         <!-- EMPLOYEE DASHBOARD DETAIL END -->
+        @endif
 
     </div>
     <!-- CONTENT WRAPPER END -->
@@ -587,7 +608,7 @@
             var getEventDetail = function(id,type) {
                 if(type == 'ticket')
                 {
-                    var url = "{{ route('tickets.show', ':id') }}";
+                    var url = "{{ (Route::has('tickets.show') ? route('tickets.show', ':id') : '') }}";
                         url = url.replace(':id', id);
                         window.location = url;
                         return true;
@@ -605,13 +626,13 @@
                         var url = "{{ route('tasks.show', ':id') }}";
                         break;
                     case 'event':
-                        var url = "{{ route('events.show', ':id') }}";
+                        var url = "{{ (Route::has('events.show') ? route('events.show', ':id') : '') }}";
                         break;
                     case 'holiday':
-                        var url = "{{ route('holidays.show', ':id') }}";
+                        var url = "{{ (Route::has('holidays.show') ? route('holidays.show', ':id') : '') }}";
                         break;
                     case 'leave':
-                        var url = "{{ route('leaves.show', ':id') }}";
+                        var url = "{{ (Route::has('leaves.show') ? route('leaves.show', ':id') : '') }}";
                         break;
                     default:
                         return 0;
@@ -702,7 +723,7 @@
         });
 
         $('#clock-in').click(function() {
-            const url = "{{ route('attendances.clock_in_modal') }}";
+            const url = "{{ (Route::has('attendances.clock_in_modal') ? route('attendances.clock_in_modal') : '') }}";
             $(MODAL_LG + ' ' + MODAL_HEADING).html('...');
             $.ajaxModal(MODAL_LG, url);
         });
@@ -711,7 +732,7 @@
             var id = $(this).data('shift-schedule-id');
             var date = $(this).data('shift-schedule-date');
             var shiftId = $(this).data('shift-id');
-            var url = "{{ route('shifts-change.edit', ':id') }}?date="+date+"&shift_id="+shiftId;
+            var url = "{{ (Route::has('shifts-change.edit') ? route('shifts-change.edit', ':id') : '') }}?date="+date+"&shift_id="+shiftId;
             url = url.replace(':id', id);
 
             $(MODAL_DEFAULT + ' ' + MODAL_HEADING).html('...');
@@ -719,14 +740,14 @@
         });
 
         $('#view-shifts').click(function() {
-            const url = "{{ route('employee-shifts.index') }}";
+            const url = "{{ (Route::has('employee-shifts.index') ? route('employee-shifts.index') : '') }}";
             $(MODAL_XL + ' ' + MODAL_HEADING).html('...');
             $.ajaxModal(MODAL_XL, url);
         });
 
         @if (!is_null($currentClockIn))
             $('#clock-out').click(function() {
-                var url = "{{ route('attendances.show_clocked_hours') }}?aid={{ $currentClockIn->id }}";
+                var url = "{{ (Route::has('attendances.show_clocked_hours') ? route('attendances.show_clocked_hours') : '') }}?aid={{ $currentClockIn->id }}";
 
                 $(MODAL_DEFAULT + ' ' + MODAL_HEADING).html('...');
                 $.ajaxModal(MODAL_LG, url);
@@ -741,7 +762,7 @@
                 var currentLongitude = document.getElementById("current-longitude").value;
 
                 $.easyAjax({
-                    url: "{{ route('attendances.update_clock_in') }}",
+                    url: "{{ (Route::has('attendances.update_clock_in') ? route('attendances.update_clock_in') : '') }}",
                     type: "GET",
                     data: {
                         currentLatitude: currentLatitude,

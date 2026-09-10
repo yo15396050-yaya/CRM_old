@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @push('datatable-styles')
     @include('sections.datatable_css')
@@ -6,13 +6,13 @@
 
 @php
 $viewClientDoc = user()->permission('view_client_document');
-$viewTicket = user()->permission('view_tickets');
-$viewClientNote = user()->permission('view_client_note');
-$viewClientContact = user()->permission('view_client_contacts');
-$viewClientOrder = user()->permission('view_order');
 @endphp
 
 @section('filter-section')
+
+    {{-- Retour a la liste. Place dans filter-section et non dans
+         content : le changement d'onglet remplace .content-wrapper. --}}
+    <x-dck.back :href="route('clients.index')" :libelle="__('app.dckBack.clients')" />
     <!-- FILTER START -->
     <!-- PROJECT HEADER START -->
 
@@ -37,39 +37,6 @@ $viewClientOrder = user()->permission('view_order');
                     </li>
                     @endif
 
-                    @if (in_array('invoices', user_modules()))
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=invoices'" ajax="false" :text="__('app.menu.invoices')"
-                            class="invoices" />
-                    </li>
-                    @endif
-
-                    @if (in_array('estimates', user_modules()))
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=estimates'" ajax="false" :text="__('app.menu.estimates')"
-                            class="estimates" />
-                    </li>
-                    @endif
-
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=creditnotes'" ajax="false" :text="__('app.menu.credit-note')"
-                            class="creditnotes" />
-                    </li>
-
-                    @if (in_array('payments', user_modules()))
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=payments'" ajax="false" :text="__('app.menu.payments')"
-                            class="payments" />
-                    </li>
-                    @endif
-
-                    @if ($viewClientContact == 'all' || $viewClientContact == 'added')
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=contacts'" ajax="false" :text="__('app.menu.contacts')"
-                            class="contacts" />
-                    </li>
-                    @endif
-
                     @if ($viewClientDoc == 'all' || ($viewClientDoc == 'added' && $client->clientDetails->added_by == user()->id) || ($viewClientDoc == 'owned' && $client->clientDetails->user_id == user()->id) || ($viewClientDoc == 'both' && ($client->clientDetails->added_by == user()->id || $client->clientDetails->user_id == user()->id)))
                     <li>
                         <x-tab :href="route('clients.show', $client->id).'?tab=documents'" ajax="false" :text="__('app.menu.documents')"
@@ -77,39 +44,10 @@ $viewClientOrder = user()->permission('view_order');
                     </li>
                     @endif
 
-                    @if ($viewClientNote != 'none')
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=notes'" ajax="false" :text="__('app.menu.notes')"
-                            class="notes" />
-                    </li>
-                    @endif
-
                     <li>
                         <x-tab :href="route('clients.show', $client->id).'?tab=notes_workspace'" ajax="false" :text="__('Notes')"
                             class="notes_workspace" />
                     </li>
-                    {{--
-                    @if ($viewTicket == 'all' || $viewTicket == 'added')
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=tickets'" ajax="false" :text="__('app.menu.tickets')"
-                            class="tickets" />
-                    </li>
-                    @endif
-                    --}}
-                    @if (in_array('orders', user_modules()) && $viewClientOrder == 'all' || ($viewClientOrder == 'added' && $client->clientDetails->added_by == user()->id) || ($viewClientOrder == 'owned' && $client->clientDetails->user_id == user()->id) || ($viewClientOrder == 'both' && ($client->clientDetails->added_by == user()->id || $client->clientDetails->user_id == user()->id)))
-
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=orders'" ajax="false" :text="__('app.menu.orders')"
-                            class="orders" />
-                    </li>
-                    @endif
-
-                    @if ($gdpr->enable_gdpr)
-                    <li>
-                        <x-tab :href="route('clients.show', $client->id).'?tab=gdpr'" ajax="false" :text="__('app.menu.gdpr')"
-                            class="gdpr" />
-                    </li>
-                    @endif
                 </ul>
             </nav>
         </div>
@@ -128,7 +66,7 @@ $viewClientOrder = user()->permission('view_order');
 
 @section('content')
 
-    <div class="content-wrapper border-top-0 client-detail-wrapper">
+    <div class="content-wrapper border-top-0 client-detail-wrapper dck-front">
         @include($view)
     </div>
 

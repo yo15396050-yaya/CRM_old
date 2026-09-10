@@ -22,9 +22,62 @@ $projectArchived = $project->trashed();
 
 @section('filter-section')
     <!-- FILTER START -->
+
+    {{-- En-tete de la fiche, conforme a la maquette.
+         Place ici et non dans @section('content') : au changement
+         d'onglet, le script remplace tout .content-wrapper. --}}
+    <div class="dck-detail-head dck-front">
+
+        <x-dck.back :href="route('projects.index')"
+                    :libelle="__('app.dckBack.projects')" :barre="false" />
+
+        <div class="dck-page-head">
+            <div class="dck-page-head__txt">
+                <h1>{{ $project->project_name }}</h1>
+                <p>
+                    @if ($project->project_short_code)
+                        <span class="dck-ref">{{ $project->project_short_code }}</span> ·
+                    @endif
+                    @if ($project->client)
+                        {{ $project->client->name }} ·
+                    @endif
+                    <span class="dck-badge" @if ($projectStatusColor) style="color:{{ $projectStatusColor->color }}" @endif>
+                        {{ $project->status }}
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        {{-- Aucune requete ajoutee : toutes ces valeurs sont deja chargees --}}
+        <div class="dck-grid dck-grid--4">
+            <x-dck.kpi icone="bi-check2-circle" ton="ok"
+                       :libelle="__('modules.projects.projectProgress')"
+                       :valeur="$project->completion_percent . '%'"
+                       :sous="__('app.completed')" />
+
+            <x-dck.kpi icone="bi-flag"
+                       :libelle="__('modules.projects.milestones')"
+                       :valeur="$project->milestones->count()"
+                       :sous="__('app.total')" />
+
+            <x-dck.kpi icone="bi-people"
+                       :libelle="__('modules.projects.projectMembers')"
+                       :valeur="$project->members->count()"
+                       :sous="__('app.menu.employees')" />
+
+            <x-dck.kpi icone="bi-calendar-event" ton="warn"
+                       :libelle="__('modules.projects.deadline')"
+                       :valeur="$project->deadline
+                            ? $project->deadline->translatedFormat(company()->date_format)
+                            : '--'"
+                       :sous="$project->deadline ? __('app.dueDate') : __('modules.projects.withoutDeadline')" />
+        </div>
+
+    </div>
+
     <!-- PROJECT HEADER START -->
 
-    <div class="d-flex d-lg-block filter-box project-header bg-white">
+    <div class="d-flex d-lg-block filter-box project-header bg-white dck-front">
         <div class="mobile-close-overlay w-100 h-100" id="close-client-overlay"></div>
 
         <div class="project-menu" id="mob-client-detail">
@@ -175,7 +228,7 @@ $projectArchived = $project->trashed();
 
 @section('content')
 
-    <div class="content-wrapper pt-0 border-top-0 client-detail-wrapper">
+    <div class="content-wrapper pt-0 border-top-0 client-detail-wrapper dck-front">
         @include($view)
     </div>
 

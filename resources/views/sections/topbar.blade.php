@@ -1,5 +1,5 @@
 <!-- HEADER START -->
-<header class="main-header clearfix bg-white" id="header">
+<header class="main-header clearfix bg-white dck-chrome" id="header">
 
 
     <!-- NAVBAR LEFT(MOBILE MENU COLLAPSE) START-->
@@ -41,30 +41,31 @@
             @endif
         </span>
 
+        {{-- Recherche transversale : une saisie, trois modules interroges
+             en une fois. Le raccourci Ctrl+K amene le curseur ici. --}}
+        <form class="dck-search d-none d-md-flex" action="{{ route('search.resultats') }}" method="GET" role="search">
+            <i class="bi bi-search dck-search__ico" aria-hidden="true"></i>
+            <input type="search" name="q" id="dck-search-input"
+                   class="dck-search__input" autocomplete="off"
+                   value="{{ request()->routeIs('search.resultats') ? request('q') : '' }}"
+                   placeholder="{{ __('Rechercher une tâche, un client, un contrat…') }}"
+                   aria-label="{{ __('Rechercher') }}">
+            <kbd class="dck-search__kbd">Ctrl K</kbd>
+        </form>
+
         <ul>
-            <!-- SEARCH START -->
-            <li data-toggle="tooltip" data-placement="top" title="{{__('app.search')}}" class="d-none d-sm-block">
-                <div class="d-flex align-items-center">
-                    <a href="javascript:;" class="d-block header-icon-box open-search">
-                        <i class="fa fa-search f-16 text-dark-grey"></i>
-                    </a>
-                </div>
-            </li>
-            <!-- SEARCH END -->
-            <!-- Sticky Note START -->
-            <li data-toggle="tooltip" data-placement="top" title="{{__('app.menu.stickyNotes')}}" class="d-none d-sm-block">
-                <div class="d-flex align-items-center">
-                    <a href="{{ route('sticky-notes.index') }}" class="d-block header-icon-box openRightModal">
-                        <i class="fa fa-sticky-note f-16 text-dark-grey"></i>
-                    </a>
-                </div>
-            </li>
-            <!-- Sticky Note END -->
+            {{-- [ICONES RETIREES] Loupe et pense-betes.
+                 La loupe ouvrait un panneau de recherche ; elle laisse la
+                 place au champ de recherche visible en permanence, place a
+                 gauche des actions. --}}
 
         @if (!in_array('client', user_roles()))
 
+            {{-- [ICONE RETIREE] Minuteur. Le module de suivi du temps
+                 continue de fonctionner : seul son raccourci disparait de
+                 l'en-tete. Le minuteur en cours reste affiche par le bloc
+                 #timer-clock, plus haut, quand une saisie est ouverte.
             @if (in_array('timelogs', user_modules()) && (add_timelogs_permission() == 'all' || add_timelogs_permission() == 'added' || manage_active_timelogs() == 'all'))
-                <!-- START TIMER -->
                     <li data-toggle="tooltip" data-placement="top" title="{{__('modules.timeLogs.startTimer')}}">
                         <div class="add_box dropdown">
                             <a class="d-block dropdown-toggle header-icon-box" type="link" id="show-active-timer"
@@ -74,7 +75,6 @@
                                         class="badge badge-primary active-timer-count position-absolute {{ ($activeTimerCount == 0) ? 'd-none' : '' }}">{{ $activeTimerCount }}</span>
                             </a>
                         @if ($activeTimerCount == 0)
-                            <!-- DROPDOWN - INFORMATION -->
                                 <div class="dropdown-menu dropdown-menu-right" id="active-timer-list"
                                      aria-labelledby="dropdownMenuLink" tabindex="0">
                                     <a class="dropdown-item text-primary f-w-500" href="javascript:;"
@@ -86,70 +86,21 @@
                             @endif
                         </div>
                     </li>
-                    <!-- START TIMER END -->
             @endif
+            --}}
 
-            <!-- ADD START -->
-                <li data-toggle="tooltip" data-placement="top" title="{{__('app.createNew')}}">
-                    <div class="add_box dropdown">
-                        <a class="d-block dropdown-toggle header-icon-box" type="link" data-toggle="dropdown"
-                           aria-haspopup="true" aria-expanded="false">
-                            <i class="fa fa-plus-circle f-16 text-dark-grey"></i>
-                        </a>
-                        <!-- DROPDOWN - INFORMATION -->
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink" tabindex="0">
-                            @if (in_array('projects', user_modules()) && (add_project_permission() == 'all' || add_project_permission() == 'added'))
-                                <a class="dropdown-item f-14 text-dark openRightModal"
-                                   href="{{ route('projects.create') }}">
-                                    <i class="fa fa-plus f-w-500 mr-2 f-11"></i>
-                                    @lang('app.addProject')
-                                </a>
-                            @endif
-
-                            @if (in_array('tasks', user_modules()) && (add_tasks_permission() == 'all' || add_tasks_permission() == 'added'))
-                                <a class="dropdown-item f-14 text-dark openRightModal"
-                                   href="{{ route('tasks.create') }}">
-                                    <i class="fa fa-plus f-w-500 mr-2 f-11"></i>
-                                    @lang('app.addTask')
-                                </a>
-                            @endif
-
-                            @if (in_array('clients', user_modules()) && (add_clients_permission() == 'all' || add_clients_permission() == 'added'))
-                                <a class="dropdown-item f-14 text-dark openRightModal"
-                                   href="{{ route('clients.create') }}">
-                                    <i class="fa fa-plus f-w-500 mr-2 f-11"></i>
-                                    @lang('app.addClient')
-                                </a>
-                            @endif
-
-                            @if (in_array('employees', user_modules()) && (add_employees_permission() == 'all' || add_employees_permission() == 'added'))
-                                <a class="dropdown-item f-14 text-dark openRightModal"
-                                   href="{{ route('employees.create') }}">
-                                    <i class="fa fa-plus f-w-500 mr-2 f-11"></i>
-                                    @lang('app.addEmployee')
-                                </a>
-                            @endif
-
-                            @if (in_array('payments', user_modules()) && (add_payments_permission() == 'all' || add_payments_permission() == 'added'))
-                                <a class="dropdown-item f-14 text-dark openRightModal"
-                                   href="{{ route('payments.create') }}">
-                                    <i class="fa fa-plus f-w-500 mr-2 f-11"></i>
-                                    @lang('modules.payments.addPayment')
-                                </a>
-                            @endif
-
-                            @if (in_array('tickets', user_modules()) && (add_tickets_permission() == 'all' || add_tickets_permission() == 'added'))
-                                <a class="dropdown-item f-14 text-dark openRightModal"
-                                   href="{{ route('tickets.create') }}">
-                                    <i class="fa fa-plus f-w-500 mr-2 f-11"></i>
-                                    @lang('modules.tickets.addTicket')
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </li>
-                <!-- ADD END -->
         @endif
+
+            {{-- Bascule du theme. Elle pilote l'interrupteur cache de la barre
+                 laterale : le gestionnaire existant fait le reste, aucune
+                 logique n'est dupliquee ici. --}}
+            <li>
+                <button type="button" class="header-icon-box dck-theme" id="dck-bascule-theme"
+                        aria-label="{{ __('Changer de thème') }}"
+                        title="{{ __('Changer de thème') }}">
+                    <i class="bi {{ user()->dark_theme ? 'bi-sun' : 'bi-moon' }}"></i>
+                </button>
+            </li>
 
         <!-- NOTIFICATIONS START -->
             <li title="{{__('app.newNotifications')}}">
@@ -194,16 +145,53 @@
                 </div>
             </li>
             <!-- NOTIFICATIONS END -->
-            <!-- LOGOUT START -->
-            <li data-toggle="tooltip" data-placement="top" title="{{__('app.logout')}}">
-                <div class="logout_box">
-                    <a class="d-block header-icon-box" href="javascript:;" onclick="event.preventDefault();
-                    document.getElementById('logout-form').submit();">
-                        <i class="fa fa-power-off f-16 text-dark-grey"></i>
-                    </a>
-                </div>
-            </li>
-            <!-- LOGOUT END -->
+            {{-- [ICONE RETIREE] Deconnexion : elle figure deja dans le menu
+                 du compte, en bas de la barre laterale. Le formulaire de
+                 deconnexion plus bas reste en place, c'est lui que ce menu
+                 soumet. --}}
+
+            @if (!in_array('client', user_roles()))
+                {{-- Bouton de creation. Il ne propose que les quatre objets
+                     que le cabinet cree au quotidien ; les modules ecartes
+                     du menu lateral n'ont pas a reapparaitre ici. --}}
+                <li class="dck-creer-li">
+                    <div class="dropdown">
+                        <button type="button" class="dck-creer dropdown-toggle" data-toggle="dropdown"
+                                aria-haspopup="true" aria-expanded="false">
+                            <i class="bi bi-plus-lg"></i>
+                            <span>@lang('Créer')</span>
+                        </button>
+
+                        <div class="dropdown-menu dropdown-menu-right dck-creer__menu" tabindex="0">
+                            <div class="dck-creer__lab">@lang('Créer un élément')</div>
+
+                            @if (in_array('tasks', user_modules()) && Route::has('tasks.create') && (add_tasks_permission() == 'all' || add_tasks_permission() == 'added'))
+                                <a class="dck-creer__item openRightModal" href="{{ route('tasks.create') }}">
+                                    <i class="bi bi-check2-square"></i>@lang('Nouvelle tâche')
+                                </a>
+                            @endif
+
+                            @if (in_array('projects', user_modules()) && Route::has('projects.create') && (add_project_permission() == 'all' || add_project_permission() == 'added'))
+                                <a class="dck-creer__item openRightModal" href="{{ route('projects.create') }}">
+                                    <i class="bi bi-folder2-open"></i>@lang('Nouvelle diligence')
+                                </a>
+                            @endif
+
+                            @if (in_array('contracts', user_modules()) && Route::has('contracts.create') && (user()->permission('add_contract') == 'all' || user()->permission('add_contract') == 'added'))
+                                <a class="dck-creer__item openRightModal" href="{{ route('contracts.create') }}">
+                                    <i class="bi bi-file-earmark-text"></i>@lang('Nouveau contrat')
+                                </a>
+                            @endif
+
+                            @if (in_array('clients', user_modules()) && Route::has('clients.create') && (add_clients_permission() == 'all' || add_clients_permission() == 'added'))
+                                <a class="dck-creer__item openRightModal" href="{{ route('clients.create') }}">
+                                    <i class="bi bi-building"></i>@lang('Nouveau client')
+                                </a>
+                            @endif
+                        </div>
+                    </div>
+                </li>
+            @endif
         </ul>
     </div>
     <!-- NAVBAR RIGHT(SEARCH, ADD, NOTIFICATION, LOGOUT) START-->
@@ -239,10 +227,37 @@
             $.ajaxModal(MODAL_XL, url);
         });
 
+        /* L'ancienne loupe a ete retiree de l'en-tete ; le gestionnaire reste
+           en place car la classe est encore posee sur d'autres ecrans. */
         $('.open-search').click(function () {
             const url = "{{ route('search.index') }}";
             $(MODAL_LG + ' ' + MODAL_HEADING).html('...');
             $.ajaxModal(MODAL_LG, url);
+        });
+
+        /* La lune de l'en-tete actionne l'interrupteur cache de la barre
+           laterale : c'est lui qui porte l'enregistrement du choix, on ne
+           duplique donc pas l'appel reseau. */
+        $('#dck-bascule-theme').on('click', function () {
+            const interrupteur = document.getElementById('dark-theme-toggle');
+
+            if (interrupteur) {
+                interrupteur.checked = !interrupteur.checked;
+                $(interrupteur).trigger('change');
+            }
+        });
+
+        /* Ctrl+K amene le curseur dans le champ de recherche de l'en-tete. */
+        document.addEventListener('keydown', function (e) {
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                const champ = document.getElementById('dck-search-input');
+
+                if (champ) {
+                    e.preventDefault();
+                    champ.focus();
+                    champ.select();
+                }
+            }
         });
 
 

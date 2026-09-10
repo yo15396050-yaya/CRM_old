@@ -1,6 +1,35 @@
 <script src="{{ asset('vendor/jquery/frappe-charts.min.iife.js') }}"></script>
 
-<div class="row">
+{{--
+    Indicateurs de tete, conformes a la maquette pilotage-dc-knowing.
+    Les quatre valeurs viennent de $diligenceKpis, calcule en une seule
+    requete par OverviewDashboard::calculerDiligenceKpis(). Aucune
+    requete n'est declenchee ici.
+
+    Le bloc n'apparait que sur l'onglet Vue d'ensemble : les autres
+    onglets reutilisent cette vue sans cette variable.
+--}}
+@isset($diligenceKpis)
+    @include('dashboard.ajax.pilotage')
+@endisset
+
+{{-- Rangee de widgets heritee du theme. Elle est pilotee par la table
+     dashboard_widgets, aujourd'hui vide : aucune carte ne s'affiche et
+     le conteneur ne laissait qu'un vide sous les indicateurs. Il n'est
+     donc rendu que si au moins une carte doit y figurer. --}}
+@php
+    $rangeeHeritee = collect([
+        ['clients', 'total_clients'],
+        ['employees', 'total_employees'],
+        ['projects', 'total_projects'],
+        ['invoices', 'unpaid_invoices'],
+        ['timelogs', 'total_hours_logged'],
+        ['tasks', 'pending_tasks'],
+        ['tickets', 'total_unresolved_tickets'],
+    ])->contains(fn ($p) => in_array($p[0], user_modules()) && in_array($p[1], $activeWidgets));
+@endphp
+
+<div class="row" @unless ($rangeeHeritee) hidden @endunless>
     @if (in_array('clients', user_modules()) && in_array('total_clients', $activeWidgets))
         <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
             <a href="{{ route('clients.index') }}">
@@ -33,7 +62,7 @@
 
     @if (in_array('invoices', user_modules()) && in_array('total_unpaid_invoices', $activeWidgets))
         <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-            <a href="{{ route('invoices.index') . '?status=pending' }}">
+            <a href="{{ (Route::has('invoices.index') ? route('invoices.index') : '') . '?status=pending' }}">
                 <x-cards.widget :title="__('modules.dashboard.totalUnpaidInvoices')"
                                 :value="$counts->totalUnpaidInvoices" icon="file-invoice">
                 </x-cards.widget>
@@ -43,7 +72,7 @@
 
     @if (in_array('timelogs', user_modules()) && in_array('total_hours_logged', $activeWidgets))
         <div class="col-xl-3 col-lg-6 col-md-6">
-            <a href="{{ route('time-log-report.index') }}">
+            <a href="{{ (Route::has('time-log-report.index') ? route('time-log-report.index') : '') }}">
                 <x-cards.widget :title="__('modules.dashboard.totalHoursLogged')" :value="$counts->totalHoursLogged"
                                 icon="clock">
                 </x-cards.widget>
@@ -61,9 +90,9 @@
         </div>
     @endif
 
-    @if (in_array('attendance', user_modules()) && in_array('total_today_attendance', $activeWidgets))
+    @if (false) {{-- [KPI RETIRE] Presence du jour : indicateur hors des trois modules retenus --}}
         <div class="col-xl-3 col-lg-6 col-md-6">
-            <a href="{{ route('attendances.index') }}">
+            <a href="{{ (Route::has('attendances.index') ? route('attendances.index') : '') }}">
                 <x-cards.widget :title="__('modules.dashboard.totalTodayAttendance')"
                                 :value="$counts->totalTodayAttendance.'/'.$counts->totalEmployees"
                                 icon="calendar-check">
@@ -74,7 +103,7 @@
 
     @if (in_array('tickets', user_modules()) && in_array('total_unresolved_tickets', $activeWidgets))
         <div class="col-xl-3 col-lg-6 col-md-6">
-            <a href="{{ route('tickets.index') . '?status=open' }}">
+            <a href="{{ (Route::has('tickets.index') ? route('tickets.index') : '') . '?status=open' }}">
                 <x-cards.widget :title="__('modules.tickets.totalUnresolvedTickets')"
                                 :value="floor($counts->totalOpenTickets)" icon="ticket-alt">
                 </x-cards.widget>
@@ -87,23 +116,27 @@
 <div class="row">
     @if (in_array('payments', user_modules()) && in_array('recent_earnings', $activeWidgets))
         <div class="col-sm-12 col-lg-6 mt-3">
+            @if (false) {{-- [BLOC RETIRE] Recettes : retire du tableau de bord, donnees conservees --}}
             <x-cards.data
                 :title="__('app.income').' <i class=\'fa fa-question-circle\' data-toggle=\'popover\' data-placement=\'top\' data-content=\''.__('app.from').' '.$startDate->translatedFormat(company()->date_format).' '.__('app.to').' '.$endDate->translatedFormat(company()->date_format).'\' data-trigger=\'hover\'></i>'">
                 <x-bar-chart id="task-chart1" :chartData="$earningChartData" height="300"></x-bar-chart>
             </x-cards.data>
+            @endif
         </div>
     @endif
 
     @if (in_array('timelogs', user_modules()) && in_array('timelogs', $activeWidgets))
         <div class="col-sm-12 col-lg-6 mt-3">
+            @if (false) {{-- [BLOC RETIRE] Feuille de temps : retire du tableau de bord, donnees conservees --}}
             <x-cards.data
                 :title="__('app.menu.timeLogs').' <i class=\'fa fa-question-circle\' data-toggle=\'popover\' data-placement=\'top\' data-content=\''.__('app.from').' '.$startDate->translatedFormat(company()->date_format).' '.__('app.to').' '.$endDate->translatedFormat(company()->date_format).'\' data-trigger=\'hover\'></i>'">
                 <x-line-chart id="task-chart2" :chartData="$timlogChartData" height="300"></x-line-chart>
             </x-cards.data>
+            @endif
         </div>
     @endif
 
-    @if (in_array('leaves', user_modules()) && in_array('settings_leaves', $activeWidgets))
+    @if (false) {{-- [KPI RETIRE] Conges en attente : indicateur hors des trois modules retenus --}}
         <div class="col-sm-12 col-lg-6 mt-3">
             <x-cards.data
                 :title="__('modules.leaves.pendingLeaves').' <i class=\'fa fa-question-circle\' data-toggle=\'popover\' data-placement=\'top\' data-content=\''.__('app.from').' '.$startDate->translatedFormat(company()->date_format).' '.__('app.to').' '.$endDate->translatedFormat(company()->date_format).'\' data-trigger=\'hover\'></i>'"
@@ -123,7 +156,7 @@
                             </td>
                             <td align="right" class="pr-20">
                                 <div class="task_view">
-                                    <a href="{{ route('leaves.show', [$item->id]) }}"
+                                    <a href="{{ (Route::has('leaves.show') ? route('leaves.show', [$item->id]) : '') }}"
                                        class="taskView openRightModal">@lang('app.view')</a>
                                     <div class="dropdown">
                                         <a class="task_view_more d-flex align-items-center justify-content-center dropdown-toggle"
@@ -177,7 +210,7 @@
                                          alt="{{ $item->requester->name }}" title="{{ $item->requester->name }}">
                                 </div>
                             </td>
-                            <td><a href="{{ route('tickets.show', $item->ticket_number) }}"
+                            <td><a href="{{ (Route::has('tickets.show') ? route('tickets.show', $item->ticket_number) : '') }}"
                                    class="text-darkest-grey">{{ $item->subject }}</a>
                                 <br/>
                                 <span class="f-10 text-lightest mt-1">{{ $item->requester->name }}</span>
@@ -213,6 +246,7 @@
 
     @if (in_array('tasks', user_modules()) && in_array('overdue_tasks', $activeWidgets))
         <div class="col-sm-12 col-lg-6 mt-3">
+            @if (false) {{-- [BLOC RETIRE] Taches en attente : retire du tableau de bord, donnees conservees --}}
             <x-cards.data
                 :title="__('modules.dashboard.totalPendingTasks').' <i class=\'fa fa-question-circle\' data-toggle=\'popover\' data-placement=\'top\' data-content=\''.__('app.from').' '.$startDate->translatedFormat(company()->date_format).' '.__('app.to').' '.$endDate->translatedFormat(company()->date_format).'\' data-trigger=\'hover\'></i>'"
                 padding="false" otherClasses="h-200">
@@ -253,6 +287,7 @@
                     @endforelse
                 </x-table>
             </x-cards.data>
+            @endif
         </div>
     @endif
 
@@ -266,7 +301,7 @@
                         <tr>
                             <td class="pl-20">
                                 <h5 class="f-13 text-darkest-grey"><a
-                                        href="{{ route('deals.show', [$item->id]) }}">{{ $item->client_name_salutation }}</a>
+                                        href="{{ (Route::has('deals.show') ? route('deals.show', [$item->id]) : '') }}">{{ $item->client_name_salutation }}</a>
                                 </h5>
                                 <div class="text-muted">{{ $item->company_name }}</div>
                             </td>
@@ -295,6 +330,7 @@
 
     @if (in_array('projects', user_modules()) && in_array('project_activity_timeline', $activeWidgets))
         <div class="col-sm-12 col-lg-6 mt-3">
+            @if (false) {{-- [BLOC RETIRE] Journal d'activite des diligences : retire du tableau de bord, donnees conservees --}}
             <x-cards.data
                 :title="__('modules.dashboard.projectActivityTimeline').' <i class=\'fa fa-question-circle\' data-toggle=\'popover\' data-placement=\'top\' data-content=\''.__('app.from').' '.$startDate->translatedFormat(company()->date_format).' '.__('app.to').' '.$endDate->translatedFormat(company()->date_format).'\' data-trigger=\'hover\'></i>'"
                 padding="false"
@@ -328,11 +364,13 @@
                     </div><!-- card end -->
                 @endforelse
             </x-cards.data>
+            @endif
         </div>
     @endif
 
     @if (in_array('employees', user_modules()) && in_array('user_activity_timeline', $activeWidgets))
         <div class="col-sm-12 col-lg-6 mt-3">
+            @if (false) {{-- [BLOC RETIRE] Journal d'activite des utilisateurs : retire du tableau de bord, donnees conservees --}}
             <x-cards.data
                 :title="__('modules.dashboard.userActivityTimeline').' <i class=\'fa fa-question-circle\' data-toggle=\'popover\' data-placement=\'top\' data-content=\''.__('app.from').' '.$startDate->translatedFormat(company()->date_format).' '.__('app.to').' '.$endDate->translatedFormat(company()->date_format).'\' data-trigger=\'hover\'></i>'"
                 padding="false"
@@ -366,6 +404,7 @@
                     </div><!-- card end -->
                 @endforelse
             </x-cards.data>
+            @endif
         </div>
     @endif
 </div>
@@ -379,7 +418,7 @@
             var type = 'single';
         }
         let searchQuery = "?leave_action=" + action + "&leave_id=" + leaveId + "&type=" + type;
-        let url = "{{ route('leaves.show_approved_modal') }}" + searchQuery;
+        let url = "{{ (Route::has('leaves.show_approved_modal') ? route('leaves.show_approved_modal') : '') }}" + searchQuery;
 
         $(MODAL_LG + ' ' + MODAL_HEADING).html('...');
         $.ajaxModal(MODAL_LG, url);
@@ -394,7 +433,7 @@
                 var type = 'single';
             }
         let searchQuery = "?leave_action=" + action + "&leave_id=" + leaveId + "&type=" + type;
-        let url = "{{ route('leaves.show_reject_modal') }}" + searchQuery;
+        let url = "{{ (Route::has('leaves.show_reject_modal') ? route('leaves.show_reject_modal') : '') }}" + searchQuery;
 
         $(MODAL_LG + ' ' + MODAL_HEADING).html('...');
         $.ajaxModal(MODAL_LG, url);

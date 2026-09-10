@@ -27,7 +27,7 @@
 @section('filter-section')
     <!-- FILTER START -->
     <!-- DASHBOARD HEADER START -->
-    <div class="d-flex filter-box project-header bg-white dashboard-header">
+    <div class="d-flex filter-box project-header bg-white dashboard-header dck-front">
 
         <div class="mobile-close-overlay w-100 h-100" id="close-client-overlay"></div>
         <div class="project-menu d-lg-flex" id="mob-client-detail">
@@ -41,17 +41,17 @@
                        class="overview" ajax="false"/>
             @endif
 
-            @if (in_array('projects', user_modules()) && $viewProjectDashboard == 'all')
+            @if (false) {{-- [ONGLET RETIRE] Diligence : son suivi passe par le module lui-meme --}}
                 <x-tab :href="route('dashboard.advanced').'?tab=project'" :text="__('app.project')" class="project"
                        ajax="false"/>
             @endif
 
-            @if (in_array('clients', user_modules()) && $viewClientDashboard == 'all')
+            @if (false) {{-- [ONGLET RETIRE] Client --}}
                 <x-tab :href="route('dashboard.advanced').'?tab=client'" :text="__('app.client')" class="client"
                        ajax="false"/>
             @endif
 
-            @if ($viewHRDashboard == 'all' && (in_array('employees', user_modules()) || in_array('leaves', user_modules()) || in_array('attendance', user_modules())))
+            @if (false) {{-- [MODULE RETIRE] Onglet RH du tableau de bord --}}
                 <x-tab :href="route('dashboard.advanced').'?tab=hr'" :text="__('app.menu.hr')" class="hr" ajax="false"/>
             @endif
 
@@ -60,7 +60,7 @@
                        ajax="false"/>
             @endif
 
-            @if ($viewFinanceDashboard == 'all' && (in_array('invoices', user_modules()) || in_array('estimates', user_modules()) || in_array('leads', user_modules())))
+            @if (false) {{-- [ONGLET RETIRE] Finances --}}
                 <x-tab :href="route('dashboard.advanced').'?tab=finance'" :text="__('app.menu.finance')" class="finance"
                        ajax="false"/>
             @endif
@@ -136,7 +136,7 @@
 @section('content')
 
     <!-- CONTENT WRAPPER START -->
-    <div class="px-4 py-0 py-lg-3  border-top-0 admin-dashboard">
+    <div class="px-4 py-0 py-lg-3  border-top-0 admin-dashboard dck-front">
         @include($view)
     </div>
     <!-- CONTENT WRAPPER END -->

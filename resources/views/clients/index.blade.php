@@ -180,7 +180,58 @@
 @section('content')
 
     <!-- CONTENT WRAPPER START -->
-    <div class="content-wrapper">
+    <div class="content-wrapper dck-front">
+
+        {{-- Indicateurs du portefeuille. Ils portent sur son etat — ce qui
+             est a renouveler, ce qui n'est pas couvert — et non sur son
+             seul volume. Calcules par PilotageClients. --}}
+        @isset($cliKpis)
+            <div class="dck-grid dck-g4">
+                <div class="dck-kpi2">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-building"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Clients actifs')</span>
+                    </div>
+                    <div class="dck-kpi2__val">{{ $cliKpis->actifs }}</div>
+                    <div class="dck-kpi2__sub">sur {{ $cliKpis->total }} au portefeuille</div>
+                </div>
+
+                <a class="dck-kpi2" href="{{ route('contracts.index') }}">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-exclamation-triangle"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Contrats expirés')</span>
+                    </div>
+                    <div class="dck-kpi2__val">{{ $cliKpis->expires }}</div>
+                    <div class="dck-kpi2__sub">
+                        {{ $cliKpis->bientot > 0
+                            ? $cliKpis->bientot . ' ' . __('autres sous 60 jours')
+                            : __('à renouveler ou archiver') }}
+                    </div>
+                </a>
+
+                <div class="dck-kpi2">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-file-earmark-x"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Sans contrat')</span>
+                    </div>
+                    <div class="dck-kpi2__val">{{ $cliKpis->sansContrat }}</div>
+                    <div class="dck-kpi2__sub">aucun contrat enregistré</div>
+                </div>
+
+                <a class="dck-kpi2" href="{{ route('projects.index') }}">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-folder2-open"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Suivis en diligence')</span>
+                    </div>
+                    <div class="dck-kpi2__val">
+                        {{ $cliKpis->suivis }}
+                        <span class="dck-kpi2__tot">/ {{ $cliKpis->total }}</span>
+                    </div>
+                    <div class="dck-kpi2__sub">avec une diligence en cours</div>
+                </a>
+            </div>
+        @endisset
+
         <!-- Add Task Export Buttons Start -->
         <div class="d-grid d-lg-flex d-md-flex action-bar">
 

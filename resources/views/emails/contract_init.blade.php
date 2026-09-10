@@ -1,53 +1,91 @@
+{{--
+  Mise a disposition d'un contrat pour lecture et signature electronique.
+  Rendu par ContractInitNotification.
+
+  Ce message porte un lien signe a expiration : le delai est donc affiche en
+  clair dans le tableau, et le caractere personnel du lien rappele sous le
+  bouton. L'ancien gabarit reposait sur un bloc <style> a base de classes,
+  degrade par Outlook et par l'application Gmail iOS.
+--}}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Nouveau Contrat - {{ $companyName }}</title>
-    <style>
-        body { font-family: 'Public Sans', 'Arial', sans-serif; background-color: #f0f2f5; margin: 0; padding: 0; }
-        .container { max-width: 600px; margin: 50px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .header { background-color: {{ $headerColor ?? '#000000' }}; text-align: center; padding: 30px; }
-        .header img { max-height: 80px; }
-        .content { padding: 40px; color: #333333; line-height: 1.6; }
-        .content h2 { color: #111111; margin-top: 0; font-size: 24px; text-align: center; }
-        .contract-box { background-color: #f8fafc; border-left: 4px solid {{ $headerColor ?? '#000000' }}; padding: 20px; margin: 25px 0; border-radius: 4px; }
-        .contract-box p { margin: 8px 0; font-size: 15px; }
-        .btn-container { text-align: center; margin-top: 30px; }
-        .btn { display: inline-block; padding: 14px 30px; background-color: {{ $headerColor ?? '#000000' }}; color: #ffffff !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; transition: all 0.3s ease; }
-        .footer { background-color: #f8fafc; font-size: 13px; color: #718096; text-align: center; padding: 20px; border-top: 1px solid #edf2f7; }
-        .footer p { margin: 5px 0; }
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ $subject }}</title>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <img src="{{ $logo }}" alt="{{ $companyName }}">
-        </div>
-        <div class="content">
-            <h2>Bonjour {{ $recipientName }} !</h2>
-            
-            <p>Nous avons le plaisir de vous informer que votre contrat est désormais disponible sur votre espace <strong>{{ $companyName }}</strong>.</p>
+<body style="margin:0;padding:0;background:#f3f4f6;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;padding:32px 12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;">
 
-            <div class="contract-box">
-                <p><strong>📋 Sujet :</strong> {{ $subject }}</p>
-                <p><strong>📑 Type :</strong> {{ $contractType }}</p>
-                <p><strong>📅 Date :</strong> {{ $date }}</p>
-                <p><strong>🔢 Référence :</strong> {{ $contractNumber }}</p>
-            </div>
+    <tr><td style="padding:22px 28px;border-bottom:1px solid #e5e7eb;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td valign="middle">
+                {{-- Image embarquee (cid) : le logo ne depend alors plus de APP_URL --}}
+                <img src="{{ isset($message) && !empty($logoPath) && file_exists($logoPath) ? $message->embed($logoPath) : $logoUrlDark }}" alt="{{ $companyName }}" width="118" height="30" style="display:block;border:0;width:118px;height:30px;">
+            </td>
+            <td align="right" valign="middle">
+                <table cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:999px;"><tr>
+                    <td style="padding:4px 11px;font-size:11.5px;font-weight:600;color:#374151;">Signature électronique</td>
+                </tr></table>
+            </td>
+        </tr></table>
+    </td></tr>
 
-            <p>Nous vous invitons à le consulter et à le signer électroniquement en cliquant sur le bouton ci-dessous :</p>
+    <tr><td style="padding:26px 28px 0 28px;">
+        <h1 style="margin:0;font-size:21px;line-height:1.3;color:#111827;font-weight:bold;letter-spacing:-.5px;">{{ $subject }}</h1>
+        <p style="margin:12px 0 0;font-size:14.5px;line-height:1.65;color:#374151;">
+            Bonjour {{ $recipientName }}, votre contrat est prêt. Vous pouvez le lire intégralement puis le signer en ligne, sans rien imprimer ni renvoyer.
+        </p>
+    </td></tr>
 
-            <div class="btn-container">
-                <a href="{{ $url }}" class="btn">Consulter le contrat</a>
-            </div>
+    <tr><td style="padding:22px 28px 0 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+                <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Référence</td>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-family:Consolas,Menlo,monospace;font-size:13.5px;color:#111827;font-weight:bold;">{{ $contractNumber }}</td>
+            </tr>
+            <tr>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Type de contrat</td>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $contractType }}</td>
+            </tr>
+            <tr>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Établi le</td>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $date }}</td>
+            </tr>
+            <tr>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">À signer avant le</td>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#a16207;font-weight:bold;">{{ $expiryDate }}</td>
+            </tr>
+        </table>
+    </td></tr>
 
-            <p style="margin-top: 30px;">Besoin d'aide ? Notre équipe reste à votre entière disposition par email ou par téléphone.</p>
-            <p>L’équipe <strong>{{ $companyName }}</strong></p>
-        </div>
-        <div class="footer">
-            <p>© {{ date('Y') }} {{ $companyName }} – Tous droits réservés.</p>
-            <p>📧 {{ $company->company_email }} | 📞 {{ $company->company_phone }}</p>
-        </div>
-    </div>
+    <tr><td style="padding:26px 28px 0 28px;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="background:#000000;border-radius:8px;">
+                <a href="{{ $url }}" style="display:inline-block;padding:13px 24px;color:#ffffff;text-decoration:none;font-size:14.5px;font-weight:600;">Lire et signer le contrat</a>
+            </td>
+        </tr></table>
+    </td></tr>
+
+    <tr><td style="padding:20px 28px 0 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fef9e7;border:1px solid #f3dfa2;border-radius:12px;">
+            <tr><td style="padding:15px 18px;font-size:13.5px;line-height:1.65;color:#a16207;">
+                <strong>Ce lien vous est personnel</strong> et reste valable {{ $expiryDays }}&nbsp;jours. Ne le transférez pas : toute signature apposée depuis ce lien vous sera attribuée. Passé ce délai, demandez-nous simplement un nouvel envoi.
+            </td></tr>
+        </table>
+    </td></tr>
+
+    <tr><td style="padding:22px 28px 30px 28px;font-size:14.5px;line-height:1.7;color:#374151;">
+        Une question sur une clause avant de signer ? Répondez à cet e-mail.
+    </td></tr>
+
+    <tr><td style="padding:18px 28px;background:#f9fafb;border-top:1px solid #e5e7eb;border-radius:0 0 12px 12px;font-size:12px;line-height:1.7;color:#6b7280;">
+        {{ $companyName }}@if(!empty($company->company_email)) · {{ $company->company_email }}@endif @if(!empty($company->company_phone))· {{ $company->company_phone }}@endif
+    </td></tr>
+</table>
+</td></tr>
+</table>
 </body>
 </html>

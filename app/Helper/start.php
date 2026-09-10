@@ -84,6 +84,47 @@ if (!function_exists('user_roles')) {
 
 }
 
+if (!function_exists('roles_arbitres')) {
+
+    /**
+     * Roles autorises a arbitrer l'etape « En attente d'approbation ».
+     *
+     * L'administrateur, plus la direction : le DG et le DGA valident le
+     * travail des collaborateurs au quotidien, c'est leur role au cabinet.
+     * Ils n'ont volontairement pas le role admin, qui reste reserve a
+     * l'administration technique de l'application.
+     *
+     * La liste vit ici, en un seul endroit, parce qu'elle etait auparavant
+     * recopiee sous la forme « in_array('admin', user_roles()) » dans le
+     * trait d'approbation, deux datatables et quatre vues : une divergence
+     * entre ces sept copies produisait un bouton visible mais une action
+     * refusee en 403.
+     */
+    // @codingStandardsIgnoreLine
+    function roles_arbitres()
+    {
+        return ['admin', 'dg-dck', 'dga-dck'];
+    }
+
+}
+
+if (!function_exists('est_arbitre')) {
+
+    /**
+     * L'utilisateur courant peut-il arbitrer une approbation ?
+     *
+     * Ne dit rien de l'administrateur de projet, qui arbitre ses propres
+     * taches : cette regle depend de la tache et reste portee par
+     * ApprobationTache::estArbitre().
+     */
+    // @codingStandardsIgnoreLine
+    function est_arbitre()
+    {
+        return (bool) array_intersect(roles_arbitres(), user_roles() ?: []);
+    }
+
+}
+
 if (!function_exists('admin_theme')) {
 
     // @codingStandardsIgnoreLine

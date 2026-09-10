@@ -36920,10 +36920,42 @@ if (el) {
 
 //show hide secret values
 $("body").on("click", ".toggle-password", function () {
-    var $selector = $(this).closest(".input-group").find("input.form-control");
-    $(this).find(".svg-inline--fa").toggleClass("fa-eye fa-eye-slash");
-    var $type = $selector.attr("type") === "password" ? "text" : "password";
-    $selector.attr("type", $type);
+    var $bouton = $(this);
+
+    // Le champ est cherche dans les conteneurs connus : .input-group pour les
+    // formulaires du theme, .auth-control pour les ecrans d'authentification
+    // refondus. En dernier recours on remonte au parent direct : certains
+    // gabarits n'ont aucun de ces deux conteneurs.
+    var $groupe = $bouton.closest(".input-group, .auth-control");
+
+    if (!$groupe.length) {
+        $groupe = $bouton.parent();
+    }
+
+    // input.form-control d'abord (cas majoritaire), sinon n'importe quel champ
+    // de saisie : la page de connexion ne met pas cette classe sur son input.
+    var $champ = $groupe.find("input.form-control").first();
+
+    if (!$champ.length) {
+        $champ = $groupe.find("input[type='password'], input[type='text']").first();
+    }
+
+    if (!$champ.length) {
+        return;
+    }
+
+    var estMasque = $champ.attr("type") === "password";
+    $champ.attr("type", estMasque ? "text" : "password");
+
+    // L'icone est un <svg> quand Font Awesome tourne en mode JS, un <i> quand
+    // il est charge en CSS. On vise les deux.
+    var $icone = $bouton.find(".svg-inline--fa, i").first();
+
+    if ($icone.length) {
+        $icone.toggleClass("fa-eye", !estMasque).toggleClass("fa-eye-slash", estMasque);
+    }
+
+    $bouton.attr("aria-pressed", estMasque ? "true" : "false");
 });
 
 $("body").on("click", ".openRightModal", function (event) {

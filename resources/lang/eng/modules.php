@@ -532,7 +532,16 @@ return array(
         'leaveMessage' => 'One or more assignees are on leave on selected dates.',
         'leaveOn' => 'is on leave',
         'editSubTask' => 'Edit Sub Task',
-        'notFinishedProjects' => 'Showing only open projects whose status is not finished'
+        'notFinishedProjects' => 'Showing only open projects whose status is not finished',
+
+        /* Notifications section of the task form: the checkbox that turns the
+           notice on, then the recipient picker it reveals. These four keys
+           were missing, so the create and edit views printed the raw
+           modules.tasks.* path instead of a label. */
+        'informCollaborator' => 'Notify the collaborators',
+        'selectCollaborator' => 'Select a collaborator',
+        'informClient' => 'Notify the client',
+        'selectClient' => 'Select a client'
     ),
     'invoices' => array(
         'addInvoice' => 'Create Invoice',

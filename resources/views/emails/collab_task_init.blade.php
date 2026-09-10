@@ -1,94 +1,136 @@
+{{--
+  Assignation d'une tache a un collaborateur.
+  Rendu par TaskInitNotification (branche collaborateur).
+
+  Mise en page reprise du design systeme du CRM (public/css/dck-flow.css) :
+  neutres --n50 a --n900, noir pur en action, rayon 12 px sur les cartes et
+  8 px sur les boutons, pastilles de statut a bordure fine.
+
+  Contrainte e-mail : tables et styles inline uniquement. Ni <style>, ni flex,
+  ni police distante — Gmail et Outlook les suppriment ou les ignorent.
+--}}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assignation Collaborateur</title>
+    <title>{{ $taskHeading }}</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #f5f7fa; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f7fa; padding: 40px 0;">
-        <tr>
-            <td align="center">
-                <table border="0" cellpadding="0" cellspacing="0" width="520" style="background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);">
-                    <!-- Header Logo -->
-                    <tr>
-                        <td style="padding: 32px 40px 10px 40px; text-align: left;">
-                            <div style="font-size: 22px; font-weight: 700; color: #1e293b;">Flow<span style="color: #3b82f6;">Task</span></div>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content Area -->
-                    <tr>
-                        <td style="padding: 20px 40px 40px 40px;">
-                            <div style="display: inline-block; background-color: #eff6ff; color: #3b82f6; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 40px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 20px;">Assignation Collaborateur</div>
-                            
-                            <div style="font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 12px;">Bonjour {{ $recipientName }},</div>
-                            <div style="font-size: 15px; line-height: 1.6; color: #475569; margin-bottom: 30px;">
-                                Une nouvelle mission vous a été confiée : <strong style="color: #1e293b;">« {{ $taskHeading }} »</strong>. Voici les détails opérationnels.
-                            </div>
-                            
-                            <!-- Info Table -->
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f8fafc; border-radius: 16px; border: 1px solid #edf2f7; padding: 10px 20px;">
-                                <tr>
-                                    <td style="padding: 12px 0; border-bottom: 1px solid #edf2f7;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Référence</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">#{{ $taskReference }}</span>
-                                    </td>
-                                </tr>
-                                @if(isset($projectName) && $projectName != '')
-                                <tr>
-                                    <td style="padding: 12px 0; border-bottom: 1px solid #edf2f7;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Projet</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">{{ $projectName }}</span>
-                                    </td>
-                                </tr>
-                                @endif
-                                <tr>
-                                    <td style="padding: 12px 0; border-bottom: 1px solid #edf2f7;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Client</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">{{ $clientName }}</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px 0; border-bottom: 1px solid #edf2f7;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Priorité</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">{{ $priority }}</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="padding: 12px 0;">
-                                        <span style="font-size: 13px; color: #64748b; font-weight: 500; display: inline-block; width: 100px;">Échéance</span>
-                                        <span style="font-size: 14px; color: #1e293b; font-weight: 600;">{{ $dueDate }}</span>
-                                    </td>
-                                </tr>
-                            </table>
+<body style="margin:0;padding:0;background:#f3f4f6;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;padding:32px 12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;">
 
-                            @if($description)
-                            <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase; margin: 24px 0 8px 0;">Description / Instructions</div>
-                            <div style="background-color: #f8fafc; border: 1px solid #edf2f7; border-radius: 12px; padding: 20px; font-size: 14px; color: #475569; line-height: 1.6;">
-                                {!! $description !!}
-                            </div>
-                            @endif
-
-                            <!-- Button -->
-                            <div style="padding: 40px 0 20px 0; text-align: center;">
-                                <a href="{{ $url }}" style="background-color: #1e293b; color: #ffffff; padding: 14px 32px; border-radius: 40px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block;">Ouvrir la tâche</a>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 32px 40px; background-color: #fafbfc; text-align: center; border-top: 1px solid #edf2f7;">
-                            <div style="font-size: 12px; color: #94a3b8; line-height: 1.5;">
-                                &copy; {{ date('Y') }} {{ $companyName }}. Accès Interne.<br>
-                                Ceci est une notification automatique de votre CRM.
-                            </div>
-                        </td>
-                    </tr>
-                </table>
+    {{-- En-tete : logo PNG (le SVG est supprime par Gmail) et nature du message --}}
+    <tr><td style="padding:22px 28px;border-bottom:1px solid #e5e7eb;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td valign="middle">
+                {{-- Image embarquee (cid) : le logo ne depend alors plus de APP_URL --}}
+                <img src="{{ isset($message) && !empty($logoPath) && file_exists($logoPath) ? $message->embed($logoPath) : $logoUrlDark }}" alt="{{ $companyName }}" width="118" height="30" style="display:block;border:0;width:118px;height:30px;">
             </td>
-        </tr>
-    </table>
+            <td align="right" valign="middle">
+                <table cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:999px;"><tr>
+                    <td style="padding:4px 11px;font-size:11.5px;font-weight:600;color:#374151;">Nouvelle assignation</td>
+                </tr></table>
+            </td>
+        </tr></table>
+    </td></tr>
+
+    <tr><td style="padding:28px 28px 0 28px;">
+        <h1 style="margin:0;font-size:21px;line-height:1.3;color:#111827;font-weight:bold;letter-spacing:-.5px;">{{ $taskHeading }}</h1>
+        <p style="margin:12px 0 0;font-size:14.5px;line-height:1.65;color:#374151;">
+            Bonjour {{ $recipientName }}, cette tâche vous est confiée. Les éléments du dossier sont récapitulés ci-dessous.
+        </p>
+        @if(!empty($dueLabel))
+            {{-- Ambre quand l'echeance approche, rouge quand elle est depassee --}}
+            <table cellpadding="0" cellspacing="0" border="0" style="margin-top:16px;background:{{ $dueOverdue ? '#fdf1f0' : '#fef9e7' }};border:1px solid {{ $dueOverdue ? '#f2c9c6' : '#f3dfa2' }};border-radius:999px;"><tr>
+                <td style="padding:4px 12px;font-size:12px;font-weight:600;color:{{ $dueOverdue ? '#b42318' : '#a16207' }};">{{ $dueLabel }}</td>
+            </tr></table>
+        @endif
+    </td></tr>
+
+    <tr><td style="padding:24px 28px 0 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #e5e7eb;border-radius:12px;">
+            <tr>
+                <td style="padding:11px 16px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-size:11.5px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;">Élément</td>
+                <td style="padding:11px 16px;background:#f9fafb;border-bottom:1px solid #e5e7eb;font-size:11.5px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;">Valeur</td>
+            </tr>
+            @if(!empty($taskReference))
+                <tr>
+                    <td width="36%" style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Référence</td>
+                    <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-family:Consolas,Menlo,monospace;font-size:13.5px;color:#111827;font-weight:bold;">{{ $taskReference }}</td>
+                </tr>
+            @endif
+            <tr>
+                <td width="36%" style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Client</td>
+                <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:bold;">{{ $clientName }}</td>
+            </tr>
+            @if(!empty($projectName))
+                <tr>
+                    <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Dossier</td>
+                    <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:bold;">{{ $projectName }}</td>
+                </tr>
+            @endif
+            @if(!empty($responsibleName))
+                <tr>
+                    <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Responsable</td>
+                    <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:bold;">{{ $responsibleName }}</td>
+                </tr>
+            @endif
+            <tr>
+                <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Priorité</td>
+                <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:bold;">{{ $priority }}</td>
+            </tr>
+            <tr>
+                <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Échéance</td>
+                <td style="padding:13px 16px;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:bold;">{{ $dueDate }}</td>
+            </tr>
+            <tr>
+                <td style="padding:13px 16px;font-size:13.5px;color:#6b7280;">Statut</td>
+                <td style="padding:13px 16px;">
+                    <table cellpadding="0" cellspacing="0" border="0" style="background:#eff8ff;border:1px solid #b3ddf7;border-radius:999px;"><tr>
+                        <td style="padding:3px 10px;font-size:11.5px;font-weight:600;color:#0369a1;">{{ $taskStatus }}</td>
+                    </tr></table>
+                </td>
+            </tr>
+        </table>
+    </td></tr>
+
+    @if(!empty($description))
+        <tr><td style="padding:24px 28px 0 28px;">
+            <div style="font-size:11.5px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-bottom:9px;">Instructions</div>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;">
+                <tr><td style="padding:16px 18px;font-size:14px;line-height:1.65;color:#374151;">{!! $description !!}</td></tr>
+            </table>
+        </td></tr>
+    @endif
+
+    @if(!empty($attachments))
+        <tr><td style="padding:22px 28px 0 28px;">
+            <div style="font-size:11.5px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">Pièces du dossier</div>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                @foreach($attachments as $attachment)
+                    <tr><td style="padding:11px 0;{{ $loop->last ? '' : 'border-bottom:1px solid #e5e7eb;' }}font-size:13.5px;">
+                        <a href="{{ $attachment['url'] }}" style="color:#111827;font-weight:600;">{{ $attachment['name'] }}</a>
+                    </td></tr>
+                @endforeach
+            </table>
+        </td></tr>
+    @endif
+
+    <tr><td style="padding:26px 28px 30px 28px;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="background:#000000;border-radius:8px;">
+                <a href="{{ $url }}" style="display:inline-block;padding:12px 22px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;">Ouvrir la tâche</a>
+            </td>
+        </tr></table>
+    </td></tr>
+
+    <tr><td style="padding:18px 28px;background:#f9fafb;border-top:1px solid #e5e7eb;border-radius:0 0 12px 12px;font-size:12px;line-height:1.7;color:#6b7280;">
+        Notification interne {{ $companyName }} — répondez à ce message pour joindre le responsable du dossier.
+    </td></tr>
+</table>
+</td></tr>
+</table>
 </body>
 </html>

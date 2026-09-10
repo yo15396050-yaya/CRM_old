@@ -372,7 +372,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     <!--<tbody>-->
                     <!--<tr>-->
                     <!--<td style="width:50%;">-->
-                    <!--<p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>-->
+                    <!--<p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>-->
                     <!--</td>-->
                     <!--<td style="width:50%;">-->
                     <!--<p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p>-->
@@ -384,7 +384,7 @@ $numadh = $contract->client->clientDetails->company_name;
     <tbody>
         <tr>
             <td style="width:50%; text-align:center;">
-                MINISTÈRE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION GÉNÉRALE DES IMPÔTS
+                MINISTÈRE DE L’ÉCONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION GÉNÉRALE DES IMPÔTS
             </td>
             <td style="width:50%; text-align:center;">
                 REPUBLIQUE DE COTE D'IVOIRE<br>Union – Discipline – Travail<br>---------------
@@ -482,7 +482,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     <tbody>
                         <tr>
                             <td style="width:50%;">
-                            <p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
+                            <p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
                             </td>
                             <td style="width:50%;">
                             <p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p>
@@ -530,7 +530,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     <tbody>
                     <tr>
                         <td style="width:50%;">
-                            <p style="text-align:center;">MINIST&#200;RE DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
+                            <p style="text-align:center;">MINIST&#200;RE DE L&#39;&#201;CONOMIE, DES FINANCES ET DU BUDGET<br>---------------<br>DIRECTION G&#201;N&#201;RALE DES IMP&#212;TS&#160;</p>
                         </td>
                         <td style="width:50%;"><p style="text-align:center;">REPUBLIQUE DE COTE D&#8217;IVOIRE<br>Union &#8211; Discipline &#8211; Travail<br>&#160;---------------</p></td>
                     </tr>

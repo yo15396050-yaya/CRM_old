@@ -2067,6 +2067,163 @@ class AuthController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    /**
+     * MODULE NOTES : Liste des notes et dossiers
+     */
+    public function getNotes(Request $request)
+    {
+        try {
+            $user = $this->getApiUser();
+            if (!$user) return response()->json(['error' => 'Unauthenticated'], 401);
+
+            $parentId = $request->query('parent_id');
+
+            $notes = \App\Models\Note::with('children')
+                ->where('user_id', $user->id)
+                ->where(function($q) use ($parentId) {
+                    if ($parentId) {
+                        $q->where('parent_id', $parentId);
+                    } else {
+                        $q->whereNull('parent_id');
+                    }
+                })
+                ->orderBy('updated_at', 'desc')
+                ->get();
+
+            return response()->json($notes);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * MODULE NOTES : Détail d'une note avec ses blocs
+     */
+    public function getNoteDetails($id)
+    {
+        try {
+            $user = $this->getApiUser();
+            if (!$user) return response()->json(['error' => 'Unauthenticated'], 401);
+
+            $note = \App\Models\Note::with(['blocks' => function($q) {
+                $q->orderBy('order');
+            }])
+            ->where('user_id', $user->id)
+            ->findOrFail($id);
+
+            return response()->json($note);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * MODULE NOTES : Création d'une note ou dossier
+     */
+    public function createNote(Request $request)
+    {
+        try {
+            $user = $this->getApiUser();
+            if (!$user) return response()->json(['error' => 'Unauthenticated'], 401);
+
+            $isFolder = $request->is_folder ?? false;
+
+            $note = \App\Models\Note::create([
+                'title' => $request->title ?? '',
+                'icon' => $request->icon ?? ($isFolder ? 'Folder' : 'FileText'),
+                'user_id' => $user->id,
+                'parent_id' => $request->parent_id,
+                'is_folder' => $isFolder,
+                'is_private' => $request->is_private ?? false,
+            ]);
+
+            if (!$isFolder) {
+                \App\Models\NoteBlock::create([
+                    'note_id' => $note->id,
+                    'type' => 'text',
+                    'content' => '',
+                    'order' => 0
+                ]);
+            }
+
+            return response()->json($note);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * MODULE NOTES : Mise à jour des métadonnées (titre, icône, parent_id, etc.)
+     */
+    public function updateNote(Request $request, $id)
+    {
+        try {
+            $user = $this->getApiUser();
+            if (!$user) return response()->json(['error' => 'Unauthenticated'], 401);
+
+            $note = \App\Models\Note::where('user_id', $user->id)->findOrFail($id);
+            $note->update($request->only(['title', 'icon', 'is_private', 'parent_id']));
+
+            return response()->json(['status' => 'success', 'note' => $note]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * MODULE NOTES : Synchronisation complète des blocs (auto-save)
+     */
+    public function syncNoteBlocks(Request $request, $id)
+    {
+        try {
+            $user = $this->getApiUser();
+            if (!$user) return response()->json(['error' => 'Unauthenticated'], 401);
+
+            $note = \App\Models\Note::where('user_id', $user->id)->findOrFail($id);
+
+            \DB::transaction(function () use ($note, $request) {
+                $incomingBlockIds = collect($request->blocks)->pluck('id')->filter();
+                $note->blocks()->whereNotIn('id', $incomingBlockIds)->delete();
+
+                foreach ($request->blocks as $index => $blockData) {
+                    \App\Models\NoteBlock::updateOrCreate(
+                        ['id' => $blockData['id'] ?? null, 'note_id' => $note->id],
+                        [
+                            'type' => $blockData['type'],
+                            'content' => $blockData['content'] ?? '',
+                            'data' => $blockData['data'] ?? null,
+                            'reminder_at' => $blockData['reminder_at'] ?? null,
+                            'order' => $index
+                        ]
+                    );
+                }
+            });
+
+            $note->touch();
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * MODULE NOTES : Suppression d'une note ou dossier
+     */
+    public function deleteNote($id)
+    {
+        try {
+            $user = $this->getApiUser();
+            if (!$user) return response()->json(['error' => 'Unauthenticated'], 401);
+
+            $note = \App\Models\Note::where('user_id', $user->id)->findOrFail($id);
+            $note->delete();
+
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 }
 
 

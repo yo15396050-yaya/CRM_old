@@ -5,6 +5,10 @@
 !public/user-uploads/.htaccess
 /storage/*.key
 .env.backup
+.env.backup-*
+.env.dev
+.env.local
+.env.*.local
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -26,8 +30,14 @@ grumphp.yml
 /bootstrap/cache/*
 storage/reviewed
 storage/fonts/installed-fonts.json
+# Copie figee du projet (snapshot du 13/03/2026), conservee hors suivi :
+# le code de reference est a la racine. Les autres documents metier de
+# Documents/ restent versionnes.
+/Documents/CRM/
+
 resources/lang/*
 !resources/lang/eng/
+!resources/lang/fr/
 !resources/lang/vendor/backup/eng
 !resources/lang/eng.json
 froiden-verify/

@@ -205,7 +205,9 @@ class ProjectsDataTable extends BaseDataTable
                     </div>
                 </div>';
         });
-        $datatables->editColumn('start_date', fn($row) => $row->start_date?->translatedFormat($this->company->date_format));
+        $datatables->editColumn('start_date', fn($row) => $row->start_date
+            ? '<span class="dck-date">' . $row->start_date->translatedFormat($this->company->date_format) . '</span>'
+            : '--');
 
         $datatables->editColumn('deadline', fn($row) => Common::dateColor($row->deadline));
 
@@ -213,7 +215,7 @@ class ProjectsDataTable extends BaseDataTable
         $datatables->addColumn('client_email', fn($row) => $row->client?->email ?? '-');
 
         $datatables->addColumn('project_status', fn($row) => ucwords($row->status));
-        $datatables->editColumn('client_id', fn($row) => $row->client_id ? view('components.client', ['user' => $row->client]) : '-');
+        $datatables->editColumn('client_id', fn($row) => $row->client ? view('components.client', ['user' => $row->client]) : '-');
         $datatables->addColumn('status', function ($row) use ($projectStatus) {
             $projectUsers = $row->members->pluck('user_id')->toArray();
 
@@ -265,19 +267,26 @@ class ProjectsDataTable extends BaseDataTable
 
         });
         $datatables->editColumn('completion_percent', function ($row) {
-            $completionPercent = $row->completion_percent;
-            $statusColor = $completionPercent < 50 ? 'danger' : ($completionPercent < 75 ? 'warning' : 'success');
+            $pourcent = (int) $row->completion_percent;
 
-            return '<div class="progress" style="height: 15px;">
-                        <div class="progress-bar f-12 bg-' . $statusColor . '" role="progressbar" style="width: ' . $completionPercent . '%;" aria-valuenow="' . $completionPercent . '" aria-valuemin="0" aria-valuemax="100">' . $completionPercent . '%</div>
-                     </div>';
+            // Memes seuils qu'auparavant : < 50 alerte, < 75 vigilance, sinon bon
+            $ton = $pourcent < 50 ? 'is-err' : ($pourcent < 75 ? 'is-warn' : 'is-ok');
+
+            return '<div class="dck-progress" role="progressbar"'
+                . ' aria-valuenow="' . $pourcent . '" aria-valuemin="0" aria-valuemax="100">'
+                . '<div class="dck-progress__track">'
+                . '<div class="dck-progress__bar ' . $ton . '" style="width:' . $pourcent . '%"></div>'
+                . '</div>'
+                . '<span class="dck-progress__val">' . $pourcent . '%</span>'
+                . '</div>';
         });
         $datatables->addColumn('completion_export', function ($row) {
             return $row->completion_percent . '% ' . __('app.complete');
         });
         $datatables->setRowId(fn($row) => 'row-' . $row->id);
         $datatables->editColumn('project_short_code', function ($row) {
-            return '<a href="' . route('projects.show', [$row->id]) . '" class="text-darkest-grey">' . $row->project_short_code . '</a>';
+            return '<a href="' . route('projects.show', [$row->id]) . '" class="dck-ref">'
+                . $row->project_short_code . '</a>';
         });
         $datatables->orderColumn('status', 'status $1');
         $datatables->removeColumn('project_summary');
@@ -293,7 +302,11 @@ class ProjectsDataTable extends BaseDataTable
         // Custom Fields For export
         $customFieldColumns = CustomField::customFieldData($datatables, Project::CUSTOM_FIELD_MODEL);
 
-        $datatables->rawColumns(array_merge(['project_name', 'action', 'completion_percent', 'members', 'status', 'client_id', 'check', 'project_short_code', 'deadline'], $customFieldColumns));
+        $datatables->rawColumns(array_merge(
+            ['project_name', 'action', 'completion_percent', 'members', 'status', 'client_id',
+                'check', 'project_short_code', 'deadline', 'start_date'],
+            $customFieldColumns
+        ));
 
         return $datatables;
     }
@@ -478,12 +491,17 @@ class ProjectsDataTable extends BaseDataTable
         }
 
         $model->groupBy('projects.id');
-        $model->orderByRaw('pinned_project desc');
+        // Tri repetant la sous-requete plutot que l'alias : DataTables
+        // compte les lignes avec un select count(*) qui conserve le
+        // ORDER BY mais supprime la liste des colonnes, donc l'alias.
+        $model->orderByRaw(
+            '(select count(*) from pinned where pinned.project_id = projects.id and pinned.user_id = ?) desc',
+            [user()->id]
+        );
 
         // Handle ordering
         $columns = $request->get('columns');
         $order = $request->get('order');
-        $model->orderByRaw('pinned_project desc');
 
         if ($order) {
             foreach ($order as $o) {

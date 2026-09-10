@@ -165,7 +165,7 @@
 @endphp
 
 @section('content')
-    <div class="content-wrapper">
+    <div class="content-wrapper dck-front">
         <!-- Add Task Export Buttons Start -->
         <div class="d-grid d-lg-flex d-md-flex action-bar my-3">
             <div id="table-actions" class="flex-grow-1 align-items-center">

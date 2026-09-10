@@ -727,28 +727,50 @@ class User extends BaseModel implements AuthenticatableContract, AuthorizableCon
     /**
      * @return false|mixed
      */
+    /**
+     * Permissions deja lues pendant la requete courante, indexees par
+     * "idUtilisateur|permission". Repart a vide a chaque requete HTTP.
+     */
+    protected static array $permissionsLues = [];
+
     public function permission($permission)
     {
-        $cacheKey = 'permission-' . $permission . '-' . $this->id;
-
-        cache()->forget($cacheKey); // Clear the cache
-
-        if (cache()->has($cacheKey)) {
-            return cache($cacheKey);
+        // Une seule page appelle cette methode des dizaines de fois, pour des
+        // permissions differentes. On charge donc toutes celles de l'utilisateur
+        // en une requete, au premier appel seulement.
+        //
+        // La memorisation ne dure que le temps de la requete HTTP : un
+        // changement de permission est pris en compte des la requete suivante,
+        // sans cache a invalider. Auparavant le cache applicatif etait efface
+        // juste avant d'etre lu, ce qui relancait la requete a chaque appel.
+        if (!array_key_exists($this->id, self::$permissionsLues)) {
+            // Alias obligatoires : les deux tables ont une colonne "name", et
+            // sans eux les valeurs se recouvrent silencieusement.
+            self::$permissionsLues[$this->id] = UserPermission::query()
+                ->join('permissions', 'user_permissions.permission_id', '=', 'permissions.id')
+                ->join('permission_types', 'user_permissions.permission_type_id', '=', 'permission_types.id')
+                ->where('user_permissions.user_id', $this->id)
+                ->select([
+                    'permissions.name as nom_permission',
+                    'permission_types.name as type_permission',
+                ])
+                ->pluck('type_permission', 'nom_permission')
+                ->all();
         }
 
-        $permissionType = UserPermission::join('permissions', 'user_permissions.permission_id', '=', 'permissions.id')
-            ->join('permission_types', 'user_permissions.permission_type_id', '=', 'permission_types.id')
-            ->select('permission_types.name')
-            ->where('permissions.name', $permission)
-            ->where('user_permissions.user_id', $this->id)
-            ->first();
-
-        $permissionType = $permissionType ? $permissionType->name : false;
-
-        cache([$cacheKey => $permissionType]);
-
-        return $permissionType;
+        // Une permission absente vaut « none », et non false.
+        //
+        // Quinze gardes du projet comparent ce retour a 'none'. Avec false,
+        // la comparaison lache echouait des deux cotes : « false == 'none' »
+        // est faux, donc abort_403 ne se declenchait pas ; et
+        // « false != 'none' » est vrai, donc les blocs reserves aux ayants
+        // droit s'executaient. Un compte client sans aucune permission
+        // accedait ainsi a la liste complete des contrats du cabinet.
+        //
+        // Aucun appelant ne s'appuie sur la valeur falsy : les negations
+        // du projet portent toutes sur une comparaison, jamais sur le
+        // retour brut.
+        return self::$permissionsLues[$this->id][$permission] ?? 'none';
 
     }
 

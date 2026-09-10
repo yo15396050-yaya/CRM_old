@@ -1,65 +1,141 @@
+{{--
+  Ouverture d'un dossier / affectation d'un collaborateur a un projet.
+  Rendu par ProjectInitNotification (branche collaborateur).
+
+  L'ancien gabarit n'annoncait que le nom du projet, et posait sa mise en page
+  sur display:flex et un <link> Google Fonts — tous deux ignores par Gmail.
+  Celui-ci ouvre le dossier et n'utilise que des tables et des styles inline.
+--}}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f5f7fa; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-        .wrapper { width: 100%; table-layout: fixed; background-color: #f5f7fa; padding: 48px 0; }
-        .container { max-width: 520px; margin: 0 auto; background-color: #ffffff; border-radius: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); overflow: hidden; }
-        .header { padding: 32px 32px 0 32px; text-align: left; }
-        .logo { font-size: 20px; font-weight: 700; text-decoration: none; }
-        .logo-flow { color: #1e293b; }
-        .logo-task { color: #3b82f6; }
-        .content { padding: 24px 32px 32px 32px; }
-        .greeting { font-size: 16px; font-weight: 600; color: #1e293b; margin-bottom: 12px; }
-        .body-text { font-size: 15px; font-weight: 400; color: #475569; line-height: 1.6; margin-bottom: 32px; }
-        .info-section { margin-bottom: 32px; }
-        .info-row { display: flex; padding: 12px 0; border-bottom: 1px solid #edf2f7; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { width: 100px; font-size: 13px; font-weight: 500; color: #64748b; flex-shrink: 0; }
-        .info-value { font-size: 14px; font-weight: 600; color: #1e293b; }
-        .btn-container { text-align: center; margin: 32px 0; }
-        .btn { background-color: #1e293b; color: #ffffff !important; padding: 12px 24px; border-radius: 40px; font-size: 14px; font-weight: 600; text-decoration: none; display: inline-block; }
-        .footer { background-color: #fafbfc; padding: 20px 32px; text-align: center; border-top: 1px solid #edf2f7; }
-        .footer-text { font-size: 11px; font-weight: 400; color: #94a3b8; }
-        @media screen and (max-width: 480px) {
-            .container { margin: 0 12px; }
-            .content { padding: 20px 24px 32px 24px; }
-            .info-label { width: 85px; }
-        }
-    </style>
+    <title>{{ $projectName }}</title>
 </head>
-<body>
-    <div class="wrapper">
-        <div class="container">
-            <div class="header">
-                <div class="logo"><span class="logo-flow">Flow</span><span class="logo-task">Task</span></div>
-            </div>
-            <div class="content">
-                <div class="greeting">Bonjour {{ $recipientName }},</div>
-                <div class="body-text">Vous avez été assigné en tant que collaborateur sur la diligence suivante.</div>
+<body style="margin:0;padding:0;background:#f3f4f6;">
+<table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f3f4f6;padding:32px 12px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;">
 
-                <div class="info-section">
-                    <div class="info-row"><div class="info-label">Diligence</div><div class="info-value">{{ $projectName }}</div></div>
-                    <div class="info-row"><div class="info-label">Statut</div><div class="info-value">Assigné</div></div>
-                    <div class="info-row"><div class="info-label">Date</div><div class="info-value">{{ $date }}</div></div>
-                </div>
+    <tr><td style="padding:22px 28px;border-bottom:1px solid #e5e7eb;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td valign="middle">
+                {{-- Image embarquee (cid) : le logo ne depend alors plus de APP_URL --}}
+                <img src="{{ isset($message) && !empty($logoPath) && file_exists($logoPath) ? $message->embed($logoPath) : $logoUrlDark }}" alt="{{ $companyName }}" width="118" height="30" style="display:block;border:0;width:118px;height:30px;">
+            </td>
+            <td align="right" valign="middle">
+                <table cellpadding="0" cellspacing="0" border="0" style="background:#f2f8e9;border:1px solid #cbe0a8;border-radius:999px;"><tr>
+                    <td style="padding:4px 11px;font-size:11.5px;font-weight:600;color:#3f6212;">Ouverture de dossier</td>
+                </tr></table>
+            </td>
+        </tr></table>
+    </td></tr>
 
-                <div class="btn-container">
-                    <a href="{{ $url }}" class="btn">Accéder au dossier</a>
-                </div>
+    <tr><td style="padding:26px 28px 0 28px;">
+        @if(!empty($clientName))
+            <div style="font-size:12.5px;color:#6b7280;">{{ $clientName }}</div>
+        @endif
+        <h1 style="margin:6px 0 0;font-size:22px;line-height:1.28;color:#111827;font-weight:bold;letter-spacing:-.6px;">{{ $projectName }}</h1>
+        <p style="margin:12px 0 0;font-size:14.5px;line-height:1.65;color:#374151;">
+            Bonjour {{ $recipientName }}, vous intervenez sur ce dossier. En voici le cadre avant votre première intervention.
+        </p>
+    </td></tr>
 
-                <div class="signature">
-                    Cordialement,<br>
-                    <span style="font-weight: 600; color: #1e293b;">FlowTask Internal</span>
-                </div>
-            </div>
-            <div class="footer">
-                <div class="footer-text">&copy; {{ date('Y') }} {{ $companyName }}. Assignation Interne.</div>
-            </div>
-        </div>
-    </div>
+    <tr><td style="padding:24px 28px 0 28px;">
+        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+            @if(!empty($projectCode))
+                <tr>
+                    <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Référence</td>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-family:Consolas,Menlo,monospace;font-size:13.5px;color:#111827;font-weight:bold;">{{ $projectCode }}</td>
+                </tr>
+            @endif
+            @if(!empty($natureName))
+                <tr>
+                    <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Nature</td>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $natureName }}</td>
+                </tr>
+            @endif
+            @if(!empty($periodLabel))
+                <tr>
+                    <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Période couverte</td>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $periodLabel }}</td>
+                </tr>
+            @endif
+            @if(!empty($deadline))
+                <tr>
+                    <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Échéance du dossier</td>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $deadline }}</td>
+                </tr>
+            @endif
+            @if(!empty($clientName))
+                <tr>
+                    <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Client</td>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $clientName }}</td>
+                </tr>
+            @endif
+            @if(!empty($adminName))
+                <tr>
+                    <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Responsable du dossier</td>
+                    <td style="padding:13px 0;border-top:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $adminName }}</td>
+                </tr>
+            @endif
+            <tr>
+                <td width="36%" style="padding:13px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#6b7280;">Affectation</td>
+                <td style="padding:13px 0;border-top:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb;font-size:13.5px;color:#111827;font-weight:600;">{{ $date }}</td>
+            </tr>
+        </table>
+    </td></tr>
+
+    @if(!empty($teamMembers))
+        <tr><td style="padding:22px 28px 0 28px;">
+            <div style="font-size:11.5px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-bottom:10px;">Équipe affectée</div>
+            <table cellpadding="0" cellspacing="0" border="0"><tr>
+                @foreach($teamMembers as $member)
+                    <td style="padding-right:6px;padding-bottom:6px;">
+                        <table cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:999px;"><tr>
+                            <td style="padding:3px 10px;font-size:11.5px;font-weight:600;color:#374151;">{{ $member }}</td>
+                        </tr></table>
+                    </td>
+                @endforeach
+            </tr></table>
+        </td></tr>
+    @endif
+
+    @if(!empty($summary))
+        <tr><td style="padding:22px 28px 0 28px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f9fafb;border:1px solid #e5e7eb;border-radius:12px;">
+                <tr><td style="padding:16px 18px;font-size:14px;line-height:1.65;color:#374151;">{!! $summary !!}</td></tr>
+            </table>
+        </td></tr>
+    @endif
+
+    @if(!empty($attachments))
+        <tr><td style="padding:22px 28px 0 28px;">
+            <div style="font-size:11.5px;font-weight:bold;letter-spacing:.5px;text-transform:uppercase;color:#6b7280;margin-bottom:4px;">Pièces du dossier</div>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                @foreach($attachments as $attachment)
+                    <tr><td style="padding:11px 0;{{ $loop->last ? '' : 'border-bottom:1px solid #e5e7eb;' }}font-size:13.5px;">
+                        <a href="{{ $attachment['url'] }}" style="color:#111827;font-weight:600;">{{ $attachment['name'] }}</a>
+                    </td></tr>
+                @endforeach
+            </table>
+        </td></tr>
+    @endif
+
+    <tr><td style="padding:26px 28px 30px 28px;">
+        <table cellpadding="0" cellspacing="0" border="0"><tr>
+            <td style="background:#000000;border-radius:8px;">
+                <a href="{{ $url }}" style="display:inline-block;padding:12px 22px;color:#ffffff;text-decoration:none;font-size:14px;font-weight:600;">Accéder au dossier</a>
+            </td>
+        </tr></table>
+    </td></tr>
+
+    <tr><td style="padding:18px 28px;background:#f9fafb;border-top:1px solid #e5e7eb;border-radius:0 0 12px 12px;font-size:12px;line-height:1.7;color:#6b7280;">
+        Affectation interne {{ $companyName }}. Les informations de ce dossier sont couvertes par le secret professionnel.
+    </td></tr>
+</table>
+</td></tr>
+</table>
 </body>
 </html>

@@ -610,6 +610,7 @@ class HomeController extends Controller
                     ->where('tasks.board_column_id', $boardColumn->id)
                     ->where('tasks.is_private', 0)
                     ->orderBy('column_priority', 'asc')
+            ->orderBy('tasks.id', 'desc')
                     ->groupBy('tasks.id');
 
                 $tasks->whereNull('projects.deleted_at');
@@ -656,6 +657,7 @@ class HomeController extends Controller
             ->select('tasks.*')
             ->where('tasks.board_column_id', $request->columnId)
             ->orderBy('column_priority', 'asc')
+            ->orderBy('tasks.id', 'desc')
             ->groupBy('tasks.id');
 
         $tasks->whereNull('projects.deleted_at');

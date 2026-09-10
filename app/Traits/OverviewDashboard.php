@@ -6,10 +6,12 @@ use App\Models\DashboardWidget;
 use App\Models\Deal;
 use App\Models\Leave;
 use App\Models\Payment;
+use App\Models\Project;
 use App\Models\ProjectActivity;
 use App\Models\ProjectTimeLog;
 use App\Models\Task;
 use App\Models\TaskboardColumn;
+use App\Models\RegulatoryDeadline;
 use App\Models\Ticket;
 use App\Models\UserActivity;
 use Carbon\Carbon;
@@ -20,6 +22,9 @@ use Illuminate\Support\Facades\DB;
  */
 trait OverviewDashboard
 {
+    use PilotageProjets;
+    use PilotageCabinet;
+
 
     /**
      *
@@ -51,6 +56,9 @@ trait OverviewDashboard
                 DB::raw('(select count(tickets.id) from `tickets` where (status="resolved" or status="closed") and deleted_at IS NULL AND tickets.company_id = ' . company()->id . ') as totalResolvedTickets')
             )
             ->first();
+
+        $this->chargerPilotage();
+        $this->chargerPilotageCabinet();
 
         $minutes = $this->counts->totalHoursLogged - $this->counts->totalBreakMinutes;
         $hours = intdiv($minutes, 60);
@@ -210,5 +218,11 @@ trait OverviewDashboard
 
         return $data;
     }
+
+
+
+
+
+
 
 }

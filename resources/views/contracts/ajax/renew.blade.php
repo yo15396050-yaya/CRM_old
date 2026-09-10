@@ -3,7 +3,7 @@ $addContractPermission = user()->permission('renew_contract');
 @endphp
 
 <!-- TAB CONTENT START -->
-<div class="tab-pane fade show active" role="tabpanel" aria-labelledby="nav-email-tab">
+<div class="tab-pane fade show active dck-front" role="tabpanel" aria-labelledby="nav-email-tab">
 
     <x-cards.data :title="__('modules.contracts.contractRenewalHistory')">
         @if ($addContractPermission == 'all' || ($addContractPermission == 'added' && $contract->added_by == user()->id))

@@ -57,7 +57,7 @@ class WaitingForApprovalDataTable extends BaseDataTable
             'action', function ($row) {
 
             $userRoles = user_roles();
-            $isAdmin = in_array('admin', $userRoles);
+            $isAdmin = est_arbitre();
             $isEmployee = in_array('employee', $userRoles);
 
             $action = '<div class="task_view">
@@ -541,7 +541,13 @@ class WaitingForApprovalDataTable extends BaseDataTable
             $model->where('tasks.is_private', 0);
         }
 
-        $model->orderbyRaw('pinned_task desc');
+        // Tri repetant la sous-requete plutot que l'alias : DataTables
+        // compte les lignes avec un select count(*) qui conserve le
+        // ORDER BY mais supprime la liste des colonnes, donc l'alias.
+        $model->orderByRaw(
+            '(select count(*) from pinned where pinned.task_id = tasks.id and pinned.user_id = ?) desc',
+            [user()->id]
+        );
 
         return $model;
     }

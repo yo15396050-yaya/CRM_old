@@ -4,6 +4,7 @@
 
 @php
 $editProjectPermission = user()->permission('edit_projects');
+$deleteProjectPermission = user()->permission('delete_projects');
 $addPaymentPermission = user()->permission('add_payments');
 $projectBudgetPermission = user()->permission('view_project_budget');
 $memberIds = $project->members->pluck('user_id')->toArray();
@@ -86,6 +87,20 @@ $memberIds = $project->members->pluck('user_id')->toArray();
                                 <hr class="my-1">
                                 <a class="dropdown-item send-project-notifications" href="javascript:;" data-project-id="{{ $project->id }}">
                                     <i class="fa fa-paper-plane mr-2"></i> Informer les bénéficiaires
+                                </a>
+                            @endif
+
+                            {{-- Suppression : la condition reprend a l'identique celle de
+                                 ProjectController@destroy ('all' ou 'added'), pour ne jamais
+                                 proposer une action que le controleur refusera par abort_403.
+                                 Attention : destroy() fait un forceDelete() et efface aussi
+                                 les fichiers de la diligence. L'action est definitive. --}}
+                            @if ($deleteProjectPermission == 'all'
+                                || ($deleteProjectPermission == 'added' && $project->added_by == user()->id))
+                                <hr class="my-1">
+                                <a class="dropdown-item text-danger delete-project-detail" href="javascript:;"
+                                   data-project-id="{{ $project->id }}">
+                                    <i class="fa fa-trash mr-2"></i>@lang('app.delete') @lang('app.project')
                                 </a>
                             @endif
                         </div>
@@ -492,6 +507,50 @@ $memberIds = $project->members->pluck('user_id')->toArray();
                         success: function(response) {
                             if (response.status == "success") {
                                 // Pas besoin de reload si on veut juste rester sur la page
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        /* Suppression depuis la fiche : confirmation renforcee (l'action est
+           definitive cote controleur, forceDelete + effacement des fichiers)
+           puis retour a la liste des diligences. */
+        $('body').on('click', '.delete-project-detail', function () {
+            var id = $(this).data('project-id');
+
+            Swal.fire({
+                title: "@lang('messages.sweetAlertTitle')",
+                text: "@lang('messages.recoverRecord')",
+                icon: 'warning',
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: "@lang('messages.confirmDelete')",
+                cancelButtonText: "@lang('app.cancel')",
+                customClass: {
+                    confirmButton: 'btn btn-primary mr-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                showClass: {
+                    popup: 'swal2-noanimation',
+                    backdrop: 'swal2-noanimation'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    var url = "{{ route('projects.destroy', ':id') }}".replace(':id', id);
+
+                    $.easyAjax({
+                        type: 'POST',
+                        url: url,
+                        data: {
+                            '_token': "{{ csrf_token() }}",
+                            '_method': 'DELETE'
+                        },
+                        success: function (response) {
+                            if (response.status == "success") {
+                                window.location.href = "{{ route('projects.index') }}";
                             }
                         }
                     });

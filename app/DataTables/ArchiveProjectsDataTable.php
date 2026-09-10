@@ -103,7 +103,7 @@ class ArchiveProjectsDataTable extends BaseDataTable
             })
             ->editColumn('start_date', fn($row) => $row->start_date ? $row->start_date->translatedFormat($this->company->date_format) : '')
             ->editColumn('deadline', fn($row) => $row->deadline ? $row->deadline->translatedFormat($this->company->date_format) : '-')
-            ->editColumn('client_id', fn($row) => is_null($row->client_id) ? '' : view('components.client', ['user' => $row->client]))
+            ->editColumn('client_id', fn($row) => is_null($row->client) ? '' : view('components.client', ['user' => $row->client]))
             ->editColumn('status', function ($row) {
 
                 $projectStatus = ProjectStatusSetting::all();

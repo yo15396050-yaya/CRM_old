@@ -27,7 +27,7 @@
 @endphp
 
 <link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">    
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <input type="hidden" name="code_id" id="code_id" value="{{$newNumber1}}">
         <x-form id="save-project-data-form">
@@ -36,6 +36,8 @@
                     @lang('app.projectDetails')</h4>
                 <input type="hidden" name="template_id" value="{{ $projectTemplate->id ?? '' }}">
                 <div class="p-20 row">
+                    <x-dck.form-section :titre="__('app.dckSection.identification')" />
+
                     @if (!in_array('client', user_roles()))
                         <div class="col-md-3">
                             <x-forms.label class="my-3" fieldId="department" :fieldLabel="('Départment')">
@@ -66,6 +68,8 @@
                                       :fieldPlaceholder="('Nom de la diligence')"
                                       :fieldValue="($project ? $project->project_name : (($projectTemplate) ? $projectTemplate->project_name : ''))"/>
                     </div>
+                    <x-dck.form-section :titre="__('app.dckSection.planning')" />
+
 
                     <div class="col-md-6 col-lg-4">
                         <x-forms.datepicker fieldId="start_date" fieldRequired="true"
@@ -132,6 +136,8 @@
                     </div>
   
                     @if ($addProjectNotePermission == 'all' || $addProjectNotePermission == 'added')
+                    <x-dck.form-section :titre="__('app.dckSection.content')" />
+
                         <div class="col-md-12 col-lg-6">
                             <div class="my-3 form-group">
                                 <x-forms.label class="my-3" fieldId="project_summary"
@@ -167,6 +173,8 @@
                             </div>
                         </div>
                     @endif
+
+                    <x-dck.form-section :titre="__('app.dckSection.visibility')" />
 
                     <div class="col-md-12 col-lg-4">
                         <div class="form-group my-3">
@@ -223,6 +231,8 @@
                     @endif
 
                     @if ($addProjectMemberPermission == 'all' || $addProjectMemberPermission == 'added')
+                        <x-dck.form-section :titre="__('app.dckSection.team')" />
+
                         <div class="col-md-12" id="add_members">
                             <div class="my-3 form-group">
                                 <x-forms.label class="my-3" fieldId="selectEmployee" fieldRequired="true"
@@ -274,6 +284,8 @@
                             <input type="hidden" name="projectID" id="projectID">
                         </div>
                     @endif
+                    <x-dck.form-section :titre="__('app.dckSection.budget')" />
+
                     {{--
                     <div class="col-lg-4">
                         <x-forms.select fieldId="currency_id" :fieldLabel="__('modules.invoices.currency')"
@@ -307,6 +319,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <x-dck.form-section :titre="__('app.dckSection.miroboard')" />
 
                     <div class="col-md-6 col-lg-3">
                         <div class="form-group">
@@ -343,6 +357,8 @@
 
                     <input type = "hidden" name = "mention_user_ids" id = "mentionUserId" class ="mention_user_ids">
 
+                    <x-dck.form-section :titre="__('app.dckSection.notifications')" />
+
                     <div class="col-md-6 col-lg-4" id="clientNotification">
                         <div class="form-group">
                             <div class="mt-5 d-flex">
@@ -362,6 +378,10 @@
                             </div>
                         </div>
                     </div>
+                        @if (isset($fields) && count($fields) > 0)
+                            <x-dck.form-section :titre="__('app.dckSection.customFields')"
+                                                :note="__('app.dckSection.customFieldsNote')" />
+                        @endif
                         <x-forms.custom-field :fields="$fields" class="col-md-12"></x-forms.custom-field>
                 </div>
 

@@ -6,17 +6,10 @@
 
 @php
 $viewEmployeeTasks = user()->permission('view_employee_tasks');
-$viewTickets = user()->permission('view_tickets');
 $viewEmployeeProjects = user()->permission('view_employee_projects');
-$viewEmployeeTimelogs = user()->permission('view_employee_timelogs');
 $manageEmergencyContact = user()->permission('manage_emergency_contact');
 $manageRolePermissionSetting = user()->permission('manage_role_permission_setting');
-$manageShiftPermission = user()->permission('view_shift_roster');
-$viewLeavePermission = user()->permission('view_leave');
 $viewDocumentPermission = user()->permission('view_documents');
-$viewAppreciationPermission = user()->permission('view_appreciation');
-$viewImmigrationPermission = user()->permission('view_immigration');
-$viewIncrementPermission = user()->permission('view_increment_promotion');
 @endphp
 
 @php
@@ -35,6 +28,10 @@ if ($viewPermission == 'all'
 @endphp
 
 @section('filter-section')
+
+    {{-- Retour a la liste. Place dans filter-section et non dans
+         content : le changement d'onglet remplace .content-wrapper. --}}
+    <x-dck.back :href="route('employees.index')" :libelle="__('app.dckBack.employees')" />
     <!-- FILTER START -->
     <!-- PROJECT HEADER START -->
 
@@ -64,22 +61,6 @@ if ($viewPermission == 'all'
                         </li>
                     @endif
 
-                    @if (in_array('leaves', user_modules()) && ($viewLeavePermission == 'all' || ($viewLeavePermission == 'owned' || $viewLeavePermission == 'both') && $employee->id == user()->id ))
-                        <li>
-                            <x-tab :href="route('employees.show', $employee->id) . '?tab=leaves'" :text="__('app.menu.leaves')" ajax="false" class="leaves" />
-                        </li>
-
-                    <li>
-                        <x-tab :href="route('employees.show', $employee->id) . '?tab=leaves-quota'" :text="__('app.menu.leavesQuota')" class="leaves-quota" />
-                    </li>
-                    @endif
-
-                    @if ($viewEmployeeTimelogs == 'all' && in_array('timelogs', user_modules()))
-                        <li>
-                            <x-tab :href="route('employees.show', $employee->id) . '?tab=timelogs'" :text="__('app.menu.timeLogs')" ajax="false" class="timelogs" />
-                        </li>
-                    @endif
-
                     @if ($viewDocumentPermission != 'none')
                         <li>
                             <x-tab :href="route('employees.show', $employee->id) . '?tab=documents'" :text="__('app.menu.documents')" class="documents" />
@@ -89,30 +70,6 @@ if ($viewPermission == 'all'
                     @if ($showFullProfile && ($manageEmergencyContact == 'all' || $employee->id == user()->id))
                         <li>
                             <x-tab :href="route('employees.show', $employee->id) . '?tab=emergency-contacts'" :text="__('modules.emergencyContact.emergencyContact')" class="emergency-contacts" />
-                        </li>
-                    @endif
-
-                    @if ($viewIncrementPermission != 'none')
-                        <li>
-                            <x-tab :href="route('employees.show', $employee->id) . '?tab=increment-promotions'" :text="__('modules.incrementPromotion.incrementPromotions')" class="increment-promotions" />
-                        </li>
-                    @endif
-
-                    @if ($viewTickets == 'all' && in_array('tickets', user_modules()))
-                        <li>
-                            <x-tab :href="route('employees.show', $employee->id) . '?tab=tickets'" :text="__('modules.tickets.ticket')" ajax="false" class="tickets" />
-                        </li>
-                    @endif
-
-                    @if ($showFullProfile && !in_array('client', user_roles()))
-                        <li>
-                            <x-tab :href="route('employees.show', $employee->id) . '?tab=appreciation'" :text="__('app.menu.appreciation')" class="appreciation" />
-                        </li>
-                    @endif
-
-                    @if ($manageShiftPermission == 'all' && in_array('attendance', user_modules()))
-                        <li>
-                            <x-tab :href="route('employees.show', $employee->id) . '?tab=shifts'" :text="__('app.menu.shiftRoster')" class="shifts" />
                         </li>
                     @endif
 
@@ -127,12 +84,6 @@ if ($viewPermission == 'all'
                             <x-tab :href="route('employees.show', $employee->id) . '?tab=activity'" :text="__('modules.employees.activity')" class="activity" />
                         </li>
                     @endif
-
-                    @if($viewImmigrationPermission == 'all' ||  (in_array($viewImmigrationPermission, ['added', 'owned', 'both']) && user()->id == $employee->id))
-                        <li>
-                            <x-tab :href="route('employees.show', $employee->id) . '?tab=immigration'" :text="__('modules.employees.immigration')" class="immigration" />
-                        </li>
-                    @endif
                 </ul>
             </nav>
         </div>
@@ -144,7 +95,7 @@ if ($viewPermission == 'all'
 @endsection
 
 @section('content')
-    <div class="content-wrapper pt-0 border-top-0 client-detail-wrapper">
+    <div class="content-wrapper pt-0 border-top-0 client-detail-wrapper dck-front">
         @include($view)
     </div>
 @endsection

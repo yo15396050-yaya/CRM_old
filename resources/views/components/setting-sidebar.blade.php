@@ -46,17 +46,21 @@
                                  :text="__('app.menu.currencySettings')"/>
         @endif
 
+        {{-- [MODULE RETIRE] Passerelles de paiement
         @if (user()->permission('manage_payment_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="payment_gateway_settings"
                                  :href="route('payment-gateway-settings.index')"
                                  :text="__('app.menu.paymentGatewayCredential')"/>
         @endif
+        --}}
 
+        {{-- [MODULE RETIRE] Parametres de facturation
         @if (user()->permission('manage_finance_setting') == 'all' && (in_array('invoices', user_modules()) ||
         in_array('estimates', user_modules()) || in_array('orders', user_modules()) || in_array('leads', user_modules()) || in_array('payments', user_modules())))
             <x-setting-menu-item :active="$activeMenu" menu="invoice_settings" :href="route('invoice-settings.index')"
                                  :text="__('app.menu.financeSettings')"/>
         @endif
+        --}}
 
 
         @if (user()->permission('manage_contract_setting') == 'all' && in_array('contracts', user_modules()))
@@ -69,25 +73,31 @@
                                  :text="__('app.menu.taxSettings')"/>
         @endif
 
+        {{-- [MODULE RETIRE] Parametres tickets
         @if (user()->permission('manage_ticket_setting') == 'all' && in_array('tickets', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="ticket_settings" :href="route('ticket-settings.index')"
                                  :text="__('app.menu.ticketSettings')"/>
         @endif
+        --}}
 
         @if (user()->permission('manage_project_setting') == 'all' && in_array('projects', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="project_settings" :href="route('project-settings.index')"
                                  :text="__('app.menu.projectSettings')"/>
         @endif
 
+        {{-- [MODULE RETIRE] Parametres de presence
         @if (user()->permission('manage_attendance_setting') == 'all' && in_array('attendance', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="attendance_settings"
                                  :href="route('attendance-settings.index')" :text="__('app.menu.attendanceSettings')"/>
         @endif
+        --}}
 
+        {{-- [MODULE RETIRE] Parametres de conges
         @if (user()->permission('manage_leave_setting') == 'all' && in_array('leaves', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="leave_settings" :href="route('leaves-settings.index')"
                                  :text="__('app.menu.leaveSettings')"/>
         @endif
+        --}}
 
         @if (user()->permission('manage_custom_field_setting') == 'all')
             <x-setting-menu-item :active="$activeMenu" menu="custom_fields" :href="route('custom-fields.index')"
@@ -99,20 +109,26 @@
                                  :text="__('app.menu.rolesPermission')"/>
         @endif
 
+        {{-- [MODULE RETIRE] Parametres messagerie
         @if (user()->permission('manage_message_setting') == 'all' && in_array('messages', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="message_settings" :href="route('message-settings.index')"
                                  :text="__('app.menu.messageSettings')"/>
         @endif
+        --}}
 
+        {{-- [MODULE RETIRE] Parametres leads
         @if (user()->permission('manage_lead_setting') == 'all' && in_array('leads', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="lead_settings" :href="route('lead-settings.index')"
                                  :text="__('app.menu.leadSettings')"/>
         @endif
+        --}}
 
+        {{-- [MODULE RETIRE] Parametres timelogs
         @if (user()->permission('manage_time_log_setting') == 'all' && in_array('timelogs', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="timelog_settings" :href="route('timelog-settings.index')"
                                  :text="__('app.menu.timeLogSettings')"/>
         @endif
+        --}}
 
         @if (user()->permission('manage_task_setting') == 'all' && in_array('tasks', user_modules()))
             <x-setting-menu-item :active="$activeMenu" menu="task_settings" :href="route('task-settings.index')"
@@ -165,10 +181,12 @@
                                     :text="__('app.menu.customLinkSetting')"/>
             @endif
 
+            {{-- [MODULE RETIRE] Parametres RGPD
             @if (user()->permission('manage_gdpr_setting') == 'all' && in_array('client', user_modules()))
                 <x-setting-menu-item :active="$activeMenu" menu="gdpr_settings" :href="route('gdpr-settings.index')"
                                      :text="__('app.menu.gdprSettings')"/>
             @endif
+            --}}
 
             @if (in_array('admin', user_roles()))
                 <x-setting-menu-item :active="$activeMenu" menu="database_backup_settings"

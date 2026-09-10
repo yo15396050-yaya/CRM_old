@@ -154,7 +154,59 @@
 
 @section('content')
     <!-- CONTENT WRAPPER START -->
-    <div class="content-wrapper">
+    <div class="content-wrapper dck-front">
+
+        {{-- Indicateurs de repartition. Ils repondent a « qui est
+             disponible, qui est sature, ou sont les retards » plutot qu'a
+             un simple comptage d'effectif. Calcules par PilotageEmployes,
+             aucune requete n'est faite ici. --}}
+        @isset($empKpis)
+            <div class="dck-grid dck-g4">
+                <div class="dck-kpi2">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-people"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Effectif actif')</span>
+                    </div>
+                    <div class="dck-kpi2__val">{{ $empKpis->effectif }}</div>
+                    <div class="dck-kpi2__sub">collaborateurs du cabinet</div>
+                </div>
+
+                <a class="dck-kpi2" href="{{ route('tasks.index') }}">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-person-dash"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Sans tâche assignée')</span>
+                    </div>
+                    <div class="dck-kpi2__val">
+                        {{ $empKpis->sansTache }}
+                        <span class="dck-kpi2__tot">/ {{ $empKpis->effectif }}</span>
+                    </div>
+                    <div class="dck-kpi2__sub">disponibles pour une affectation</div>
+                </a>
+
+                <div class="dck-kpi2">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-bar-chart-steps"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Charge maximale')</span>
+                    </div>
+                    <div class="dck-kpi2__val">{{ $empKpis->chargeMax }}</div>
+                    <div class="dck-kpi2__sub">
+                        {{ $empKpis->chargeQui ? __('portées par') . ' ' . $empKpis->chargeQui : __('aucune tâche ouverte') }}
+                    </div>
+                </div>
+
+                <a class="dck-kpi2" href="{{ route('tasks.index') }}">
+                    <div class="dck-kpi2__top">
+                        <span class="dck-kpi2__ico"><i class="bi bi-exclamation-triangle"></i></span>
+                        <span class="dck-kpi2__lab">@lang('Tâches en retard')</span>
+                    </div>
+                    <div class="dck-kpi2__val">{{ $empKpis->retards }}</div>
+                    <div class="dck-kpi2__sub">
+                        {{ trans_choice('sur :n collaborateur|sur :n collaborateurs', $empKpis->retardsGens, ['n' => $empKpis->retardsGens]) }}
+                    </div>
+                </a>
+            </div>
+        @endisset
+
         <!-- Add Task Export Buttons Start -->
         <div class="d-flex justify-content-between action-bar">
 

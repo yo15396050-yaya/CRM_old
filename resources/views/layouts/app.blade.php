@@ -10,7 +10,7 @@
 
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="{{ asset('vendor/css/all.min.css') }}" defer="defer">
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet" />
 
     <!-- Simple Line Icons -->
     <link rel="stylesheet" href="{{ asset('vendor/css/simple-line-icons.css') }}" defer="defer">
@@ -31,6 +31,17 @@
 
     <!-- Template CSS -->
     <link type="text/css" rel="stylesheet" media="all" href="{{ asset('css/main.css') }}">
+
+    {{-- Refonte du front — phase 1 : module Contrats.
+         Toutes les regles sont scopees sous .dck-front : les ecrans
+         qui ne portent pas cette classe conservent l'ancien rendu. --}}
+    {{-- Typographie de la refonte : IBM Plex Sans pour l'interface,
+         IBM Plex Mono pour les chiffres, references et colonnes numeriques. --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+
+    <link type="text/css" rel="stylesheet" media="all" href="{{ asset('css/dck-flow.css') }}?v={{ @filemtime(public_path('css/dck-flow.css')) }}">
 
     <title>{{ is_array(__($pageTitle)) ? $pageTitle : __($pageTitle) }}</title>
     <meta name="msapplication-TileColor" content="#ffffff">
@@ -121,7 +132,9 @@
 
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('vendor/jquery/modernizr.min.js') }}"></script>
-    <script src="{{ asset('vendor/jquery/bootstrap-colorpicker.js') }}"></script>
+    {{-- 166 Ko non minifies, utilises uniquement par quelques ecrans de
+         parametrage : differe pour ne plus bloquer le rendu de chaque page. --}}
+    <script src="{{ asset('vendor/jquery/bootstrap-colorpicker.js') }}" defer="defer"></script>
 
     {{-- Timepicker --}}
     <script src="{{ asset('vendor/jquery/bootstrap-timepicker.min.js') }}" defer="defer"></script>
@@ -176,7 +189,11 @@
 @include('sections.modals')
 
 <!-- Global Required Javascript -->
-<script src="{{ asset('js/main.js') }}"></script>
+<script src="{{ asset('js/main.js') }}?v={{ @filemtime(public_path('js/main.js')) }}"></script>
+
+{{-- Fluidite percue : squelettes, barre de navigation, retour immediat
+     sur les boutons. Charge apres main.js, qu il complete sans le modifier. --}}
+<script src="{{ asset('js/dck-fluidite.js') }}?v={{ @filemtime(public_path('js/dck-fluidite.js')) }}"></script>
 <script>
     // Translation of default values for the select picker box.
     $.fn.selectpicker.Constructor.DEFAULTS.noneSelectedText = "@lang('placeholders.noneSelectedText')";
@@ -664,7 +681,7 @@
     });
 </script>
 
-@if (in_array('messages', user_modules()))
+@if (false) {{-- [MODULE RETIRE] Messagerie : notification de nouveau message --}}
     <script>
         function newMessageNotificationPlay() {
             var audio = new Audio("{{ asset('message-notification.mp3') }}");

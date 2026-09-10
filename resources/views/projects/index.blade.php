@@ -190,80 +190,82 @@ $deleteProjectPermission = user()->permission('delete_projects');
 @endphp
 
 @section('content')
-    <!-- CONTENT WRAPPER START -->
-    <div class="content-wrapper">
-        <!-- Add Task Export Buttons Start -->
-        <div class="d-grid d-lg-flex d-md-flex action-bar">
-            <div id="table-actions" class="flex-grow-1 align-items-center mb-2 mb-lg-0 mb-md-0">
+    <div class="content-wrapper dck-front">
+
+        <x-dck.page-head :titre="__('app.menu.projects')"
+                         :description="__('modules.projects.allProject')">
+            <x-slot name="actions">
                 @if ($addProjectPermission == 'all' || $addProjectPermission == 'added' || $addProjectPermission == 'both')
-                    <x-forms.link-primary :link="route('projects.create')"
-                        class="mr-3 openRightModal float-left mb-2 mb-lg-0 mb-md-0" icon="plus">
+                    <x-forms.link-primary :link="route('projects.create')" class="openRightModal" icon="plus">
                         @lang('app.addProject')
                     </x-forms.link-primary>
                 @endif
-                @if ($viewProjectTemplatePermission == 'all' || in_array($manageProjectTemplatePermission , ['added', 'all']))
-                    <x-forms.link-secondary :link="route('project-template.index')"
-                        class="mr-3 mb-2 mb-lg-0 mb-md-0 float-left" icon="layer-group">
+
+                @if ($viewProjectTemplatePermission == 'all' || in_array($manageProjectTemplatePermission, ['added', 'all']))
+                    <x-forms.link-secondary :link="route('project-template.index')" icon="layer-group">
                         @lang('app.menu.projectTemplate')
                     </x-forms.link-secondary>
                 @endif
 
-
                 @if ($addProjectPermission == 'all' || $addProjectPermission == 'added' || $addProjectPermission == 'both')
-                    <x-forms.link-secondary :link="route('projects.import')" class="mr-3 float-left mb-2 mb-lg-0 mb-md-0 d-none d-lg-block" icon="file-upload">
+                    <x-forms.link-secondary :link="route('projects.import')" class="d-none d-lg-inline-flex" icon="file-upload">
                         @lang('app.importExcel')
                     </x-forms.link-secondary>
                 @endif
+            </x-slot>
+        </x-dck.page-head>
 
-            </div>
+        <div class="dck-card">
 
-            @if (!in_array('client', user_roles()))
-                <x-datatable.actions>
-                    <div class="select-status mr-3 pl-3">
-                        <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
-                            <option value="">@lang('app.selectAction')</option>
-                            <option value="change-status">@lang('modules.tasks.changeStatus')</option>
-                            <option value="archive">@lang('app.archive')</option>
-                            <option value="delete">@lang('app.delete')</option>
-                        </select>
-                    </div>
-                    <div class="select-status mr-3 d-none quick-action-field" id="change-status-action">
-                        <select name="status" class="form-control select-picker">
-                            @foreach ($projectStatus as $status)
-                                 <option value="{{ $status->status_name }}">{{ $status->status_name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </x-datatable.actions>
-            @endif
+            <div class="dck-card__bar">
+                {{-- Conteneur d'injection du bouton d'export (initComplete) --}}
+                <div id="table-actions" class="d-flex align-items-center"></div>
 
-            <div class="btn-group mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3" role="group">
-                <a href="{{ route('projects.index') }}" class="btn btn-secondary f-14 btn-active projects" data-toggle="tooltip"
-                    data-original-title="@lang('app.menu.projects')"><i class="side-icon bi bi-list-ul"></i></a>
+                {{-- Selecteur de vue --}}
+                <div class="btn-group dck-seg" role="group">
+                    <a href="{{ route('projects.index') }}" class="btn btn-secondary f-14 btn-active projects"
+                       data-toggle="tooltip" data-original-title="@lang('app.menu.projects')"><i class="side-icon bi bi-list-ul"></i></a>
 
                     @if ($deleteProjectPermission != 'none')
-                        <a href="{{ route('projects.archive') }}" class="btn btn-secondary f-14" data-toggle="tooltip"
-                            data-original-title="@lang('app.archive')"><i class="side-icon bi bi-archive"></i></a>
+                        <a href="{{ route('projects.archive') }}" class="btn btn-secondary f-14"
+                           data-toggle="tooltip" data-original-title="@lang('app.archive')"><i class="side-icon bi bi-archive"></i></a>
                     @endif
-                    <a href="{{ route('project-calendar.index') }}" class="btn btn-secondary f-14" data-toggle="tooltip"
-                    data-original-title="@lang('app.menu.calendar')"><i class="side-icon bi bi-calendar"></i></a>
 
+                    <a href="{{ route('project-calendar.index') }}" class="btn btn-secondary f-14"
+                       data-toggle="tooltip" data-original-title="@lang('app.menu.calendar')"><i class="side-icon bi bi-calendar"></i></a>
 
-                <a href="javascript:;" class="btn btn-secondary f-14 show-pinned" data-toggle="tooltip"
-                    data-original-title="@lang('app.pinned')"><i class="side-icon bi bi-pin-angle"></i></a>
+                    <a href="javascript:;" class="btn btn-secondary f-14 show-pinned"
+                       data-toggle="tooltip" data-original-title="@lang('app.pinned')"><i class="side-icon bi bi-pin-angle"></i></a>
+                </div>
+
+                @if (!in_array('client', user_roles()))
+                    <x-datatable.actions>
+                        <div class="select-status mr-3 pl-3">
+                            <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
+                                <option value="">@lang('app.selectAction')</option>
+                                <option value="change-status">@lang('modules.tasks.changeStatus')</option>
+                                <option value="archive">@lang('app.archive')</option>
+                                <option value="delete">@lang('app.delete')</option>
+                            </select>
+                        </div>
+                        <div class="select-status mr-3 d-none quick-action-field" id="change-status-action">
+                            <select name="status" class="form-control select-picker">
+                                @foreach ($projectStatus as $status)
+                                    <option value="{{ $status->status_name }}">{{ $status->status_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </x-datatable.actions>
+                @endif
             </div>
-        </div>
-        <!-- Add Task Export Buttons End -->
-        <!-- Task Box Start -->
-        <div class="d-flex flex-column w-tables rounded mt-3 bg-white table-responsive">
 
-            {!! $dataTable->table(['class' => 'table table-hover border-0 w-100']) !!}
+            <div class="table-responsive">
+                {!! $dataTable->table(['class' => 'table table-hover border-0 w-100']) !!}
+            </div>
 
         </div>
-        <!-- Task Box End -->
+
     </div>
-    <!-- CONTENT WRAPPER END -->
-
 @endsection
 
 @push('scripts')

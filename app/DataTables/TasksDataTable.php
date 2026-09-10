@@ -73,7 +73,7 @@ class TasksDataTable extends BaseDataTable
             'action', function ($row) {
 
             $userRoles = user_roles();
-            $isAdmin = in_array('admin', $userRoles);
+            $isAdmin = est_arbitre();
             $isEmployee = in_array('employee', $userRoles);
 
             $action = '<div class="task_view">
@@ -165,7 +165,8 @@ class TasksDataTable extends BaseDataTable
                 return ' -- ';
             }
 
-            return '<a href="' . route('tasks.show', [$row->id]) . $this->tabUrl . '" class="text-darkest-grey openRightModal">' . $row->task_short_code . '</a>';
+            return '<a href="' . route('tasks.show', [$row->id]) . $this->tabUrl . '" class="dck-ref openRightModal">'
+                . $row->task_short_code . '</a>';
         });
 
         $datatables->addColumn('name', function ($row) {
@@ -650,7 +651,16 @@ class TasksDataTable extends BaseDataTable
             $model->where('tasks.is_private', 0);
         }
 
-        $model->orderbyRaw('pinned_task desc');
+        // Les taches epinglees remontent en tete. Le tri repete la
+        // sous-requete au lieu de viser l'alias pinned_task : DataTables
+        // compte les lignes avec un select count(*) qui remplace la liste
+        // des colonnes mais conserve le ORDER BY. L'alias n'existe alors
+        // plus, et la requete de comptage echouait — d'ou l'erreur ajax
+        // « Unknown column 'pinned_task' in 'order clause' ».
+        $model->orderByRaw(
+            '(select count(*) from pinned where pinned.task_id = tasks.id and pinned.user_id = ?) desc',
+            [user()->id]
+        );
 
         return $model;
     }

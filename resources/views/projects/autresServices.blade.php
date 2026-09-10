@@ -13,7 +13,7 @@ $deleteProjectPermission = user()->permission('delete_projects');
 
 
 @section('content')
-<div class="content-wrapper">
+<div class="content-wrapper dck-front">
     <h6>C'est en cours de développement.</h6>
 </div>
 @endsection

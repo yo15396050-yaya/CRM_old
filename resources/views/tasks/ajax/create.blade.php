@@ -11,7 +11,7 @@
 
 <link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <x-form id="save-task-data-form">
             <input type="hidden" id="taskID" name="taskID">
@@ -19,6 +19,8 @@
                 <h4 class="mb-0 p-20 f-21 font-weight-normal  border-bottom-grey">
                     @lang('modules.tasks.taskInfo')</h4>
                 <div class="row p-20">
+
+                    <x-dck.form-section :titre="__('app.dckSection.identification')" />
 
                     <div class="col-lg-6 col-md-6">
                         <x-forms.text :fieldLabel="__('app.title')" fieldName="heading" fieldRequired="true"
@@ -94,6 +96,8 @@
                         <div class="col-md-6 col-lg-6 pt-5" id='clientDetails'></div>
                     @endif
 
+                    <x-dck.form-section :titre="__('app.dckSection.planning')" />
+
                     <div class="col-md-5 col-lg-3">
                         <x-forms.datepicker fieldId="task_start_date" fieldRequired="true"
                                             :fieldLabel="__('modules.projects.startDate')" fieldName="start_date"
@@ -115,6 +119,8 @@
 
                     <div class="col-md-12 col-lg-12">
                     </div>
+
+                    <x-dck.form-section :titre="__('app.dckSection.assignment')" />
 
                     <div class="col-md-12 col-lg-8">
                         <div class="form-group my-3">
@@ -152,6 +158,8 @@
                         </div>
                     </div>
                     <div class="col-md-6 show-leave"></div>
+
+                    <x-dck.form-section :titre="__('app.dckSection.description')" />
 
                     <div class="col-md-12">
                         <div class="form-group my-3">
@@ -265,6 +273,8 @@
                                             value="low">@lang('modules.tasks.low')</option>
                                 </x-forms.select>
                             </div>
+                            <x-dck.form-section :titre="__('app.dckSection.notifications')" />
+
 
                             <div class="col-md-6 col-lg-6">
                                 <div class="form-group my-3">
@@ -308,6 +318,8 @@
                     </div>
 
 
+                    <x-dck.form-section :titre="__('app.dckSection.options')" />
+
                     <div class="col-md-6 col-lg-3">
                         <div class="form-group">
                             <div class="d-flex mt-5">
@@ -328,6 +340,8 @@
                             </div>
                         </div>
                     </div>
+
+                    <x-dck.form-section :titre="__('app.dckSection.estimate')" />
 
                     <div class="col-md-6 col-lg-3">
                         <div class="form-group">
@@ -351,6 +365,8 @@
                             @lang('app.mins')
                         </div>
                     </div>
+
+                    <x-dck.form-section :titre="__('app.dckSection.repeat')" />
 
                     <div class="col-md-6">
                         <div class="form-group my-3">
@@ -399,6 +415,8 @@
                     </div>
 
                     @if(is_null($task))
+                        <x-dck.form-section :titre="__('app.dckSection.dependency')" />
+
                         <div class="col-md-6">
                             <div class="form-group my-3">
                                 <div class="d-flex">
@@ -431,6 +449,8 @@
                     @endif
                     <input type = "hidden" name = "mention_user_ids" id = "mentionUserId" class ="mention_user_ids">
                     @if ($addTaskFilePermission == 'all' || $addTaskFilePermission == 'added')
+                        <x-dck.form-section :titre="__('app.dckSection.attachments')" />
+
                         <div class="col-lg-12">
                             <x-forms.file-multiple class="mr-0 mr-lg-2 mr-md-2"
                                                    :fieldLabel="__('app.menu.addFile')" fieldName="file"
@@ -441,6 +461,10 @@
                         <input type="hidden" name="addedFiles" id="addedFiles">
                     @endif
 
+                    @if (isset($fields) && count($fields) > 0)
+                        <x-dck.form-section :titre="__('app.dckSection.customFields')"
+                                            :note="__('app.dckSection.customFieldsNote')" />
+                    @endif
                     <x-forms.custom-field :fields="$fields" class="col-sm-12"></x-forms.custom-field>
 
                 </div>

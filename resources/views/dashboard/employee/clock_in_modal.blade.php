@@ -81,7 +81,7 @@
         const token = "{{ csrf_token() }}";
 
         $.easyAjax({
-            url: "{{ route('attendances.store_clock_in') }}",
+            url: "{{ (Route::has('attendances.store_clock_in') ? route('attendances.store_clock_in') : '') }}",
             type: "POST",
             buttonSelector: "#save-clock-in",
             disableButton: true,

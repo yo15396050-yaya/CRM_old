@@ -55,9 +55,34 @@ class ContractController extends AccountBaseController
 
             $this->contract = Contract::all();
             $this->contractTypes = ContractType::all();
-            $this->contractCounts = Contract::count();
-            $this->expiredCounts = Contract::where(DB::raw('DATE(`end_date`)'), '<', now()->format('Y-m-d'))->count();
-            $this->aboutToExpireCounts = Contract::where(DB::raw('DATE(`end_date`)'), '>', now()->format('Y-m-d'))
+
+            /* Les compteurs portaient sur l'ensemble des contrats, sans les
+               restrictions de droits appliquees par la liste : un utilisateur
+               limite a ses propres contrats lisait un total qui ne
+               correspondait pas au tableau affiche en dessous. */
+            $portee = function () {
+                $q = Contract::query();
+                $droit = user()->permission('view_contract');
+
+                if ($droit == 'added') {
+                    $q->where('added_by', user()->id);
+                }
+                elseif ($droit == 'owned') {
+                    $q->where('client_id', user()->id);
+                }
+                elseif ($droit == 'both') {
+                    $q->where(fn ($s) => $s->where('added_by', user()->id)->orWhere('client_id', user()->id));
+                }
+
+                return $q;
+            };
+
+            $this->contractCounts = $portee()->count();
+            $this->expiredCounts = $portee()
+                ->where(DB::raw('DATE(`end_date`)'), '<', now()->format('Y-m-d'))
+                ->count();
+            $this->aboutToExpireCounts = $portee()
+                ->where(DB::raw('DATE(`end_date`)'), '>', now()->format('Y-m-d'))
                 ->where(DB::raw('DATE(`end_date`)'), '<', now()->timezone($this->company->timezone)->addDays(7)->format('Y-m-d'))
                 ->count();
         }
@@ -100,8 +125,51 @@ class ContractController extends AccountBaseController
 
         Contract::destroy($id);
 
-        return Reply::success(__('messages.deleteSuccess'));
+        /* Les compteurs sont rendus au chargement de la page : sans ces
+           valeurs, le total restait fige apres une suppression et il
+           fallait recharger l'ecran pour le voir baisser. */
+        return Reply::successWithData(__('messages.deleteSuccess'), [
+            'compteurs' => $this->compteursContrats(),
+        ]);
 
+    }
+
+    /**
+     * Compteurs de l'en-tete de la liste, restreints aux memes droits
+     * que le tableau lui-meme.
+     */
+    private function compteursContrats(): array
+    {
+        $portee = function () {
+            $q = Contract::query();
+            $droit = user()->permission('view_contract');
+
+            if ($droit == 'added') {
+                $q->where('added_by', user()->id);
+            }
+            elseif ($droit == 'owned') {
+                $q->where('client_id', user()->id);
+            }
+            elseif ($droit == 'both') {
+                $q->where(fn ($s) => $s->where('added_by', user()->id)->orWhere('client_id', user()->id));
+            }
+
+            return $q;
+        };
+
+        $total = $portee()->count();
+        $expires = $portee()->where(DB::raw('DATE(`end_date`)'), '<', now()->format('Y-m-d'))->count();
+        $bientot = $portee()
+            ->where(DB::raw('DATE(`end_date`)'), '>', now()->format('Y-m-d'))
+            ->where(DB::raw('DATE(`end_date`)'), '<', now()->timezone(company()->timezone)->addDays(7)->format('Y-m-d'))
+            ->count();
+
+        return [
+            'total'   => $total,
+            'actifs'  => max($total - $expires, 0),
+            'bientot' => $bientot,
+            'expires' => $expires,
+        ];
     }
 
     public function create()

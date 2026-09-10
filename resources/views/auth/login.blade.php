@@ -1,104 +1,96 @@
 <x-auth>
     <form id="login-form" action="{{ route('login') }}" class="ajax-form" method="POST">
         {{ csrf_field() }}
-        <h3 class=" mb-4 f-w-500">Bienvenue sur DCK FLOW TASK!</h3>
-        <span align="left">Veuillez vous connecter à votre compte et commencer l'aventure</span>
-        <br><br> 
-        <script>   
-            const facebook = "{{ route('social_login', 'facebook') }}";
-            const google = "{{ route('social_login', 'google') }}";
-            const twitter = "{{ route('social_login', 'twitter-oauth-2') }}";
-            const linkedin = "{{ route('social_login', 'linkedin-openid') }}";
-        </script>
-  
-        @if ($socialAuthSettings->google_status == 'enable')
-            <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = google;">
-                <span><img src="{{ asset('img/google.png') }}" alt="Google"/></span>
-                @lang('auth.signInGoogle')</a>
-        @endif
-        @if ($socialAuthSettings->facebook_status == 'enable')
-            <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = facebook;">
-                <span><img src="{{ asset('img/fb.png') }}" alt="Google"/></span>
-                @lang('auth.signInFacebook')
-            </a>
-        @endif
-        @if ($socialAuthSettings->twitter_status == 'enable')
-            <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = twitter;">
-                <span><img src="{{ asset('img/twitter.png') }}" alt="Google"/></span>
-                @lang('auth.signInTwitter')
-            </a>
-        @endif
-        @if ($socialAuthSettings->linkedin_status == 'enable')
-            <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = linkedin;">
-                <span><img src="{{ asset('img/linkedin.png') }}" alt="Google"/></span>
-                @lang('auth.signInLinkedin')
-            </a>
-        @endif
+        <div class="auth-head">
+            <h2>Bienvenue sur Taskflow</h2>
+            <p>Connectez-vous pour commencer l'aventure.</p>
+        </div>
 
         @if ($socialAuthSettings->social_auth_enable)
-            <p class="position-relative my-4">@lang('auth.useEmail')</p>
+            <div class="social_login mb-3">
+                @if ($socialAuthSettings->google_status == 'enable')
+                    <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = google;">
+                        <span><img src="{{ asset('img/google.png') }}" alt="Google"/></span>@lang('app.signInGoogle')
+                    </a>
+                @endif
+                @if ($socialAuthSettings->facebook_status == 'enable')
+                    <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = facebook;">
+                        <span><img src="{{ asset('img/fb.png') }}" alt="Facebook"/></span>@lang('app.signInFacebook')
+                    </a>
+                @endif
+                @if ($socialAuthSettings->twitter_status == 'enable')
+                    <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = twitter;">
+                        <span><img src="{{ asset('img/twitter.png') }}" alt="Twitter"/></span>@lang('app.signInTwitter')
+                    </a>
+                @endif
+                @if ($socialAuthSettings->linkedin_status == 'enable')
+                    <a class="mb-3 height_50 rounded f-w-500" onclick="window.location.href = linkedin;">
+                        <span><img src="{{ asset('img/linkedin.png') }}" alt="LinkedIn"/></span>@lang('app.signInLinkedin')
+                    </a>
+                @endif
+            </div>
         @endif
 
-        <div class="form-group text-left">
-            <label for="email">@lang('auth.email')</label>
-            <input tabindex="1" type="email" name="email"
-                   class="form-control height-50 f-15 light_text @error('email') is-invalid @enderror"
-                   autofocus
-                   value="{{request()->old('email')}}"
-                   placeholder="@lang('auth.email')" id="email">
+        {{-- Adresse e-mail --}}
+        <div class="auth-field">
+            <label class="auth-field__label" for="email">@lang('auth.email')</label>
+            <span class="auth-control">
+                <span class="auth-control__icon"><i class="far fa-envelope"></i></span>
+                <input tabindex="1" type="email" name="email" id="email" autofocus
+                       value="{{ request()->old('email') }}"
+                       placeholder="@lang('auth.email')"
+                       class="@error('email') is-invalid @enderror">
+            </span>
             @if ($errors->has('email'))
-                <div class="invalid-feedback">{{ $errors->first('email') }}</div>
+                <p class="auth-error">{{ $errors->first('email') }}</p>
             @endif
-            @if ($socialAuthSettings->social_auth_enable_count>1)
-                <div class="forgot_pswd mt-2" id="forget-pass-email-section">
-                    <a href="{{ url('forgot-password') }}">@lang('app.forgotPassword')</a>
-                </div>
+            @if ($socialAuthSettings->social_auth_enable_count > 1)
+                <p class="auth-hint" id="forget-pass-email-section">
+                    <a class="auth-link" href="{{ url('forgot-password') }}">@lang('app.forgotPassword')</a>
+                </p>
             @endif
         </div>
 
-        @if ($socialAuthSettings->social_auth_enable_count>1 && !$errors->has('g-recaptcha-response'))
-            <button type="submit" id="submit-next"
-                    class="btn-primary f-w-500 rounded w-100 height-50 f-18"> @lang('auth.next') <i
-                    class="fa fa-arrow-right pl-1"></i></button>
+        @if ($socialAuthSettings->social_auth_enable_count > 1 && !$errors->has('g-recaptcha-response'))
+            <button type="submit" id="submit-next" class="auth-submit">
+                @lang('auth.next') <i class="fa fa-arrow-right"></i>
+            </button>
 
             @if ($company->allow_client_signup)
-                <a href="{{ route('register') }}" id="signup-client-next"
-                   class="btn-secondary f-w-500 rounded w-100 height-50 f-15 mt-3">
+                <a href="{{ route('register') }}" id="signup-client-next" class="auth-secondary">
                     @lang('app.signUpAsClient')
                 </a>
             @endif
-
         @endif
 
+        {{-- Mot de passe --}}
         <div id="password-section"
              @if ($socialAuthSettings->social_auth_enable_count > 1 && !$errors->has('g-recaptcha-response')) class="d-none" @endif>
-            <div class="form-group text-left">
-                <label for="password">@lang('app.password')</label>
-                <x-forms.input-group>
-                    <input type="password" name="password" id="password"
-                           placeholder="@lang('placeholders.password')" tabindex="3"
-                           class="form-control height-50 f-15 light_text @error('password') is-invalid @enderror">
 
-                    <x-slot name="append">
-                        <button type="button" data-toggle="tooltip"
-                                data-original-title="@lang('app.viewPassword')"
-                                class="btn btn-outline-secondary border-grey height-50 toggle-password">
-                            <i
-                                class="fa fa-eye"></i></button>
-                    </x-slot>
-
-                </x-forms.input-group>
+            <div class="auth-field">
+                <div class="auth-field__head">
+                    <label class="auth-field__label" for="password">@lang('app.password')</label>
+                    <a class="auth-link" href="{{ url('forgot-password') }}">@lang('app.forgotPassword')</a>
+                </div>
+                <span class="auth-control auth-control--with-action">
+                    <span class="auth-control__icon"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="password" id="password" tabindex="3"
+                           placeholder="@lang('placeholders.password')"
+                           class="@error('password') is-invalid @enderror">
+                    <button type="button" class="auth-control__action toggle-password"
+                            data-toggle="tooltip" data-original-title="@lang('app.viewPassword')"
+                            aria-label="@lang('app.viewPassword')">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </span>
                 @if ($errors->has('password'))
-                    <div class="invalid-feedback d-block">{{ $errors->first('password') }}</div>
+                    <p class="auth-error">{{ $errors->first('password') }}</p>
                 @endif
             </div>
-            <div class="forgot_pswd mb-3">
-                <a href="{{ url('forgot-password') }}">@lang('app.forgotPassword')</a>
-            </div>
 
-            <div class="form-group text-left ">
-                <input id="checkbox-signup" class="cursor-pointer" type="checkbox" name="remember">
-                <label for="checkbox-signup" class="cursor-pointer">@lang('app.rememberMe')</label>
+            <div class="auth-check">
+                <input id="checkbox-signup" type="checkbox" name="remember">
+                <label for="checkbox-signup">@lang('app.rememberMe')</label>
             </div>
 
             @if ($globalSetting->google_recaptcha_status == 'active')
@@ -108,21 +100,18 @@
             <input type="hidden" id="g_recaptcha" name="g_recaptcha">
 
             @if ($errors->has('g-recaptcha-response'))
-                <div
-                    class="invalid-feedback  d-block text-left">{{ $errors->first('g-recaptcha-response') }}
-                </div>
+                <p class="auth-error">{{ $errors->first('g-recaptcha-response') }}</p>
             @endif
 
-            <button type="submit" id="submit-login"
-                    class="btn-primary f-w-500 rounded w-100 height-50 f-18">
-                @lang('app.login') <i class="fa fa-arrow-right pl-1"></i>
+            <button type="submit" id="submit-login" class="auth-submit">
+                @lang('app.login') <i class="fa fa-arrow-right"></i>
             </button>
 
             @if ($company->allow_client_signup)
-                <a href="{{ route('register') }}"
-                   class="btn-secondary f-w-500 rounded w-100 height-50 f-15 mt-3">
-                    @lang('app.signUpAsClient')
-                </a>
+                <p class="auth-foot">
+                    Vous n'avez pas de compte ?
+                    <a href="{{ route('register') }}">@lang('app.signUpAsClient')</a>
+                </p>
             @endif
         </div>
 

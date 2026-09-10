@@ -45,24 +45,42 @@ class ContractInitNotification extends BaseNotification
         $url = url()->temporarySignedRoute('front.contract.show', now()->addDays(GlobalSetting::SIGNED_ROUTE_EXPIRY), $this->contract->hash);
         $url = getDomainSpecificUrl($url, $this->company);
         
-        $date = $this->contract->created_at->translatedFormat('d F Y');
-        $contractNumber = $this->contract->formatContractNumber();
+        // La locale n'est posee que par build(), appele plus bas : sans la fixer
+        // ici, les mois sortent en anglais dans un gabarit ecrit en francais.
+        $locale = $this->company->locale ?: 'fr';
+        $date = $this->contract->created_at->locale($locale)->translatedFormat('d F Y');
+        // contract_number porte deja le prefixe, applique une seule fois par
+        // ContractObserver::creating(). Le reformater donnerait « CONT#CONT#642 ».
+        $contractNumber = $this->contract->contract_number;
         $contractTypeName = $this->contract->contractType->name ?? __('app.menu.contract');
 
+        // Le lien de signature est une route signee : le gabarit affiche sa
+        // date limite plutot que de laisser le destinataire la decouvrir expiree.
+        $expiryDays = GlobalSetting::SIGNED_ROUTE_EXPIRY;
+        $expiryDate = now($this->company->timezone)
+            ->addDays($expiryDays)
+            ->locale($locale)
+            ->translatedFormat('d F Y');
+
+        $data = [
+            'companyName' => $this->company->company_name,
+            'logoUrlDark' => $this->emailLogoUrl(),
+            'logoPath' => $this->emailLogoPath(),
+            'recipientName' => $notifiable->name,
+            'subject' => $this->contract->subject ?: 'Contrat de service',
+            'contractType' => $contractTypeName,
+            'date' => $date,
+            'contractNumber' => $contractNumber,
+            'expiryDays' => $expiryDays,
+            'expiryDate' => $expiryDate,
+            'url' => $url,
+            'company' => $this->company,
+        ];
+
         return $this->build($notifiable)
-            ->subject('Nouveau Contrat : ' . ($this->contract->subject ?: $contractNumber))
-            ->view('emails.contract_init', [
-                'companyName' => $this->company->company_name,
-                'logo' => $this->company->logo_url,
-                'headerColor' => $this->company->header_color,
-                'recipientName' => $notifiable->name,
-                'subject' => $this->contract->subject ?: 'Contrat de service',
-                'contractType' => $contractTypeName,
-                'date' => $date,
-                'contractNumber' => $contractNumber,
-                'url' => $url,
-                'company' => $this->company,
-            ]);
+            ->subject('Contrat ' . $contractNumber . ' à signer avant le ' . $expiryDate)
+            ->view('emails.contract_init', $data)
+            ->text('emails.txt.contract_init', $data);
     }
 
     public function toArray($notifiable)
@@ -80,7 +98,9 @@ class ContractInitNotification extends BaseNotification
      */
     public function toWhatsAppContent($notifiable)
     {
-        $contractNumber = $this->contract->formatContractNumber();
+        // contract_number porte deja le prefixe, applique une seule fois par
+        // ContractObserver::creating(). Le reformater donnerait « CONT#CONT#642 ».
+        $contractNumber = $this->contract->contract_number;
         $url = url()->temporarySignedRoute('front.contract.show', now()->addDays(GlobalSetting::SIGNED_ROUTE_EXPIRY), $this->contract->hash);
         $url = getDomainSpecificUrl($url, $this->company);
         
@@ -92,7 +112,9 @@ class ContractInitNotification extends BaseNotification
 
     public function toSmsContent()
     {
-        $contractNumber = $this->contract->formatContractNumber();
+        // contract_number porte deja le prefixe, applique une seule fois par
+        // ContractObserver::creating(). Le reformater donnerait « CONT#CONT#642 ».
+        $contractNumber = $this->contract->contract_number;
         return "Nouv. Contrat: {$this->contract->subject}\nRef: {$contractNumber}\nConsultez vos emails.";
     }
 }

@@ -53,7 +53,7 @@
 
     @if (in_array('attendance', user_modules()) && in_array('total_today_attendance', $activeWidgets))
         <div class="col-xl-3 col-lg-6 col-md-6">
-            <a href="{{ route('attendances.index') }}">
+            <a href="{{ (Route::has('attendances.index') ? route('attendances.index') : '') }}">
                 <x-cards.widget :title="__('modules.dashboard.totalTodayAttendance')"
                     :value="$counts->totalTodayAttendance.'/'.$counts->totalEmployees" icon="calendar-check">
                 </x-cards.widget>
@@ -63,7 +63,7 @@
 
     @if (in_array('attendance', user_modules()) && in_array('average_attendance', $activeWidgets))
         <div class="col-xl-3 col-lg-6 col-md-6 mb-3">
-            <a href="{{ route('attendances.index') }}">
+            <a href="{{ (Route::has('attendances.index') ? route('attendances.index') : '') }}">
                 <x-cards.widget :title="__('modules.dashboard.averageAttendance')" :value="$averageAttendance"
                 icon="fingerprint" />
             </a>
@@ -259,7 +259,7 @@
     $('body').on('click', '#total-leaves-approved', function() {
         var dateRange = getDateRange();
 
-        var url = `{{ route('leaves.index') }}`;
+        var url = `{{ (Route::has('leaves.index') ? route('leaves.index') : '') }}`;
         string = `?status=approved&start=${dateRange.startDate}&end=${dateRange.endDate}`;
         url += string;
 
@@ -295,7 +295,7 @@
     $('body').on('click', '.view-late-attendance', function() {
         var empId = $(this).data('user-id');
         var dateRange = getDateRange();
-        var url = `{{ route('attendances.index') }}`;
+        var url = `{{ (Route::has('attendances.index') ? route('attendances.index') : '') }}`;
 
         var string = `?employee_id=${empId}&late=yes`;
         url += string;

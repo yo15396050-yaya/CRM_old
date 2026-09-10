@@ -5,7 +5,7 @@ $addDepartmentPermission = user()->permission('add_department');
 
 <link rel="stylesheet" href="{{ asset('vendor/css/tagify.css') }}">
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <x-form id="save-employee-data-form">
 
@@ -15,6 +15,8 @@ $addDepartmentPermission = user()->permission('add_department');
                 <div class="p-20 row">
                     <div class="col-lg-9">
                         <div class="row">
+                            <x-dck.form-section :titre="__('app.dckSection.identity')" />
+
                             <div class="col-md-3">
                                 <x-forms.text fieldId="employee_id" :fieldLabel="__('modules.employees.employeeId')"
                                     fieldName="employee_id" :fieldValue="((!$checkifExistEmployeeId) ? ($lastEmployeeID+1) : '')" fieldRequired="true"
@@ -63,6 +65,8 @@ $addDepartmentPermission = user()->permission('add_department');
                                 </x-forms.input-group>
                                 <small class="form-text text-muted">@lang('placeholders.password')</small>
                             </div>
+                            <x-dck.form-section :titre="__('app.dckSection.position')" />
+
                             <div class="col-lg-4 col-md-6">
                                 <x-forms.label class="my-3" fieldId="category_id"
                                     :fieldLabel="__('app.designation')" fieldRequired="true">
@@ -112,6 +116,8 @@ $addDepartmentPermission = user()->permission('add_department');
                             :fieldLabel="__('modules.profile.profilePicture')" fieldName="image" fieldId="image"
                             fieldHeight="119" :popover="__('messages.fileFormat.ImageFile')" />
                     </div>
+                    <x-dck.form-section :titre="__('app.dckSection.contact')" />
+
                     <div class="col-lg-3 col-md-6">
                         <x-forms.select fieldId="country" :fieldLabel="__('app.country')" fieldName="country"
                             search="true">
@@ -186,6 +192,8 @@ $addDepartmentPermission = user()->permission('add_department');
                             @endforeach
                         </x-forms.select>
                     </div>
+                    <x-dck.form-section :titre="__('app.dckSection.personalStatus')" />
+
                     <div class="col-md-12">
                         <div class="my-3 form-group">
                             <x-forms.textarea class="mr-0 mr-lg-2 mr-md-2" :fieldLabel="__('app.address')"
@@ -206,6 +214,8 @@ $addDepartmentPermission = user()->permission('add_department');
                 <h4 class="p-20 mb-0 f-21 font-weight-normal  border-top-grey">
                     @lang('modules.client.clientOtherDetails')</h4>
                 <div class="p-20 row">
+                    <x-dck.form-section :titre="__('app.dckSection.accountAccess')" />
+
                     <div class="col-lg-3 col-md-6">
                         <div class="my-3 form-group">
                             <label class="mb-12 f-14 text-dark-grey w-100"
@@ -283,6 +293,8 @@ $addDepartmentPermission = user()->permission('add_department');
                             </p>
                         </div>
                     @endif
+
+                    <x-dck.form-section :titre="__('app.dckSection.contractFollowUp')" />
                     <div class="col-lg-3 col-md-6">
                         <x-forms.datepicker fieldId="probation_end_date" :fieldLabel="__('modules.employees.probationEndDate')"
                             fieldName="probation_end_date" :fieldPlaceholder="__('placeholders.date')"

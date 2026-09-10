@@ -8,6 +8,17 @@
 
 @section('filter-section')
 
+    {{-- Bascule entre les deux regards sur les memes donnees. Place hors
+         de x-filters.filter-box, qui est masque sur toutes les pages. --}}
+    <div class="d-flex filter-box project-header bg-white">
+        <div class="project-menu d-lg-flex">
+            <x-tab :href="route('task-report.index')" ajax="false"
+                   :text="__('Rapport détaillé')" class="detaille active" />
+            <x-tab :href="route('task-report.hebdomadaire')" ajax="false"
+                   :text="__('Rapport hebdomadaire')" class="hebdomadaire" />
+        </div>
+    </div>
+
     <x-filters.filter-box>
         <!-- DATE START -->
         <div class="select-box d-flex pr-2 border-right-grey border-right-grey-sm-0">

@@ -1,0 +1,4991 @@
+/* ══════════════════════════════════════════════════════════════
+   DCK FLOW TASK — refonte du front, phase 1 : module Contrats
+   ──────────────────────────────────────────────────────────────
+   Toutes les regles sont scopees sous .dck-front : aucun ecran
+   depourvu de cette classe n'est affecte. Retirer la classe suffit
+   a revenir a l'ancien rendu, sans toucher au reste du projet.
+
+   Aucun attribut name= n'est modifie par cette feuille : elle ne
+   fait que redefinir l'apparence des primitives Bootstrap deja
+   utilisees par les vues Blade existantes.
+
+   Herite de la direction artistique de la page de connexion :
+   noir primaire, gris froids, rayon 12px, bordures fines.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front {
+  /* Neutres */
+  --n0:#ffffff; --n50:#f9fafb; --n100:#f3f4f6; --n200:#e5e7eb;
+  --n300:#d1d5db; --n400:#9ca3af; --n500:#6b7280; --n600:#4b5563;
+  --n700:#374151; --n800:#1f2937; --n900:#111827;
+
+  --surface:var(--n0);
+  --surface-2:var(--n50);
+  --surface-3:var(--n100);
+  --line:var(--n200);
+  --line-strong:var(--n300);
+
+  --tx:var(--n900);
+  --tx-2:var(--n700);
+  --tx-3:var(--n500);
+  --tx-4:var(--n400);
+
+  --act:#000000;
+  --act-hover:#1f2937;
+  --act-tx:#ffffff;
+
+  --ok:#3f6212;   --ok-bg:#f2f8e9;   --ok-line:#cbe0a8;
+  --warn:#a16207; --warn-bg:#fef9e7; --warn-line:#f3dfa2;
+  --err:#b42318;  --err-bg:#fdf1f0;  --err-line:#f2c9c6;
+  --info:#0369a1; --info-bg:#eff8ff; --info-line:#b3ddf7;
+
+  --r-sm:8px; --r:12px; --r-full:999px;
+  --f-num:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  color:var(--tx);
+}
+
+/* ── Conteneur de page ──────────────────────────────────────── */
+.dck-front.dck-front.content-wrapper,
+.dck-front.dck-front .content-wrapper { background:transparent; }
+
+/* Cartes : la surface blanche arrondie deja utilisee par les vues */
+.dck-front.dck-front .bg-white.rounded,
+.dck-front.dck-front .add-client.bg-white {
+  background:var(--surface) !important;
+  border:1px solid var(--line);
+  border-radius:var(--r) !important;
+  box-shadow:none;
+}
+
+/* En-tete de carte */
+.dck-front.dck-front .border-bottom-grey {
+  border-bottom:1px solid var(--line) !important;
+}
+.dck-front.dck-front h4.f-21 {
+  font-size:16px !important;
+  font-weight:600 !important;
+  letter-spacing:-.02em;
+  color:var(--tx);
+  padding:16px 20px !important;
+}
+
+/* ── Libelles ───────────────────────────────────────────────── */
+.dck-front.dck-front label,
+.dck-front.dck-front .form-group > label {
+  font-size:13px;
+  font-weight:600;
+  color:var(--tx-2);
+  margin-bottom:7px;
+}
+.dck-front.dck-front .text-dark-grey { color:var(--tx-2) !important; }
+.dck-front.dck-front .text-lightest  { color:var(--tx-3) !important; }
+
+/* ── Champs de saisie ───────────────────────────────────────── */
+.dck-front.dck-front .form-control,
+.dck-front.dck-front .bootstrap-select > .dropdown-toggle,
+.dck-front.dck-front .select2-container--default .select2-selection--single {
+  height:auto !important;
+  min-height:40px;
+  padding:9px 12px;
+  font-size:14px;
+  color:var(--tx);
+  background-color:var(--surface);
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-sm);
+  box-shadow:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.dck-front.dck-front .form-control.height-35 { height:auto !important; }
+
+.dck-front.dck-front .form-control::placeholder { color:var(--tx-4); }
+
+.dck-front.dck-front .form-control:focus,
+.dck-front.dck-front .bootstrap-select.show > .dropdown-toggle,
+.dck-front.dck-front .select2-container--default.select2-container--focus .select2-selection--single {
+  outline:none;
+  border-color:var(--act);
+  /* Halo discret : un anneau noir a 90 % d'opacite, comme auparavant,
+     doublait visuellement l'epaisseur de la bordure et ecrasait le
+     champ. L'atelier pose un halo clair de 3 px autour d'une bordure
+     nette : c'est la meme intention, transposee sur le noir primaire. */
+  box-shadow:0 0 0 3px rgba(17,24,39,.12);
+}
+
+.dck-front.dck-front .form-control:disabled,
+.dck-front.dck-front .form-control[readonly],
+.dck-front.dck-front .readonly-background {
+  background-color:var(--surface-3) !important;
+  color:var(--tx-4);
+  cursor:not-allowed;
+}
+
+.dck-front.dck-front textarea.form-control { min-height:96px; }
+
+/* Champ en erreur signale par la validation ajax */
+.dck-front.dck-front .form-control.is-invalid,
+.dck-front.dck-front .form-control.error {
+  border-color:var(--err);
+}
+.dck-front.dck-front .form-control.is-invalid:focus {
+  box-shadow:0 0 0 3px rgba(180,35,24,.16);
+}
+.dck-front.dck-front .invalid-feedback,
+.dck-front.dck-front .error-message,
+.dck-front.dck-front label.error {
+  display:block;
+  margin-top:6px;
+  font-size:12.5px;
+  font-weight:500;
+  color:var(--err);
+}
+
+/* ── Groupes avec prefixe (numero de contrat) ───────────────── */
+.dck-front.dck-front .input-group-text {
+  padding:9px 12px;
+  font-family:var(--f-num);
+  font-size:13px;
+  color:var(--tx-3);
+  background-color:var(--surface-3);
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-sm) 0 0 var(--r-sm);
+}
+.dck-front.dck-front .input-group > .form-control:not(:first-child) {
+  border-top-left-radius:0;
+  border-bottom-left-radius:0;
+}
+.dck-front.dck-front .input-group > .form-control:not(:last-child) {
+  border-top-right-radius:0;
+  border-bottom-right-radius:0;
+}
+.dck-front.dck-front .input-group-append .btn {
+  border-radius:0 var(--r-sm) var(--r-sm) 0;
+}
+
+/* ── Selecteurs bootstrap-select ────────────────────────────── */
+.dck-front.dck-front .bootstrap-select > .dropdown-toggle::after {
+  border-top-color:var(--tx-4);
+}
+.dck-front.dck-front .bootstrap-select .dropdown-menu {
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  box-shadow:0 4px 16px rgba(16,24,40,.10), 0 1px 3px rgba(16,24,40,.06);
+  padding:6px;
+}
+.dck-front.dck-front .bootstrap-select .dropdown-menu li a {
+  border-radius:var(--r-sm);
+  padding:8px 10px;
+  font-size:13.5px;
+}
+.dck-front.dck-front .bootstrap-select .dropdown-menu li a:hover {
+  background:var(--surface-3);
+}
+.dck-front.dck-front .bootstrap-select .dropdown-menu li.selected a {
+  background:var(--act);
+  color:var(--act-tx);
+}
+
+/* ── Selecteur de date ──────────────────────────────────────── */
+.dck-front.dck-front .datepicker {
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  box-shadow:0 4px 16px rgba(16,24,40,.10);
+  padding:8px;
+}
+.dck-front.dck-front .datepicker td.active,
+.dck-front.dck-front .datepicker td.active:hover {
+  background:var(--act) !important;
+  color:var(--act-tx) !important;
+  border-radius:var(--r-sm);
+}
+
+/* ── Cases a cocher ─────────────────────────────────────────── */
+.dck-front.dck-front .form-check-input,
+.dck-front.dck-front input[type="checkbox"],
+.dck-front.dck-front input[type="radio"] {
+  accent-color:var(--act);
+  width:16px;
+  height:16px;
+  cursor:pointer;
+}
+.dck-front.dck-front .form-check-label { font-weight:500; color:var(--tx-2); cursor:pointer; }
+
+/* ── Boutons ────────────────────────────────────────────────── */
+.dck-front.dck-front .btn {
+  padding:9px 16px;
+  border-radius:var(--r-sm);
+  font-size:13.5px;
+  font-weight:600;
+  text-transform:none;
+  letter-spacing:0;
+  border:1px solid transparent;
+  transition:background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.dck-front.dck-front .btn-primary,
+.dck-front.dck-front .btn-primary:not(:disabled):not(.disabled) {
+  background-color:var(--act);
+  border-color:var(--act);
+  color:var(--act-tx);
+}
+.dck-front.dck-front .btn-primary:hover,
+.dck-front.dck-front .btn-primary:focus,
+.dck-front.dck-front .btn-primary:not(:disabled):not(.disabled):active {
+  background-color:var(--act-hover);
+  border-color:var(--act-hover);
+  color:var(--act-tx);
+  box-shadow:none;
+}
+
+.dck-front.dck-front .btn-secondary,
+.dck-front.dck-front .btn-outline-secondary {
+  background-color:var(--surface);
+  border-color:var(--line-strong);
+  color:var(--tx);
+}
+.dck-front.dck-front .btn-secondary:hover,
+.dck-front.dck-front .btn-outline-secondary:hover {
+  background-color:var(--surface-2);
+  border-color:var(--tx-4);
+  color:var(--tx);
+}
+
+.dck-front.dck-front .btn-danger {
+  background-color:var(--err);
+  border-color:var(--err);
+  color:#fff;
+}
+.dck-front.dck-front .btn-danger:hover { filter:brightness(.92); }
+
+.dck-front.dck-front .btn-link { color:var(--tx-2); font-weight:500; }
+.dck-front.dck-front .btn-link:hover { color:var(--tx); }
+
+.dck-front.dck-front .btn:focus-visible {
+  outline:2px solid var(--act);
+  outline-offset:2px;
+}
+
+/* ── Barre d'actions et filtres ─────────────────────────────── */
+.dck-front.dck-front .action-bar { padding-bottom:14px; }
+.dck-front.dck-front .filter-box,
+.dck-front.dck-front .select-box {
+  border-color:var(--line) !important;
+}
+.dck-front.dck-front .border-right-grey { border-right:1px solid var(--line) !important; }
+.dck-front.dck-front .border-additional-grey { border-color:var(--line) !important; }
+
+/* ── Tableaux ───────────────────────────────────────────────── */
+.dck-front.dck-front table.dataTable thead th,
+.dck-front.dck-front .table thead th {
+  padding:11px 16px;
+  background:var(--surface-2);
+  border-bottom:1px solid var(--line) !important;
+  border-top:0 !important;
+  font-size:11.5px;
+  font-weight:600;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  color:var(--tx-3);
+  white-space:nowrap;
+}
+.dck-front.dck-front table.dataTable tbody td,
+.dck-front.dck-front .table tbody td {
+  padding:13px 16px;
+  border-top:0;
+  border-bottom:1px solid var(--line);
+  vertical-align:middle;
+  font-size:13.5px;
+  color:var(--tx-2);
+}
+.dck-front.dck-front table.dataTable tbody tr:hover,
+.dck-front.dck-front .table tbody tr:hover { background:var(--surface-2); }
+.dck-front.dck-front table.dataTable tbody tr:last-child td { border-bottom:0; }
+
+/* Chiffres et references alignes */
+.dck-front.dck-front .table td .f-monospace,
+.dck-front.dck-front table.dataTable td:first-child {
+  font-variant-numeric:tabular-nums;
+}
+
+/* Pagination DataTables */
+.dck-front.dck-front .dataTables_paginate .paginate_button {
+  min-width:31px;
+  height:31px;
+  margin:0 2px;
+  padding:0 8px !important;
+  border:1px solid var(--line) !important;
+  border-radius:7px !important;
+  background:var(--surface) !important;
+  color:var(--tx-2) !important;
+  font-size:12.5px;
+}
+.dck-front.dck-front .dataTables_paginate .paginate_button:hover {
+  background:var(--surface-3) !important;
+  color:var(--tx) !important;
+}
+.dck-front.dck-front .dataTables_paginate .paginate_button.current {
+  background:var(--act) !important;
+  border-color:var(--act) !important;
+  color:var(--act-tx) !important;
+  font-weight:600;
+}
+.dck-front.dck-front .dataTables_info { font-size:13px; color:var(--tx-3); }
+
+/* ── Pastilles de statut ────────────────────────────────────── */
+.dck-front.dck-front .badge {
+  padding:3px 9px;
+  border-radius:var(--r-full);
+  border:1px solid var(--line);
+  background:var(--surface-2);
+  color:var(--tx-2);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0;
+  text-transform:none;
+}
+.dck-front.dck-front .badge-success,
+.dck-front.dck-front .badge-primary { background:var(--ok-bg); border-color:var(--ok-line); color:var(--ok); }
+.dck-front.dck-front .badge-warning { background:var(--warn-bg); border-color:var(--warn-line); color:var(--warn); }
+.dck-front.dck-front .badge-danger  { background:var(--err-bg); border-color:var(--err-line); color:var(--err); }
+.dck-front.dck-front .badge-info    { background:var(--info-bg); border-color:var(--info-line); color:var(--info); }
+
+/* ── Editeur de texte enrichi ───────────────────────────────── */
+.dck-front.dck-front .ql-toolbar.ql-snow,
+.dck-front.dck-front trix-toolbar {
+  border:1px solid var(--line-strong) !important;
+  border-bottom:0 !important;
+  border-radius:var(--r-sm) var(--r-sm) 0 0;
+  background:var(--surface-2);
+}
+.dck-front.dck-front .ql-container.ql-snow,
+.dck-front.dck-front trix-editor {
+  border:1px solid var(--line-strong) !important;
+  border-radius:0 0 var(--r-sm) var(--r-sm);
+  min-height:120px;
+  font-size:14px;
+}
+
+/* ── Modale laterale (creation et edition) ──────────────────── */
+.dck-front.dck-front .modal-header,
+.modal .dck-front.dck-front .modal-header {
+  border-bottom:1px solid var(--line);
+  padding:18px 22px;
+}
+.dck-front.dck-front .modal-title { font-size:17px; font-weight:700; letter-spacing:-.02em; }
+.dck-front.dck-front .modal-body { padding:20px 22px; }
+.dck-front.dck-front .modal-footer {
+  border-top:1px solid var(--line);
+  background:var(--surface-2);
+  padding:14px 22px;
+}
+
+/* ── Titres de section de formulaire ────────────────────────── */
+/* Rendu par le composant Blade x-dck.form-section, transcription
+   de la fonction sectionForm() de la maquette. */
+.dck-front.dck-front .dck-form-section {
+  display:flex;
+  align-items:baseline;
+  gap:9px;
+  margin:6px 0 14px;
+  padding-bottom:7px;
+  border-bottom:1px solid var(--line);
+}
+.dck-front.dck-front .dck-form-section > b {
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--tx-3);
+}
+.dck-front.dck-front .dck-form-section > span {
+  font-size:12px;
+  color:var(--tx-4);
+}
+/* La premiere section d'un formulaire ne doit pas decoller du bord haut. */
+.dck-front.dck-front .dck-form-section:first-child { margin-top:0; }
+
+/* ── Espacements ────────────────────────────────────────────── */
+.dck-front.dck-front .form-group { margin-bottom:18px; }
+.dck-front.dck-front .p-20 { padding:20px !important; }
+
+/* ══════════════════════════════════════════════════════════════
+   TABLEAU KANBAN (module Taches)
+   La vue taskboard_data est chargee en ajax a l'interieur de
+   taskboard, qui porte .dck-front : la portee est donc heritee.
+   ══════════════════════════════════════════════════════════════ */
+.dck-front.dck-front.w-task-board-box,
+.dck-front.dck-front .w-task-board-box {
+  background:transparent !important;
+  padding:0 !important;
+}
+
+.dck-front.dck-front .w-task-board-panel { gap:14px; }
+
+/* Colonne */
+.dck-front.dck-front .b-p-header {
+  margin:0 0 11px !important;
+  padding:12px 14px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:var(--r) var(--r) 0 0;
+  border-bottom:0;
+}
+.dck-front.dck-front .b-p-body {
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-top:0;
+  border-radius:0 0 var(--r) var(--r);
+  padding:11px;
+}
+.dck-front.dck-front .b-p-tasks { display:flex; flex-direction:column; gap:9px; }
+
+/* Compteur de la colonne */
+.dck-front.dck-front .b-p-badge {
+  padding:1px 8px !important;
+  background:var(--surface-3) !important;
+  color:var(--tx-3) !important;
+  border-radius:var(--r-full) !important;
+  font-family:var(--f-num);
+  font-size:11.5px !important;
+  font-weight:600;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FENETRE DE CONFIRMATION (SweetAlert)
+
+   Elle s'ouvre depuis 256 ecrans differents. La mise en forme est donc
+   faite ici, une fois, plutot que dans chaque appel.
+
+   Les regles ne sont pas scopees sous .dck-front : SweetAlert attache
+   sa fenetre directement au <body>, hors de tout conteneur applicatif.
+   ══════════════════════════════════════════════════════════════ */
+.swal2-popup {
+  width:min(430px, 92vw) !important;
+  padding:28px 26px 22px !important;
+  border-radius:14px !important;
+  background:#fff !important;
+  box-shadow:0 8px 12px -6px rgba(16,24,40,.08), 0 24px 48px -12px rgba(16,24,40,.22) !important;
+  font-family:'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+.swal2-container.swal2-backdrop-show { background:rgba(16,24,40,.55) !important; }
+
+/* Icone : un disque discret, pas le grand cercle par defaut */
+.swal2-icon {
+  width:46px !important;
+  height:46px !important;
+  margin:0 auto 16px !important;
+  border-width:2px !important;
+}
+.swal2-icon .swal2-icon-content { font-size:24px !important; }
+.swal2-icon.swal2-warning {
+  border-color:#F2C9C6 !important;
+  background:#FDF1F0 !important;
+  color:#B42318 !important;
+}
+.swal2-icon.swal2-success { border-color:#CBE0A8 !important; background:#F2F8E9 !important; }
+.swal2-icon.swal2-info    { border-color:#B3DDF7 !important; background:#EFF8FF !important; }
+
+.swal2-title {
+  padding:0 !important;
+  font-size:18px !important;
+  font-weight:700 !important;
+  line-height:1.35 !important;
+  color:#111827 !important;
+}
+.swal2-html-container {
+  margin:9px 0 0 !important;
+  font-size:14px !important;
+  line-height:1.55 !important;
+  color:#4B5563 !important;
+}
+
+/* Actions : annuler d'abord, action a droite, largeurs egales */
+.swal2-actions {
+  display:flex !important;
+  gap:10px !important;
+  width:100% !important;
+  margin:24px 0 0 !important;
+}
+.swal2-actions button.btn {
+  flex:1 1 0 !important;
+  min-height:40px !important;
+  margin:0 !important;
+  padding:0 16px !important;
+  border-radius:8px !important;
+  font-size:14px !important;
+  font-weight:600 !important;
+  border:1px solid transparent !important;
+  transition:background-color .14s ease, border-color .14s ease !important;
+}
+.swal2-actions .swal2-cancel.btn {
+  order:1;
+  background:#fff !important;
+  border-color:#D1D5DB !important;
+  color:#374151 !important;
+}
+.swal2-actions .swal2-cancel.btn:hover { background:#F3F4F6 !important; }
+.swal2-actions .swal2-confirm.btn {
+  order:2;
+  background:#000 !important;
+  color:#fff !important;
+}
+.swal2-actions .swal2-confirm.btn:hover { background:#1F2937 !important; }
+
+/* Une confirmation de suppression porte l'icone « warning » : son bouton
+   d'action passe alors au rouge. La couleur annonce ce qui va se passer,
+   au lieu de laisser le meme bouton noir que pour une action anodine.
+   Navigateurs sans :has() — le bouton reste noir, sans rien casser. */
+.swal2-popup:has(.swal2-icon.swal2-warning) .swal2-actions .swal2-confirm.btn {
+  background:#B42318 !important;
+}
+.swal2-popup:has(.swal2-icon.swal2-warning) .swal2-actions .swal2-confirm.btn:hover {
+  background:#912018 !important;
+}
+
+.swal2-popup .swal2-close { color:#9CA3AF !important; box-shadow:none !important; }
+.swal2-popup .swal2-close:hover { color:#374151 !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .swal2-popup, .swal2-container { animation:none !important; }
+}
+
+/* ── Bandeau de filtres, retire de l'affichage ──────────────────
+   Non pas « display:none » : plusieurs ecrans lisent en JavaScript les
+   valeurs de ces champs pour construire leurs requetes, et un element
+   masque de cette facon ne repond plus a certaines mesures. On le sort
+   du flux visuel en le laissant dans le document.
+   Cette regle n'est pas scopee : le bandeau vit hors des conteneurs
+   .dck-front, sur toutes les pages. */
+.dck-filtres-caches {
+  position:absolute !important;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  white-space:nowrap;
+  border:0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MODULE PARAMETRES
+
+   Vingt-neuf ecrans partagent quatre composants : la barre laterale,
+   ses entrees, la carte de contenu et la barre d'actions. Les mettre
+   en forme ici suffit donc a habiller tout le module.
+
+   Les selecteurs ne sont pas scopes sous .dck-front : ces classes
+   n'existent que dans les parametres, et les vues concernees ne
+   portent pas ce conteneur.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Colonne de navigation ──────────────────────────────────── */
+.settings-sidebar {
+  background:#fff !important;
+  border-right:1px solid #E5E7EB;
+}
+
+/* Champ de recherche des reglages */
+.settings-sidebar form { border-bottom:1px solid #E5E7EB !important; }
+.settings-sidebar .input-group {
+  height:36px;
+  border:1px solid #E5E7EB !important;
+  border-radius:8px !important;
+  background:#F9FAFB;
+  overflow:hidden;
+}
+.settings-sidebar .input-group:focus-within {
+  border-color:#D1D5DB !important;
+  background:#fff;
+}
+.settings-sidebar .input-group-text { background:transparent !important; padding-right:4px; }
+.settings-sidebar #search-setting-menu {
+  background:transparent !important;
+  font-size:13.5px !important;
+  box-shadow:none !important;
+}
+
+/* Entrees du menu : le filet sous chaque ligne cede la place a des
+   pastilles arrondies, comme dans le menu principal. */
+.settings-menu { padding:8px 10px !important; }
+.settings-menu li { margin-bottom:1px; }
+.settings-menu li a {
+  display:block;
+  padding:9px 12px !important;
+  border:0 !important;
+  border-radius:8px;
+  font-size:13.5px !important;
+  font-weight:500;
+  color:#374151 !important;
+  transition:background-color .14s ease, color .14s ease;
+}
+.settings-menu li a:hover {
+  background:#F3F4F6;
+  color:#111827 !important;
+  text-decoration:none;
+}
+.settings-menu li.active a,
+.settings-menu li[class~="active"] a {
+  background:#000 !important;
+  color:#fff !important;
+  font-weight:600;
+}
+
+/* ── Carte de contenu ───────────────────────────────────────── */
+.settings-box { background:transparent !important; }
+.settings-box .s-b-inner {
+  border:1px solid #E5E7EB !important;
+  border-radius:12px !important;
+  box-shadow:none !important;
+}
+
+/* En-tete de la carte */
+.settings-box .s-b-inner > .s-b-n-header,
+.settings-box .s-b-inner > div:first-child {
+  border-radius:12px 12px 0 0;
+}
+.settings-box .s-b-inner h4,
+.settings-box .s-b-inner .card-title {
+  font-size:17px !important;
+  font-weight:700 !important;
+  color:#111827 !important;
+}
+
+/* Onglets internes de la carte */
+.settings-box .nav-tabs { border-bottom:1px solid #E5E7EB !important; }
+.settings-box .nav-tabs .nav-link {
+  padding:11px 2px !important;
+  margin-right:22px;
+  border:0 !important;
+  border-bottom:2px solid transparent !important;
+  border-radius:0 !important;
+  color:#6B7280 !important;
+  font-size:13.5px !important;
+  font-weight:500;
+  background:transparent !important;
+}
+.settings-box .nav-tabs .nav-link:hover { color:#111827 !important; }
+.settings-box .nav-tabs .nav-link.active {
+  color:#111827 !important;
+  font-weight:600;
+  border-bottom-color:#000 !important;
+}
+
+/* Champs de formulaire, alignes sur le reste de l'application */
+.settings-box .form-control,
+.settings-box .select-picker + .dropdown-toggle {
+  min-height:38px;
+  border-radius:8px !important;
+  border-color:#D1D5DB !important;
+  font-size:13.5px !important;
+}
+.settings-box .form-control:focus {
+  border-color:#000 !important;
+  box-shadow:0 0 0 3px rgba(0,0,0,.06) !important;
+}
+.settings-box label,
+.settings-box .f-14.text-dark-grey {
+  font-size:13px !important;
+  font-weight:600 !important;
+  color:#374151 !important;
+}
+
+/* Barre d'actions en pied de carte */
+.settings-box .s-b-n-content + div,
+.settings-box .setting-form-actions {
+  border-top:1px solid #E5E7EB;
+}
+.settings-box .btn-primary {
+  border-radius:8px !important;
+  font-weight:600;
+}
+
+@media (max-width: 991px) {
+  .settings-sidebar { border-right:0; }
+}
+
+/* ── Liste des taches : mise en forme des cellules ──────────────
+   Le tableau est produit par TasksDataTable ; on n'en modifie pas le
+   rendu, on met seulement en forme ce qu'il emet. */
+
+/* Reference de la tache, en chiffres tabulaires et discrete */
+.dck-front.dck-front #tasks-table td .task-short-code,
+.dck-front.dck-front #tasks-table td a[href*="/tasks/"] > .text-lightest {
+  font-family:var(--f-num);
+  font-size:11.5px;
+  color:var(--tx-4);
+}
+
+/* Pastille de statut : la puce ronde et son libelle forment un badge */
+.dck-front.dck-front #tasks-table .disabled-select,
+.dck-front.dck-front #tasks-table td > span > .fa-circle {
+  vertical-align:middle;
+}
+.dck-front.dck-front #tasks-table .disabled-select {
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:3px 10px;
+  border-radius:var(--r-full);
+  background:var(--surface-3);
+  color:var(--tx-2);
+  font-size:12px;
+  font-weight:500;
+  white-space:nowrap;
+}
+
+/* Selecteur de statut : allege, il ne doit pas ressembler a un champ */
+.dck-front.dck-front #tasks-table select.select-status,
+.dck-front.dck-front #tasks-table td select.form-control {
+  height:28px !important;
+  padding:0 26px 0 10px !important;
+  border-radius:var(--r-full) !important;
+  border-color:var(--line) !important;
+  background-color:var(--surface-2) !important;
+  font-size:12px !important;
+}
+
+/* Dates depassees : la couleur porte l'alerte, pas une icone */
+.dck-front.dck-front #tasks-table .text-red,
+.dck-front.dck-front #tasks-table td .text-danger {
+  color:var(--err) !important;
+  font-weight:600;
+}
+.dck-front.dck-front #tasks-table td { font-size:13px; vertical-align:middle; }
+
+/* Intitule de la tache : c'est la colonne que l'oeil doit trouver */
+.dck-front.dck-front #tasks-table td a.openRightModal,
+.dck-front.dck-front #tasks-table td a[href*="/tasks/"] {
+  font-weight:600;
+  color:var(--tx);
+}
+.dck-front.dck-front #tasks-table td a.openRightModal:hover { color:var(--act); }
+
+/* ── Carte de tache, disposition de la maquette ─────────────── */
+.dck-front.dck-front .dck-tk {
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding:12px 13px 11px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-left:3px solid var(--dck-prio, var(--line-strong));
+  border-radius:10px;
+  cursor:grab;
+  transition:border-color .14s ease, box-shadow .14s ease, transform .14s ease;
+}
+.dck-front.dck-front .dck-tk:hover {
+  border-color:var(--line-strong);
+  border-left-color:var(--dck-prio, var(--line-strong));
+  box-shadow:0 1px 2px rgba(16,24,40,.05), 0 6px 14px -8px rgba(16,24,40,.16);
+  transform:translateY(-1px);
+}
+.dck-front.dck-front .dck-tk.move-disable { cursor:default; }
+
+/* Reference et priorite */
+.dck-front.dck-front .dck-tk__top {
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+.dck-front.dck-front .dck-tk__ref {
+  font-family:var(--f-num);
+  font-size:11px;
+  color:var(--tx-4);
+  letter-spacing:.02em;
+}
+.dck-front.dck-front .dck-tk__prio {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  font-size:11px;
+  font-weight:600;
+  color:var(--dck-prio);
+}
+/* Le trait vertical qui precede le libelle de priorite */
+.dck-front.dck-front .dck-tk__prio::before {
+  content:'';
+  width:2px;
+  height:11px;
+  border-radius:1px;
+  background:var(--dck-prio);
+}
+.dck-front.dck-front .dck-tk__prive {
+  margin-left:auto;
+  font-size:10px;
+  color:var(--tx-4);
+}
+
+/* Intitule */
+.dck-front.dck-front .dck-tk__titre {
+  display:block;
+  /* La colonne du tableau porte « white-space:nowrap » (main.css) pour
+     empecher ses en-tetes de se casser ; sans ce rappel le titre en
+     herite et sort de la carte sur une seule ligne. */
+  white-space:normal;
+  overflow-wrap:anywhere;
+  font-size:13.5px;
+  font-weight:600;
+  line-height:1.4;
+  color:var(--tx);
+  text-decoration:none;
+}
+.dck-front.dck-front .dck-tk__titre:hover { color:var(--act); text-decoration:none; }
+
+/* Etiquettes */
+.dck-front.dck-front .dck-tk__etiq { display:flex; flex-wrap:wrap; gap:5px; }
+.dck-front.dck-front .dck-tk__etiq span {
+  white-space:normal;
+  padding:1px 7px;
+  border-radius:var(--r-full);
+  font-size:10.5px;
+  font-weight:500;
+  color:#fff;
+}
+
+/* Intervenants, compteurs, echeance */
+.dck-front.dck-front .dck-tk__bas {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:0;
+}
+/* Les avatars se chevauchent legerement : un ecart negatif n'existe pas
+   en CSS, on decale donc chaque pastille sauf la premiere. Le groupe
+   accepte de se comprimer pour que l'echeance reste dans la carte. */
+.dck-front.dck-front .dck-tk__qui {
+  display:flex;
+  min-width:0;
+  flex-shrink:1;
+  overflow:hidden;
+}
+.dck-front.dck-front .dck-tk__qui > * + * { margin-left:-4px; }
+.dck-front.dck-front .dck-tk__av {
+  display:grid;
+  place-items:center;
+  width:22px;
+  height:22px;
+  margin-right:-5px;
+  border:1.5px solid var(--surface);
+  border-radius:50%;
+  background:var(--surface-3);
+  color:var(--tx-2);
+  font-family:var(--f-num);
+  font-size:9.5px;
+  font-weight:600;
+}
+.dck-front.dck-front .dck-tk__av.is-plus { background:var(--surface-2); color:var(--tx-4); }
+
+.dck-front.dck-front .dck-tk__meta {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+  font-family:var(--f-num);
+  font-size:11px;
+  color:var(--tx-4);
+}
+.dck-front.dck-front .dck-tk__meta span {
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+}
+
+.dck-front.dck-front .dck-tk__ech {
+  margin-left:auto;
+  flex-shrink:0;
+  font-family:var(--f-num);
+  font-size:11.5px;
+  color:var(--tx-3);
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-tk__ech.is-late  { color:var(--err); font-weight:600; }
+.dck-front.dck-front .dck-tk__ech.is-today { color:var(--ok); font-weight:600; }
+
+/* Carte de tache */
+.dck-front.dck-front .b-p-tasks .card,
+.dck-front.dck-front .no-task-card {
+  margin:0 !important;
+  background:var(--surface) !important;
+  border:1px solid var(--line) !important;
+  border-radius:10px !important;
+  box-shadow:none !important;
+  transition:border-color .14s ease, transform .14s ease;
+}
+.dck-front.dck-front .b-p-tasks .card:hover {
+  border-color:var(--line-strong) !important;
+  transform:translateY(-1px);
+}
+.dck-front.dck-front .b-p-tasks .card-body { padding:12px !important; }
+.dck-front.dck-front .b-shadow-4 { box-shadow:none !important; }
+.dck-front.dck-front .border-grey { border-color:var(--line) !important; }
+.dck-front.dck-front .bg-additional-grey { background:var(--surface-2) !important; }
+.dck-front.dck-front .bg-grey { background:var(--surface-3) !important; }
+
+/* Carte saisie pendant le glisser-deposer */
+.dck-front.dck-front .gu-mirror {
+  border:1px solid var(--line-strong) !important;
+  border-radius:10px !important;
+  box-shadow:0 8px 24px rgba(16,24,40,.16) !important;
+  opacity:.96;
+}
+.dck-front.dck-front .gu-transit { opacity:.35; }
+
+/* ── Cartes generiques hors kanban ──────────────────────────── */
+.dck-front.dck-front .card {
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  box-shadow:none;
+}
+.dck-front.dck-front .card-header {
+  padding:15px 18px;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+  font-size:14.5px;
+  font-weight:600;
+}
+
+/* ── Onglets (fiche contrat, fiche diligence) ───────────────── */
+.dck-front.dck-front .nav-tabs { border-bottom:1px solid var(--line); }
+.dck-front.dck-front .nav-tabs .nav-link {
+  padding:10px 14px;
+  border:0;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px;
+  font-size:13.5px;
+  font-weight:500;
+  color:var(--tx-3);
+  border-radius:0;
+}
+.dck-front.dck-front .nav-tabs .nav-link:hover { color:var(--tx); border-color:transparent; }
+.dck-front.dck-front .nav-tabs .nav-link.active {
+  color:var(--tx);
+  font-weight:600;
+  background:transparent;
+  border-bottom-color:var(--act);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   COMPOSANTS STRUCTURELS DU NOUVEAU FRONT
+   ──────────────────────────────────────────────────────────────
+   Classes creees pour la refonte, sans equivalent dans main.css :
+   aucune concurrence de specificite, aucun !important necessaire.
+   Rendus par les composants Blade x-dck.page-head et x-dck.kpi.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── En-tete de page ────────────────────────────────────────── */
+.dck-front.dck-front .dck-page-head {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:14px;
+  margin-bottom:22px;
+}
+.dck-front.dck-front .dck-page-head__txt { min-width:0; }
+.dck-front.dck-front .dck-page-head h1 {
+  margin:0;
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:-.03em;
+  line-height:1.2;
+  color:var(--tx);
+  text-wrap:balance;
+}
+.dck-front.dck-front .dck-page-head p {
+  margin:5px 0 0;
+  max-width:62ch;
+  font-size:14px;
+  color:var(--tx-3);
+}
+.dck-front.dck-front .dck-page-head__acts {
+  margin-left:auto;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+}
+.dck-front.dck-front .dck-page-head__acts .btn,
+.dck-front.dck-front .dck-page-head__acts a {
+  margin:0 !important;
+  float:none !important;
+}
+
+/* ── Grille d'indicateurs ───────────────────────────────────── */
+.dck-front.dck-front .dck-grid { display:grid; gap:16px; margin-bottom:18px; }
+.dck-front.dck-front .dck-grid--4 { grid-template-columns:repeat(4, minmax(0, 1fr)); }
+.dck-front.dck-front .dck-grid--3 { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+.dck-front.dck-front .dck-grid--2 { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+
+@media (max-width:1180px) {
+  .dck-front.dck-front .dck-grid--4 { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+  .dck-front.dck-front .dck-grid--3 { grid-template-columns:1fr; }
+}
+@media (max-width:640px) {
+  .dck-front.dck-front .dck-grid--4,
+  .dck-front.dck-front .dck-grid--2 { grid-template-columns:1fr; }
+}
+
+/* ── Carte d'indicateur ─────────────────────────────────────── */
+.dck-front.dck-front .dck-kpi {
+  padding:17px 18px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  transition:border-color .16s ease, transform .16s ease;
+}
+.dck-front.dck-front .dck-kpi:hover {
+  border-color:var(--line-strong);
+  transform:translateY(-2px);
+}
+.dck-front.dck-front .dck-kpi__top {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:12px;
+}
+.dck-front.dck-front .dck-kpi__ico {
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  flex:0 0 auto;
+  border-radius:8px;
+  background:var(--surface-3);
+  color:var(--tx-2);
+}
+.dck-front.dck-front .dck-kpi__ico i { font-size:15px; line-height:1; }
+.dck-front.dck-front .dck-kpi__ico.is-ok   { background:var(--ok-bg);   color:var(--ok); }
+.dck-front.dck-front .dck-kpi__ico.is-warn { background:var(--warn-bg); color:var(--warn); }
+.dck-front.dck-front .dck-kpi__ico.is-err  { background:var(--err-bg);  color:var(--err); }
+.dck-front.dck-front .dck-kpi__ico.is-info { background:var(--info-bg); color:var(--info); }
+
+.dck-front.dck-front .dck-kpi__lab { font-size:12.5px; font-weight:500; color:var(--tx-3); }
+.dck-front.dck-front .dck-kpi__val {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:29px;
+  font-weight:600;
+  letter-spacing:-.03em;
+  line-height:1;
+  color:var(--tx);
+}
+.dck-front.dck-front .dck-kpi__sub { margin-top:9px; font-size:12.5px; color:var(--tx-3); }
+
+/* ── Carte de contenu ───────────────────────────────────────── */
+.dck-front.dck-front .dck-card {
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+.dck-front.dck-front .dck-card__bar {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:9px;
+  padding:13px 16px;
+  border-bottom:1px solid var(--line);
+  min-height:56px;
+}
+.dck-front.dck-front .dck-card__bar #quick-action-form { margin-left:auto; }
+.dck-front.dck-front .dck-card .table-responsive { border:0; }
+.dck-front.dck-front .dck-card table.dataTable { margin:0 !important; }
+
+@media (max-width:900px) {
+  .dck-front.dck-front .dck-page-head h1 { font-size:22px; }
+  .dck-front.dck-front .dck-page-head__acts { width:100%; }
+}
+
+/* ── Cellules de tableau enrichies ──────────────────────────── */
+/* Rendues par les *DataTable.php cote serveur. */
+
+.dck-front.dck-front .dck-ref {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:12.5px;
+  color:var(--tx-3);
+  text-decoration:none;
+}
+.dck-front.dck-front .dck-ref:hover { color:var(--tx); text-decoration:underline; }
+
+.dck-front.dck-front .dck-date {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:13px;
+  color:var(--tx-2);
+  white-space:nowrap;
+}
+
+.dck-front.dck-front .dck-amount {
+  display:block;
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-weight:600;
+  font-size:13.5px;
+  color:var(--tx);
+  text-align:right;
+  white-space:nowrap;
+}
+
+.dck-front.dck-front .dck-cell-stack {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:5px;
+}
+
+.dck-front.dck-front .dck-badge {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:2.5px 9px;
+  border:1px solid var(--line);
+  border-radius:var(--r-full);
+  background:var(--surface-2);
+  color:var(--tx-2);
+  font-size:11.5px;
+  font-weight:600;
+  line-height:1.45;
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-badge::before {
+  content:"";
+  width:6px;
+  height:6px;
+  flex:0 0 auto;
+  border-radius:50%;
+  background:currentColor;
+}
+.dck-front.dck-front .dck-badge.is-ok   { color:var(--ok);   background:var(--ok-bg);   border-color:var(--ok-line); }
+.dck-front.dck-front .dck-badge.is-warn { color:var(--warn); background:var(--warn-bg); border-color:var(--warn-line); }
+.dck-front.dck-front .dck-badge.is-err  { color:var(--err);  background:var(--err-bg);  border-color:var(--err-line); }
+.dck-front.dck-front .dck-badge.is-wait { color:var(--tx-3); background:var(--surface-3); border-color:var(--line); }
+
+/* Declencheur du menu d'actions de ligne.
+   La largeur etait figee a 30 px, taille juste pour le bouton a icone
+   seule mais trop etroite des qu'il porte un libelle : « Choix », dans
+   la colonne Radiation des clients, en debordait. « min-width » garde
+   le carre pour les icones seules et laisse le bouton s'elargir quand
+   il contient du texte. */
+.dck-front.dck-front .task_view_more {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-width:30px;
+  height:30px;
+  padding:0 8px;
+  border-radius:var(--r-sm);
+  color:var(--tx-3);
+  font-size:12.5px;
+  white-space:nowrap;
+  transition:background-color .14s ease, color .14s ease;
+}
+.dck-front.dck-front .task_view_more:hover { background:var(--surface-3); color:var(--tx); }
+.dck-front.dck-front .task_view_more::after { display:none; }
+
+/* ── Selecteur de vue (liste / kanban / calendrier) ─────────── */
+.dck-front.dck-front .dck-seg {
+  display:inline-flex;
+  padding:3px;
+  background:var(--surface-3);
+  border-radius:var(--r-sm);
+  gap:2px;
+}
+.dck-front.dck-front .dck-seg .btn,
+.dck-front.dck-front .dck-seg .btn-secondary {
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  height:30px;
+  padding:0 10px !important;
+  border:0 !important;
+  border-radius:6px !important;
+  background:transparent !important;
+  color:var(--tx-3) !important;
+  box-shadow:none !important;
+}
+.dck-front.dck-front .dck-seg .btn:hover { background:var(--surface) !important; color:var(--tx) !important; }
+.dck-front.dck-front .dck-seg .btn-active,
+.dck-front.dck-front .dck-seg .btn.btn-active {
+  background:var(--surface) !important;
+  color:var(--tx) !important;
+  font-weight:600;
+  box-shadow:0 1px 2px rgba(16,24,40,.08) !important;
+}
+.dck-front.dck-front .dck-seg .badge-danger {
+  top:-2px;
+  right:-2px;
+  padding:1px 5px;
+  font-family:var(--f-num);
+  font-size:9.5px;
+  border:2px solid var(--surface-3);
+}
+.dck-front.dck-front .dck-seg i { font-size:15px; }
+
+/* ── Barre d'avancement des diligences ─────────────────────── */
+.dck-front.dck-front .dck-progress {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  min-width:130px;
+}
+.dck-front.dck-front .dck-progress__track {
+  flex:1 1 auto;
+  height:6px;
+  border-radius:var(--r-full);
+  background:var(--surface-3);
+  overflow:hidden;
+}
+.dck-front.dck-front .dck-progress__bar {
+  height:100%;
+  border-radius:var(--r-full);
+  background:var(--tx);
+  transition:width .6s cubic-bezier(.2,.7,.3,1);
+}
+.dck-front.dck-front .dck-progress__bar.is-ok   { background:var(--ok); }
+.dck-front.dck-front .dck-progress__bar.is-warn { background:var(--warn); }
+.dck-front.dck-front .dck-progress__bar.is-err  { background:var(--err); }
+.dck-front.dck-front .dck-progress__val {
+  flex:0 0 auto;
+  width:34px;
+  text-align:right;
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:12px;
+  font-weight:600;
+  color:var(--tx-2);
+}
+
+/* ── Libelles de section du menu ────────────────────────────── */
+.dck-chrome.dck-chrome .dck-sect {
+  list-style:none;
+  margin:18px 10px 6px;
+  padding:0 10px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--tx-4);
+  user-select:none;
+}
+.dck-chrome.dck-chrome .dck-sect:first-child { margin-top:6px; }
+
+/* Barre laterale repliee : les libelles cedent la place a un filet */
+body.sidebar-toggled .dck-chrome.dck-chrome .dck-sect,
+.mini-sidebar .dck-chrome.dck-chrome .dck-sect {
+  height:1px;
+  margin:12px 14px;
+  padding:0;
+  overflow:hidden;
+  text-indent:-999px;
+  background:var(--line);
+}
+
+/* ── Icones du menu (jeu en trait fin) ──────────────────────── */
+.dck-chrome.dck-chrome .dck-ico {
+  width:18px;
+  height:18px;
+  flex:0 0 auto;
+  opacity:.9;
+  stroke-width:1.7;
+}
+.dck-chrome.dck-chrome .nav-item.active .dck-ico,
+.dck-chrome.dck-chrome .accordionItem.active .dck-ico { opacity:1; }
+.dck-chrome.dck-chrome .nav-item .pl-3 { padding-left:11px !important; }
+
+/* ══════════════════════════════════════════════════════════════
+   PHASE 3 — BARRE LATERALE ET EN-TETE
+   ──────────────────────────────────────────────────────────────
+   Portee : .dck-chrome, posee sur <aside> et <header>.
+   Ces deux conteneurs sont communs a toute l'application : cette
+   section est donc la seule a s'appliquer hors des modules deja
+   habilles. Aucune condition de permission n'est touchee — les
+   entrees de menu restent pilotees par les memes @if Blade.
+   ══════════════════════════════════════════════════════════════ */
+.dck-chrome {
+  --n0:#ffffff; --n50:#f9fafb; --n100:#f3f4f6; --n200:#e5e7eb;
+  --n300:#d1d5db; --n400:#9ca3af; --n500:#6b7280;
+  --n700:#374151; --n800:#1f2937; --n900:#111827;
+
+  --surface:var(--n0);
+  --surface-2:var(--n50);
+  --surface-3:var(--n100);
+  --line:var(--n200);
+  --line-strong:var(--n300);
+  --tx:var(--n900);
+  --tx-2:var(--n700);
+  --tx-3:var(--n500);
+  --tx-4:var(--n400);
+  --act:#000000;
+  --act-hover:#1f2937;
+  --act-tx:#ffffff;
+  --r-sm:8px; --r:12px; --r-full:999px;
+  --f-num:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ── Barre laterale ─────────────────────────────────────────── */
+.dck-chrome.dck-chrome .main-sidebar,
+.dck-chrome.dck-chrome.sidebar-dark .main-sidebar,
+.dck-chrome.dck-chrome.sidebar-light .main-sidebar {
+  background:var(--surface) !important;
+  border-right:1px solid var(--line);
+}
+
+/* Bloc de marque */
+.dck-chrome.dck-chrome .sidebar-brand-box {
+  height:64px;
+  display:flex;
+  align-items:center;
+  padding:0 18px;
+  background:var(--surface) !important;
+  border-bottom:1px solid var(--line);
+}
+.dck-chrome.dck-chrome .sidebar-brand-name h1,
+.dck-chrome.dck-chrome .sidebar-brand h1 {
+  font-size:14.5px !important;
+  font-weight:700 !important;
+  letter-spacing:-.02em;
+  color:var(--tx) !important;
+}
+.dck-chrome.dck-chrome .text-white-shade { color:var(--tx) !important; }
+.dck-chrome.dck-chrome .sidebar-brand img { max-height:32px; width:auto; }
+
+/* Entrees de menu */
+.dck-chrome.dck-chrome .accordionItem { margin:0 10px 2px; }
+.dck-chrome.dck-chrome .nav-item,
+.dck-chrome.dck-chrome .accordionItemHeading {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:9px 10px !important;
+  border-radius:var(--r-sm);
+  font-size:14px !important;
+  font-weight:500;
+  color:var(--tx-2) !important;
+  transition:background-color .14s ease, color .14s ease;
+}
+.dck-chrome.dck-chrome .sidebar-text-color { color:var(--tx-2) !important; }
+
+.dck-chrome.dck-chrome .nav-item:hover,
+.dck-chrome.dck-chrome .accordionItemHeading:hover {
+  background:var(--surface-3);
+  color:var(--tx) !important;
+  text-decoration:none;
+}
+
+/* Entree active */
+.dck-chrome.dck-chrome .accordionItem.active > .nav-item,
+.dck-chrome.dck-chrome .nav-item.active,
+.dck-chrome.dck-chrome .accordionItemHeading.active {
+  background:var(--act) !important;
+  color:var(--act-tx) !important;
+  font-weight:600;
+}
+.dck-chrome.dck-chrome .accordionItem.active > .nav-item svg,
+.dck-chrome.dck-chrome .nav-item.active svg { color:var(--act-tx); }
+
+.dck-chrome.dck-chrome .nav-item svg,
+.dck-chrome.dck-chrome .accordionItemHeading svg {
+  width:18px;
+  height:18px;
+  flex:0 0 auto;
+  opacity:.9;
+}
+
+/* Compteur d'entree */
+.dck-chrome.dck-chrome .menu-item-count {
+  margin-left:auto;
+  padding:1px 7px;
+  background:var(--surface-3);
+  color:var(--tx-3);
+  border-radius:var(--r-full);
+  font-family:var(--f-num);
+  font-size:11px;
+  font-weight:600;
+}
+.dck-chrome.dck-chrome .nav-item.active .menu-item-count,
+.dck-chrome.dck-chrome .accordionItem.active .menu-item-count {
+  background:rgba(255,255,255,.18);
+  color:var(--act-tx);
+}
+
+/* Sous-menus */
+.dck-chrome.dck-chrome .accordionItemContent {
+  margin:2px 0 6px 30px;
+  padding-left:11px;
+  border-left:1px solid var(--line);
+}
+.dck-chrome.dck-chrome .accordionItemContent a {
+  display:block;
+  padding:7px 10px;
+  border-radius:var(--r-sm);
+  font-size:13.5px !important;
+  color:var(--tx-3) !important;
+}
+.dck-chrome.dck-chrome .accordionItemContent a:hover {
+  background:var(--surface-3);
+  color:var(--tx) !important;
+  text-decoration:none;
+}
+.dck-chrome.dck-chrome .text-lightest { color:var(--tx-3) !important; }
+
+/* ── En-tete ────────────────────────────────────────────────── */
+.dck-chrome.dck-chrome.main-header {
+  height:64px;
+  background:var(--surface) !important;
+  border-bottom:1px solid var(--line);
+  box-shadow:none;
+}
+.dck-chrome.dck-chrome .navbar-left,
+.dck-chrome.dck-chrome .navbar-right { display:flex; align-items:center; }
+
+.dck-chrome.dck-chrome .app-title,
+.dck-chrome.dck-chrome .page-title {
+  font-size:15.5px !important;
+  font-weight:600;
+  letter-spacing:-.02em;
+  color:var(--tx) !important;
+}
+
+/* ── Champ de recherche de l'en-tete ────────────────────────── */
+.dck-chrome.dck-chrome .dck-search {
+  align-items:center;
+  gap:8px;
+  width:min(360px, 34vw);
+  height:36px;
+  margin-right:14px;
+  padding:0 11px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  transition:border-color .14s ease, background-color .14s ease;
+}
+.dck-chrome.dck-chrome .dck-search:focus-within {
+  background:var(--surface);
+  border-color:var(--line-strong);
+}
+.dck-chrome.dck-chrome .dck-search__ico {
+  flex:0 0 auto;
+  font-size:14px;
+  color:var(--tx-4);
+}
+.dck-chrome.dck-chrome .dck-search__input {
+  flex:1 1 auto;
+  min-width:0;
+  height:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  font-size:13.5px;
+  color:var(--tx);
+}
+.dck-chrome.dck-chrome .dck-search__input::placeholder { color:var(--tx-4); }
+/* La croix native de Chrome doublonnerait avec le raccourci affiche. */
+.dck-chrome.dck-chrome .dck-search__input::-webkit-search-cancel-button { display:none; }
+.dck-chrome.dck-chrome .dck-search__kbd {
+  flex:0 0 auto;
+  padding:2px 6px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  background:var(--surface);
+  color:var(--tx-4);
+  font-family:var(--f-num);
+  font-size:10.5px;
+  line-height:1.5;
+}
+@media (max-width:1100px) {
+  .dck-chrome.dck-chrome .dck-search { width:220px; }
+  .dck-chrome.dck-chrome .dck-search__kbd { display:none; }
+}
+
+/* ── Page de resultats de recherche ─────────────────────────── */
+.dck-front.dck-front .dck-res { margin-bottom:16px; }
+.dck-front.dck-front .dck-res__form {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+  padding:0 12px;
+  height:44px;
+  background:var(--surface);
+  border:1px solid var(--line-strong);
+  border-radius:var(--r-sm);
+}
+.dck-front.dck-front .dck-res__form > i { color:var(--tx-4); }
+.dck-front.dck-front .dck-res__form input {
+  flex:1 1 auto;
+  min-width:0;
+  height:100%;
+  border:0;
+  outline:0;
+  background:transparent;
+  font-size:14px;
+  color:var(--tx);
+}
+.dck-front.dck-front .dck-res__form input::-webkit-search-cancel-button { display:none; }
+
+.dck-front.dck-front .dck-res__item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 12px;
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  background:var(--surface);
+  text-decoration:none;
+  transition:border-color .14s ease, background-color .14s ease;
+}
+.dck-front.dck-front .dck-res__item:hover {
+  border-color:var(--line-strong);
+  background:var(--surface-2);
+  text-decoration:none;
+}
+.dck-front.dck-front .dck-res__ico {
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  border-radius:var(--r-sm);
+  background:var(--surface-3);
+  color:var(--tx-3);
+  font-size:14px;
+}
+.dck-front.dck-front .dck-res__txt { flex:1 1 auto; min-width:0; }
+.dck-front.dck-front .dck-res__txt b {
+  display:block;
+  font-size:14px;
+  font-weight:600;
+  color:var(--tx);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-res__txt small {
+  display:block;
+  margin-top:2px;
+  font-family:var(--f-num);
+  font-size:11.5px;
+  color:var(--tx-4);
+}
+.dck-front.dck-front .dck-res__badge {
+  flex:0 0 auto;
+  padding:3px 9px;
+  border-radius:var(--r-full);
+  font-size:11.5px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+/* ── Bascule de theme de l'en-tete ──────────────────────────── */
+.dck-chrome.dck-chrome .dck-theme {
+  border:0;
+  background:transparent;
+  font-size:16px;
+  cursor:pointer;
+}
+
+/* ── Bouton « Creer » ───────────────────────────────────────── */
+.dck-chrome.dck-chrome .dck-creer-li { margin-left:6px; }
+.dck-chrome.dck-chrome .dck-creer {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  height:36px;
+  padding:0 15px;
+  border:0;
+  border-radius:var(--r-sm);
+  background:var(--act);
+  color:var(--act-tx);
+  font-size:13.5px;
+  font-weight:600;
+  cursor:pointer;
+  white-space:nowrap;
+  transition:background-color .14s ease;
+}
+.dck-chrome.dck-chrome .dck-creer:hover { background:var(--act-hover); }
+.dck-chrome.dck-chrome .dck-creer:focus-visible {
+  outline:2px solid var(--act);
+  outline-offset:2px;
+}
+/* La fleche de Bootstrap ferait doublon avec le signe plus. */
+.dck-chrome.dck-chrome .dck-creer.dropdown-toggle::after { display:none; }
+.dck-chrome.dck-chrome .dck-creer i { font-size:14px; }
+
+.dck-chrome.dck-chrome .dck-creer__menu {
+  min-width:232px;
+  padding:7px;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  background:var(--surface);
+  box-shadow:0 4px 6px -2px rgba(16,24,40,.05), 0 12px 20px -4px rgba(16,24,40,.12);
+}
+.dck-chrome.dck-chrome .dck-creer__lab {
+  padding:7px 10px 8px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--tx-4);
+}
+.dck-chrome.dck-chrome .dck-creer__item {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:9px 10px;
+  border-radius:var(--r-sm);
+  color:var(--tx-2);
+  font-size:13.5px;
+  text-decoration:none;
+  transition:background-color .12s ease, color .12s ease;
+}
+.dck-chrome.dck-chrome .dck-creer__item:hover {
+  background:var(--surface-3);
+  color:var(--tx);
+  text-decoration:none;
+}
+.dck-chrome.dck-chrome .dck-creer__item i {
+  font-size:15px;
+  color:var(--tx-3);
+  width:17px;
+  text-align:center;
+}
+
+@media (max-width:640px) {
+  .dck-chrome.dck-chrome .dck-creer span { display:none; }
+  .dck-chrome.dck-chrome .dck-creer { padding:0 11px; }
+}
+
+/* Boutons a icone */
+.dck-chrome.dck-chrome .header-icon-box {
+  display:grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border-radius:var(--r-sm);
+  color:var(--tx-2) !important;
+  transition:background-color .14s ease;
+}
+.dck-chrome.dck-chrome .header-icon-box:hover {
+  background:var(--surface-3);
+  color:var(--tx) !important;
+  text-decoration:none;
+}
+.dck-chrome.dck-chrome .header-icon-box i { font-size:16px; }
+
+/* Pastille de notification */
+.dck-chrome.dck-chrome .badge-primary,
+.dck-chrome.dck-chrome .unread-notifications-count {
+  background:#b42318 !important;
+  color:#fff !important;
+  border:2px solid var(--surface);
+  border-radius:var(--r-full);
+  font-family:var(--f-num);
+  font-size:10px;
+  font-weight:600;
+  padding:1px 5px;
+}
+
+/* Recherche globale */
+.dck-chrome.dck-chrome .search-form input,
+.dck-chrome.dck-chrome #search-input,
+.dck-chrome.dck-chrome input[type="search"] {
+  height:auto;
+  padding:8px 12px 8px 34px;
+  background:var(--surface-2);
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  font-size:13.5px;
+  color:var(--tx);
+}
+.dck-chrome.dck-chrome .search-form input:focus,
+.dck-chrome.dck-chrome input[type="search"]:focus {
+  outline:none;
+  background:var(--surface);
+  border-color:var(--act);
+  box-shadow:0 0 0 2px rgba(0,0,0,.9);
+}
+
+/* Menus deroulants de l'en-tete */
+.dck-chrome.dck-chrome .dropdown-menu {
+  padding:6px;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  box-shadow:0 4px 16px rgba(16,24,40,.10), 0 1px 3px rgba(16,24,40,.06);
+}
+.dck-chrome.dck-chrome .dropdown-item {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 10px !important;
+  border-radius:var(--r-sm);
+  font-size:13.5px !important;
+  color:var(--tx-2) !important;
+}
+.dck-chrome.dck-chrome .dropdown-item:hover {
+  background:var(--surface-3);
+  color:var(--tx) !important;
+}
+.dck-chrome.dck-chrome .dropdown-divider { margin:5px 4px; border-color:var(--line); }
+
+/* Focus visible au clavier */
+.dck-chrome.dck-chrome a:focus-visible,
+.dck-chrome.dck-chrome button:focus-visible {
+  outline:2px solid var(--act);
+  outline-offset:2px;
+  border-radius:6px;
+}
+
+/* ── Accessibilite et mouvement ─────────────────────────────── */
+@media (prefers-reduced-motion:reduce) {
+  .dck-front.dck-front * { transition-duration:.01ms !important; animation-duration:.01ms !important; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TYPOGRAPHIE GLOBALE
+   ──────────────────────────────────────────────────────────────
+   Seul bloc volontairement NON scope de cette feuille.
+   main.css impose au corps la pile systeme (-apple-system,
+   BlinkMacSystemFont, Segoe UI...). Pour que l application porte la
+   meme typographie que la maquette, la famille doit etre redefinie
+   globalement — un selecteur scope ne peut pas atteindre <body>.
+
+   Seule la FAMILLE change : ni les tailles, ni les graisses, ni les
+   interlignages existants ne sont touches.
+   ══════════════════════════════════════════════════════════════ */
+
+body,
+.content-wrapper,
+.main-header,
+.main-sidebar,
+.sidebar-menu,
+.modal,
+.modal-content,
+.dropdown-menu,
+.table,
+table.dataTable,
+.card,
+.form-control,
+.btn,
+input,
+select,
+textarea,
+button {
+  font-family:"IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Les chiffres alignes gardent la fonte a chasse fixe */
+.dck-front.dck-front .dck-ref,
+.dck-front.dck-front .dck-date,
+.dck-front.dck-front .dck-amount,
+.dck-front.dck-front .dck-kpi__val,
+.dck-front.dck-front .dck-progress__val,
+.dck-chrome.dck-chrome .menu-item-count {
+  font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FLUIDITE PERCUE — squelettes et retours immediats
+   Styles associes a public/js/dck-fluidite.js.
+   Non scopes : ils s appliquent au panneau lateral et aux tableaux,
+   qui vivent hors des conteneurs .dck-front.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-skel { padding:22px; display:flex; flex-direction:column; gap:11px; }
+.dck-skel__line {
+  height:13px;
+  border-radius:6px;
+  background:#f3f4f6;
+  animation:dckPulse 1.5s ease-in-out infinite;
+}
+.dck-skel__sep { height:1px; background:#e5e7eb; margin:7px 0; }
+.dck-skel__row { display:flex; align-items:center; gap:12px; }
+.dck-skel__col { flex:1; display:flex; flex-direction:column; gap:8px; }
+.dck-skel__box {
+  width:42px; height:42px; flex:0 0 auto; border-radius:50%;
+  background:#f3f4f6; animation:dckPulse 1.5s ease-in-out infinite;
+}
+.dck-skel__grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.dck-skel__card {
+  height:88px; border-radius:12px; background:#f3f4f6;
+  animation:dckPulse 1.5s ease-in-out infinite;
+}
+.dck-skel-row td { padding:13px 16px !important; border-bottom:1px solid #e5e7eb; }
+
+@keyframes dckPulse { 0%,100% { opacity:1; } 50% { opacity:.45; } }
+
+/* Barre de progression de navigation */
+.dck-nav-bar {
+  position:fixed; top:0; left:0; z-index:9999;
+  height:2px; width:0;
+  background:#000;
+  transition:width 2.2s cubic-bezier(.1,.7,.2,1);
+  pointer-events:none;
+}
+
+/* Bouton en attente : le libelle cede la place a un indicateur */
+.dck-busy { position:relative; color:transparent !important; pointer-events:none; }
+.dck-busy::after {
+  content:"";
+  position:absolute; top:50%; left:50%;
+  width:14px; height:14px; margin:-7px 0 0 -7px;
+  border:2px solid currentColor; border-top-color:transparent;
+  border-radius:50%;
+  animation:dckSpin .6s linear infinite;
+  color:#fff;
+}
+.btn-secondary.dck-busy::after, .btn-outline-secondary.dck-busy::after { color:#111827; }
+@keyframes dckSpin { to { transform:rotate(360deg); } }
+
+@media (prefers-reduced-motion:reduce) {
+  .dck-skel__line, .dck-skel__box, .dck-skel__card { animation:none; }
+  .dck-nav-bar { transition:none; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PAGES DE DETAIL — tache et diligence
+   ──────────────────────────────────────────────────────────────
+   Ces deux vues font 1184 et 301 lignes, truffees de conditions de
+   permission. Elles sont traitees en CSS seul : aucune ligne de
+   balisage n est deplacee, donc aucun risque sur les droits.
+
+   Le motif libelle/valeur du projet
+     <div class="col-12 px-0 pb-3 d-lg-flex">
+       <p class="text-lightest w-30">Libelle</p>
+       <p class="text-dark-grey w-70">Valeur</p>
+     </div>
+   est rendu comme la liste de definitions de la maquette.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Cartes de detail ───────────────────────────────────────── */
+.dck-front.dck-front .card.b-shadow-4,
+.dck-front.dck-front .card.bg-white.border-0 {
+  border:1px solid var(--line) !important;
+  border-radius:var(--r);
+  box-shadow:none !important;
+}
+
+.dck-front.dck-front .card-header.p-20 { padding:16px 18px !important; }
+.dck-front.dck-front .card-header h4,
+.dck-front.dck-front .card-header .f-18,
+.dck-front.dck-front .card-header .f-21 {
+  font-size:17px !important;
+  font-weight:700 !important;
+  letter-spacing:-.02em;
+  color:var(--tx);
+}
+.dck-front.dck-front .card-body { padding:18px !important; }
+
+/* ── Paires libelle / valeur ────────────────────────────────── */
+.dck-front.dck-front .card-body > .col-12.px-0.pb-3,
+.dck-front.dck-front .card > .col-12.px-0.pb-3 {
+  display:flex;
+  align-items:flex-start;
+  gap:14px;
+  padding:11px 0 !important;
+  margin:0;
+  border-bottom:1px solid var(--line);
+}
+.dck-front.dck-front .card-body > .col-12.px-0.pb-3:last-child { border-bottom:0; }
+
+.dck-front.dck-front .card-body > .col-12.px-0.pb-3 > p.text-lightest,
+.dck-front.dck-front .card > .col-12.px-0.pb-3 > p.text-lightest {
+  flex:0 0 auto;
+  width:34%;
+  font-size:12.5px !important;
+  font-weight:500;
+  color:var(--tx-3) !important;
+  line-height:1.5;
+}
+.dck-front.dck-front .card-body > .col-12.px-0.pb-3 > p.text-dark-grey,
+.dck-front.dck-front .card > .col-12.px-0.pb-3 > p.text-dark-grey {
+  flex:1 1 auto;
+  width:auto !important;
+  font-size:13.5px !important;
+  font-weight:500;
+  color:var(--tx) !important;
+  line-height:1.5;
+}
+
+/* Pastille de statut devant une valeur */
+.dck-front.dck-front .fa-circle.f-10 { font-size:7px !important; vertical-align:middle; }
+
+/* ── Colonne laterale collante ──────────────────────────────── */
+@media (min-width:992px) {
+  .dck-front.dck-front .row > .col-sm-3 {
+    position:sticky;
+    top:78px;
+    align-self:flex-start;
+  }
+}
+
+/* ── Onglets de la fiche tache ──────────────────────────────── */
+.dck-front.dck-front .task-tabs .nav-link,
+.dck-front.dck-front .nav-link.f-15 {
+  padding:10px 14px !important;
+  border:0 !important;
+  border-bottom:2px solid transparent !important;
+  margin-bottom:-1px;
+  border-radius:0 !important;
+  font-size:13.5px !important;
+  font-weight:500;
+  color:var(--tx-3) !important;
+  background:transparent !important;
+}
+.dck-front.dck-front .task-tabs .nav-link:hover,
+.dck-front.dck-front .nav-link.f-15:hover { color:var(--tx) !important; }
+.dck-front.dck-front .task-tabs .nav-link.active,
+.dck-front.dck-front .nav-link.f-15.active {
+  color:var(--tx) !important;
+  font-weight:600;
+  border-bottom-color:var(--act) !important;
+}
+
+/* ── Onglets de la fiche diligence ──────────────────────────── */
+.dck-front.dck-front .p-sub-menu,
+.p-sub-menu {
+  padding:11px 15px !important;
+  border:0 !important;
+  border-bottom:2px solid transparent !important;
+  font-size:13.5px !important;
+  font-weight:500;
+  color:var(--tx-3) !important;
+  text-decoration:none;
+}
+.p-sub-menu:hover { color:var(--tx) !important; }
+.p-sub-menu.active,
+.p-sub-menu.btn-active {
+  color:var(--tx) !important;
+  font-weight:600;
+  border-bottom-color:#000 !important;
+}
+
+/* ── Fils de discussion et commentaires ─────────────────────── */
+.dck-front.dck-front .taskEmployeeImg,
+.dck-front.dck-front .rounded-circle.taskEmployeeImg {
+  width:30px;
+  height:30px;
+  object-fit:cover;
+  border:1px solid var(--line);
+}
+
+/* ── Fichiers joints ────────────────────────────────────────── */
+.dck-front.dck-front .file-card,
+.dck-front.dck-front .attachment-box {
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface);
+}
+
+/* ── En-tete de fiche (diligence, contrat) ──────────────────── */
+.dck-detail-head {
+  padding:22px 22px 0;
+  background:var(--surface);
+  border-bottom:1px solid var(--line);
+}
+.dck-detail-head .dck-page-head { margin-bottom:18px; }
+.dck-detail-head .dck-grid { margin-bottom:18px; }
+.dck-detail-head .dck-page-head p {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
+}
+
+/* Bandeau ne contenant que le lien de retour, sur les fiches qui n'ont
+   pas d'en-tete propre (employe, contrat, client). Plus ras que le
+   .dck-detail-head complet, qui doit loger un titre. */
+.dck-detail-head--seul {
+  padding:12px 22px 0;
+}
+.dck-detail-head--seul .dck-back { margin-bottom:10px; }
+
+/* Dans l'enveloppe d'une tache, le lien est pose directement dans le
+   contenu : il lui faut sa propre respiration. */
+.dck-front .content-wrapper > .dck-back,
+.content-wrapper.dck-front > .dck-back { margin:2px 0 14px; }
+
+.dck-back {
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:13px;
+  padding:5px 9px 5px 5px;
+  border-radius:var(--r-sm);
+  font-size:13px;
+  font-weight:500;
+  color:var(--tx-3);
+  text-decoration:none;
+  transition:background-color .14s ease, color .14s ease;
+}
+.dck-back:hover { background:var(--surface-3); color:var(--tx); text-decoration:none; }
+.dck-back svg { flex:0 0 auto; transition:transform .16s ease; }
+.dck-back:hover svg { transform:translateX(-2px); }
+
+@media (max-width:900px) {
+  .dck-detail-head { padding:16px 15px 0; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TABLEAU DE BORD
+   ──────────────────────────────────────────────────────────────
+   Deux conteneurs portent .dck-front dans dashboard/admin.blade.php :
+   l'en-tete (.dashboard-header) et le corps (.admin-dashboard).
+   Le corps fait @include($view) : ces regles habillent donc aussi
+   bien l'onglet Vue d'ensemble que les onglets Diligences, Clients
+   et Tickets, qui reutilisent les memes composants de carte.
+
+   Aucune vue n'est restructuree. Trois points d'accroche inertes
+   ont ete ajoutes aux composants partages — .dck-widget,
+   .dck-card et .dck-card__head — sans effet hors de .dck-front.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front.admin-dashboard { background:var(--surface-2); }
+
+/* ── Indicateurs de tete ────────────────────────────────────────
+   Le composant place le libelle, la valeur et l'icone cote a cote.
+   On reprend la metrique des indicateurs de la liste des contrats :
+   libelle discret, nombre en chasse fixe, icone en pastille. */
+
+.dck-front.dck-front .dck-widget {
+  background:var(--surface) !important;
+  border:1px solid var(--line);
+  border-radius:var(--r) !important;
+  box-shadow:none !important;
+  padding:17px 19px !important;
+  align-items:flex-start !important;
+  transition:border-color .15s ease;
+  height:100%;
+}
+
+.dck-front.dck-front a:hover .dck-widget { border-color:var(--line-strong); }
+
+.dck-front.dck-front .dck-widget h5 {
+  font-size:12.5px !important;
+  font-weight:500 !important;
+  color:var(--tx-3) !important;
+  margin-bottom:11px !important;
+  line-height:1.35;
+}
+
+.dck-front.dck-front .dck-widget p {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:27px !important;
+  font-weight:600 !important;
+  letter-spacing:-.03em;
+  line-height:1 !important;
+  color:var(--tx) !important;
+}
+
+/* L'icone devient une pastille, alignee sur le libelle */
+.dck-front.dck-front .dck-widget > .d-block:last-child {
+  width:32px; height:32px; flex:0 0 32px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--surface-3);
+  border-radius:var(--r-sm);
+}
+
+.dck-front.dck-front .dck-widget > .d-block:last-child i {
+  font-size:14px !important;
+  color:var(--tx-3) !important;
+}
+
+/* ── Cartes de contenu ──────────────────────────────────────── */
+
+.dck-front.dck-front .dck-card {
+  background:var(--surface) !important;
+  border:1px solid var(--line) !important;
+  border-radius:var(--r) !important;
+  box-shadow:none !important;
+  height:100%;
+}
+
+.dck-front.dck-front .dck-card__head {
+  padding:16px 19px 13px !important;
+  border-bottom:1px solid var(--line) !important;
+  align-items:center;
+  background:transparent !important;
+}
+
+.dck-front.dck-front .dck-card__head h4 {
+  font-size:14.5px !important;
+  font-weight:600 !important;
+  color:var(--tx) !important;
+  letter-spacing:-.005em;
+}
+
+.dck-front.dck-front .dck-card__head .fa-question-circle {
+  color:var(--tx-4);
+  font-size:12px;
+  margin-left:5px;
+}
+
+.dck-front.dck-front .dck-card > .card-body { padding:15px 19px; }
+.dck-front.dck-front .dck-card > .card-body.p-0 { padding:0 !important; }
+
+/* ── Lignes internes ────────────────────────────────────────────
+   Les fils d'activite et les listes de taches enveloppent CHAQUE
+   ligne dans une .card, ce qui produisait une carte dans la carte.
+   On les aplatit en lignes separees par un filet. */
+
+.dck-front.dck-front .dck-card .card-body .card {
+  background:transparent !important;
+  border:0 !important;
+  border-bottom:1px solid var(--line) !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  padding:13px 19px !important;
+}
+
+.dck-front.dck-front .dck-card .card-body .card:last-child {
+  border-bottom:0 !important;
+}
+
+.dck-front.dck-front .dck-card .card-body .card:hover {
+  background:var(--surface-2) !important;
+}
+
+.dck-front.dck-front .dck-card .card-title {
+  font-size:13px !important;
+  font-weight:500 !important;
+  color:var(--tx) !important;
+  line-height:1.45;
+}
+
+.dck-front.dck-front .dck-card .card-text {
+  font-size:12px !important;
+  color:var(--tx-3) !important;
+  margin-top:3px;
+}
+
+.dck-front.dck-front .dck-card .card-text a { color:var(--tx-2) !important; }
+.dck-front.dck-front .dck-card .card-text a:hover { color:var(--tx) !important; }
+
+/* Zones defilantes : la barre reste discrete */
+.dck-front.dck-front .h-200 { scrollbar-width:thin; }
+.dck-front.dck-front .h-200::-webkit-scrollbar { width:7px; }
+.dck-front.dck-front .h-200::-webkit-scrollbar-thumb {
+  background:var(--n300); border-radius:var(--r-full);
+}
+
+/* ── En-tete : onglets et selecteur de periode ──────────────── */
+
+.dck-front.dck-front.dashboard-header {
+  background:var(--surface) !important;
+  border-bottom:1px solid var(--line);
+}
+
+.dck-front.dck-front.dashboard-header .form-control {
+  font-size:13px !important;
+  color:var(--tx-2) !important;
+}
+
+.dck-front.dck-front.dashboard-header .fa-calendar-alt,
+.dck-front.dck-front.dashboard-header .fa-cog {
+  color:var(--tx-3) !important;
+  font-size:13px !important;
+}
+
+/* ── Tableaux dans les cartes ───────────────────────────────── */
+
+.dck-front.dck-front .dck-card table { margin-bottom:0; }
+
+.dck-front.dck-front .dck-card table th {
+  font-size:11px;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  font-weight:600;
+  color:var(--tx-3) !important;
+  border-top:0 !important;
+  border-bottom:1px solid var(--line) !important;
+  padding:10px 19px !important;
+  background:var(--surface-2);
+}
+
+.dck-front.dck-front .dck-card table td {
+  font-size:13px;
+  color:var(--tx-2) !important;
+  border-top:0 !important;
+  border-bottom:1px solid var(--line) !important;
+  padding:11px 19px !important;
+  vertical-align:middle;
+}
+
+.dck-front.dck-front .dck-card table tr:last-child td { border-bottom:0 !important; }
+
+/* ── Bandeau d'indicateurs de tete ───────────────────────────────
+   Reutilise le composant x-dck.kpi de la liste des contrats : meme
+   metrique, meme grille. Le bandeau precede les widgets historiques,
+   qui restent pilotes par les reglages de widgets. */
+
+.dck-front.dck-front .dck-kpis { margin-bottom:4px; }
+
+.dck-front.dck-front .dck-kpis .dck-kpi { height:100%; }
+
+.dck-front.dck-front .dck-kpis a { text-decoration:none; display:block; height:100%; }
+
+/* ── En-tete : onglets ──────────────────────────────────────────
+   x-tab produit .p-sub-menu, deja habille pour la fiche diligence.
+   Il reste a retirer le filet vertical herite du theme, que la
+   maquette n'a pas, et a poser le rail horizontal sous la rangee. */
+
+.dck-front.dck-front.dashboard-header .p-sub-menu.border-right-grey {
+  border-right:0 !important;
+}
+
+.dck-front.dck-front.dashboard-header .project-menu {
+  gap:2px;
+}
+
+.dck-front.dck-front.dashboard-header .select-status .form-control {
+  background:transparent !important;
+  padding-left:0 !important;
+}
+
+/* Le panneau de reglage des widgets suit la meme facture que les cartes */
+.dck-front.dck-front.dashboard-header .dropdown-menu {
+  border:1px solid var(--line) !important;
+  border-radius:var(--r) !important;
+  box-shadow:0 8px 28px rgba(15,20,25,.10) !important;
+}
+
+.dck-front.dck-front.dashboard-header .dropdown-menu .heading-h3 {
+  font-size:14px !important;
+  font-weight:600 !important;
+  color:var(--tx) !important;
+}
+
+.dck-front.dck-front.dashboard-header .dropdown-menu label {
+  font-size:13px !important;
+  color:var(--tx-2) !important;
+}
+
+/* ── Graphiques ─────────────────────────────────────────────────
+   frappe-charts dessine en SVG dans .chart-container. Les couleurs
+   des series viennent des donnees (couleurs de statut en base pour
+   l'onglet Diligences, couleur du theme pour la Vue d'ensemble) :
+   on n'habille donc ici que le cadre, la grille et les etiquettes.
+
+   Note d'accessibilite : la paire terminee / annulee est a une
+   distance perceptive faible en deuteranopie. Les etiquettes de
+   frappe-charts sont conservees pour que la couleur ne porte
+   jamais l'information seule. */
+
+.dck-front.dck-front .chart-container { padding:4px 0; }
+
+.dck-front.dck-front .chart-container .chart-label,
+.dck-front.dck-front .chart-container text {
+  font-size:11px !important;
+  fill:var(--tx-3) !important;
+}
+
+.dck-front.dck-front .chart-container .y-axis-guide,
+.dck-front.dck-front .chart-container line.y-line,
+.dck-front.dck-front .chart-container .axis line {
+  stroke:var(--line) !important;
+}
+
+.dck-front.dck-front .chart-container .axis text { fill:var(--tx-3) !important; }
+
+/* Infobulle du graphique : meme facture que les cartes */
+.dck-front.dck-front .graph-svg-tip {
+  background:var(--n900) !important;
+  border-radius:var(--r-sm) !important;
+  font-size:12px !important;
+}
+
+.dck-front.dck-front .graph-svg-tip .title { color:var(--n300) !important; }
+.dck-front.dck-front .graph-svg-tip ul li { color:var(--n0) !important; }
+
+/* ── Legendes de statut ─────────────────────────────────────────
+   Les pastilles de couleur des statuts sont toujours accompagnees
+   de leur libelle : jamais de couleur seule. */
+
+.dck-front.dck-front .status-label,
+.dck-front.dck-front .legend-dot {
+  width:9px; height:9px; border-radius:var(--r-full);
+  display:inline-block; margin-right:6px; flex:0 0 auto;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BLOC DE PILOTAGE — conforme a pilotage-dc-knowing
+   ──────────────────────────────────────────────────────────────
+   Transposition des regles de la maquette sur les jetons de cette
+   feuille. Les classes sont prefixees dck- : les noms de la maquette
+   (.card, .kpi, .stack, .legend) sont trop generiques pour cohabiter
+   avec Bootstrap sans collision.
+
+   Correspondances : --surface, --line, --tx-3 et --f-num remplacent
+   respectivement --surface, --line-2, --ink-3 et --fm.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front .dck-pilotage {
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-bottom:22px;
+}
+
+/* ── Indicateurs ────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-kpis {
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  gap:14px;
+}
+
+.dck-front.dck-front .dck-k {
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  padding:15px 16px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  text-decoration:none;
+  transition:border-color .15s ease;
+}
+
+.dck-front.dck-front a.dck-k:hover { border-color:var(--line-strong); }
+
+.dck-front.dck-front .dck-k__lbl {
+  font-size:10.5px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--tx-3);
+}
+
+.dck-front.dck-front .dck-k__val {
+  font-family:var(--f-num);
+  font-weight:600;
+  font-size:27px;
+  letter-spacing:-.02em;
+  line-height:1.15;
+  font-variant-numeric:tabular-nums;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-k__val.is-alerte { color:var(--err); }
+
+.dck-front.dck-front .dck-k__foot {
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  margin-top:7px;
+}
+
+.dck-front.dck-front .dck-k__delta {
+  font-size:11.5px;
+  font-weight:600;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+
+.dck-front.dck-front .dck-k__delta.is-up   { color:var(--ok); }
+.dck-front.dck-front .dck-k__delta.is-down { color:var(--err); }
+.dck-front.dck-front .dck-k__delta.is-flat { color:var(--tx-3); }
+
+/* ── Grille analytique ──────────────────────────────────────── */
+
+.dck-front.dck-front .dck-grid2 {
+  display:grid;
+  grid-template-columns:1.55fr 1fr;
+  gap:18px;
+  align-items:start;
+}
+
+/* ── Cartes ─────────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-c {
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  overflow:hidden;
+}
+
+.dck-front.dck-front .dck-c__head {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 16px;
+  border-bottom:1px solid var(--line);
+}
+
+.dck-front.dck-front .dck-c__head h3 {
+  font-size:13.5px;
+  font-weight:600;
+  margin:0;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-c__sub {
+  font-size:11.5px;
+  color:var(--tx-3);
+  margin-top:2px;
+}
+
+.dck-front.dck-front .dck-c__right { margin-left:auto; }
+
+.dck-front.dck-front .dck-lien {
+  font-size:12px;
+  font-weight:500;
+  color:var(--tx-2);
+  text-decoration:none;
+}
+
+.dck-front.dck-front .dck-lien:hover { color:var(--tx); text-decoration:underline; }
+
+.dck-front.dck-front .dck-c__body { padding:16px; }
+
+/* ── Graphique en barres ────────────────────────────────────── */
+
+.dck-front.dck-front .dck-chart { overflow-x:auto; }
+.dck-front.dck-front .dck-bars { display:block; width:100%; height:auto; }
+.dck-front.dck-front .dck-bar__v { fill:var(--act); }
+.dck-front.dck-front .dck-bar__hit { fill:transparent; cursor:pointer; }
+.dck-front.dck-front .dck-bar:hover .dck-bar__v { fill:var(--act-hover); }
+.dck-front.dck-front .dck-grid { stroke:var(--line); stroke-width:1; }
+.dck-front.dck-front .dck-zero { stroke:var(--line-strong); stroke-width:1; }
+
+.dck-front.dck-front .dck-axe {
+  font-family:var(--f-num);
+  font-size:9.5px;
+  fill:var(--tx-3);
+}
+
+/* ── Barre empilee et legende ───────────────────────────────── */
+
+.dck-front.dck-front .dck-stack {
+  display:flex;
+  height:13px;
+  border-radius:7px;
+  overflow:hidden;
+  gap:2px;
+  background:var(--surface);
+}
+
+.dck-front.dck-front .dck-stack > span { display:block; }
+
+.dck-front.dck-front .dck-legend {
+  display:flex;
+  flex-direction:column;
+  gap:9px;
+  margin-top:15px;
+}
+
+.dck-front.dck-front .dck-legend__row {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:13px;
+}
+
+.dck-front.dck-front .dck-legend__key {
+  width:9px; height:9px;
+  border-radius:2.5px;
+  flex:none;
+  display:inline-block;
+}
+
+.dck-front.dck-front .dck-legend__nm { color:var(--tx-2); }
+
+.dck-front.dck-front .dck-legend__n {
+  margin-left:auto;
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-weight:600;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-legend__p {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:12px;
+  color:var(--tx-3);
+  width:52px;
+  text-align:right;
+}
+
+/* ── Tableau ────────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-tbl { overflow-x:auto; }
+
+.dck-front.dck-front .dck-tbl table {
+  border-collapse:collapse;
+  width:100%;
+  /* Largeur plancher, comme .tbl dans la maquette : en dessous, le
+     tableau defile dans son conteneur au lieu d'ecraser ses colonnes
+     au point de les rendre illisibles. */
+  min-width:640px;
+  font-size:13px;
+  margin:0;
+}
+
+.dck-front.dck-front .dck-tbl th {
+  text-align:left;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  color:var(--tx-3);
+  padding:9px 16px;
+  background:var(--surface-2);
+  border:0;
+  border-bottom:1px solid var(--line);
+}
+
+.dck-front.dck-front .dck-tbl td {
+  padding:11px 16px;
+  border:0;
+  border-bottom:1px solid var(--line);
+  vertical-align:middle;
+  color:var(--tx-2);
+}
+
+.dck-front.dck-front .dck-tbl tbody tr:last-child td { border-bottom:0; }
+.dck-front.dck-front .dck-tbl tbody tr:hover td { background:var(--surface-2); }
+
+.dck-front.dck-front .dck-ref,
+.dck-front.dck-front .dck-date {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.dck-front.dck-front .dck-ttl {
+  font-weight:500;
+  color:var(--tx);
+  text-decoration:none;
+}
+
+.dck-front.dck-front .dck-ttl:hover { text-decoration:underline; }
+.dck-front.dck-front .dck-cl { color:var(--tx-3); }
+
+.dck-front.dck-front .dck-vide {
+  text-align:center;
+  color:var(--tx-3);
+  padding:26px 16px !important;
+}
+
+.dck-front.dck-front .dck-pill {
+  display:inline-block;
+  font-size:11px;
+  font-weight:600;
+  padding:3px 9px;
+  border-radius:var(--r-full);
+  white-space:nowrap;
+}
+
+.dck-front.dck-front .dck-pill.is-late  { background:var(--err-bg);  color:var(--err);  }
+.dck-front.dck-front .dck-pill.is-doing { background:var(--info-bg); color:var(--info); }
+
+/* ── Echeancier ─────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-dl {
+  display:flex;
+  gap:12px;
+  padding:11px 16px;
+  border-bottom:1px solid var(--line);
+  align-items:flex-start;
+}
+
+.dck-front.dck-front .dck-dl:last-child { border-bottom:0; }
+
+.dck-front.dck-front .dck-dl__when {
+  flex:none;
+  width:42px;
+  text-align:center;
+  font-family:var(--f-num);
+  line-height:1.1;
+  padding-top:2px;
+}
+
+.dck-front.dck-front .dck-dl__when b {
+  display:block;
+  font-size:15px;
+  font-weight:600;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-dl__when span {
+  font-size:9.5px;
+  text-transform:uppercase;
+  color:var(--tx-3);
+  letter-spacing:.06em;
+}
+
+.dck-front.dck-front .dck-dl.is-urgent .dck-dl__when b { color:var(--err); }
+
+.dck-front.dck-front .dck-dl__what { min-width:0; }
+
+.dck-front.dck-front .dck-dl__what b {
+  display:block;
+  font-size:13px;
+  font-weight:600;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-dl__what span {
+  font-size:11.5px;
+  color:var(--tx-3);
+}
+
+/* ── Adaptation aux petits ecrans ───────────────────────────── */
+
+@media (max-width:1200px) {
+  .dck-front.dck-front .dck-grid2 { grid-template-columns:1fr; }
+}
+
+@media (max-width:900px) {
+  .dck-front.dck-front .dck-kpis { grid-template-columns:repeat(2, 1fr); }
+}
+
+@media (max-width:560px) {
+  .dck-front.dck-front .dck-kpis { grid-template-columns:1fr; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ONGLETS INTERNES — diligence, tache, contrat
+   ──────────────────────────────────────────────────────────────
+   Le contenu des onglets est injecte par ajax dans .content-wrapper,
+   qui porte .dck-front : la classe survit a l'appel, puisque le script
+   remplace le CONTENU du conteneur et non le conteneur lui-meme. Les
+   regles ci-dessous s'appliquent donc a tous les onglets sans qu'aucune
+   vue n'ait a etre modifiee.
+
+   L'essentiel etait deja couvert : les onglets Membres et Jalons
+   passent par x-cards.data et x-table, l'onglet Fichiers par
+   x-file-card, tous trois habilles. Restait .w-tables, le conteneur
+   de tableau du theme — utilise par 91 vues, dont onze onglets de
+   diligence. Une seule regle les couvre toutes.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front .w-tables {
+  background:var(--surface) !important;
+  border:1px solid var(--line);
+  border-radius:var(--r) !important;
+  box-shadow:none !important;
+  /* Le defilement horizontal est pose plus bas, dans le bloc
+     d'adaptation aux petits ecrans : overflow:hidden coupait ici les
+     colonnes de droite au lieu de les rendre atteignables. */
+}
+
+/* Le tableau colle aux bords du conteneur : la bordure de la carte
+   fait office de cadre, un double filet serait redondant. */
+.dck-front.dck-front .w-tables > .table,
+.dck-front.dck-front .w-tables > table,
+.dck-front.dck-front .w-tables table.dataTable {
+  margin:0 !important;
+  border:0 !important;
+}
+
+/* La barre d'outils DataTables (recherche, longueur, export) vit
+   au-dessus du tableau, a l'interieur de la carte. */
+.dck-front.dck-front .w-tables .dataTables_wrapper > .row:first-child {
+  padding:12px 16px 0;
+}
+
+.dck-front.dck-front .w-tables .dataTables_wrapper > .row:last-child {
+  padding:10px 16px;
+  border-top:1px solid var(--line);
+}
+
+/* ── Barre d'action au-dessus des tableaux ──────────────────── */
+
+.dck-front.dck-front .table-responsive { border:0; }
+
+/* ── Onglet Vue d'ensemble d'une diligence ──────────────────── */
+
+/* Les blocs date de debut / echeance : meme facture que les
+   indicateurs, sans en reprendre la taille. */
+.dck-front.dck-front .project-detail-box h5 {
+  font-size:12px !important;
+  font-weight:500 !important;
+  color:var(--tx-3) !important;
+  letter-spacing:.02em;
+}
+
+/* ── Cartes de fichiers ─────────────────────────────────────── */
+
+.dck-front.dck-front .file-card {
+  box-shadow:none !important;
+  transition:border-color .15s ease;
+}
+
+.dck-front.dck-front .file-card:hover { border-color:var(--line-strong); }
+
+.dck-front.dck-front .file-card .card-body { padding:10px 12px; }
+
+/* ── Etat vide ──────────────────────────────────────────────── */
+
+.dck-front.dck-front .no-record-found,
+.dck-front.dck-front .text-center.p-20 .fa-3x {
+  color:var(--tx-4);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TABLEAU DES TACHES — cartes et colonnes
+   ──────────────────────────────────────────────────────────────
+   Reference : section « Cartes du tableau » de atelier-taskflow.
+
+       .col-head        13.5px / 600, pastille + compteur
+       .col-head .count chasse fixe, 11.5px, fond clair, filet
+       .card            lisere de 3px a gauche selon la severite
+       .card h4         14px / 600, interligne 1.4
+       .card .meta      filet superieur, 10px d'ecart
+       .card .ref       chasse fixe, 11px, gris
+       .due.over        rouge, gras
+
+   La vue taskboard/index ne portait aucune classe de portee : elle
+   echappait donc entierement a la refonte, ce que montrait la capture.
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Colonnes ───────────────────────────────────────────────── */
+
+.dck-front.dck-front .board-panel {
+  background:var(--surface-2) !important;
+  border:1px solid var(--line) !important;
+  border-radius:var(--r) !important;
+  box-shadow:none !important;
+}
+
+.dck-front.dck-front .b-p-header p {
+  font-size:13.5px !important;
+  font-weight:600 !important;
+  color:var(--tx) !important;
+  display:flex;
+  align-items:center;
+}
+
+.dck-front.dck-front .b-p-header .fa-circle {
+  font-size:8px !important;
+  margin-right:8px !important;
+}
+
+.dck-front.dck-front .b-p-badge {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:11.5px !important;
+  font-weight:500 !important;
+  color:var(--tx-2) !important;
+  background:var(--surface) !important;
+  border:1px solid var(--line);
+  border-radius:var(--r-sm) !important;
+  padding:1px 7px !important;
+  align-self:center;
+}
+
+/* ── Cartes ─────────────────────────────────────────────────── */
+
+.dck-front.dck-front .task-card {
+  background:var(--surface) !important;
+  border:1px solid var(--line) !important;
+  /* Le lisere de priorite est pose en style inline par le composant :
+     on ne redefinit que les trois autres cotes. */
+  border-radius:var(--r-sm) !important;
+  box-shadow:none !important;
+  transition:box-shadow .15s ease, transform .15s ease;
+}
+
+.dck-front.dck-front .task-card:hover {
+  box-shadow:0 2px 8px rgba(15,20,25,.07), 0 1px 2px rgba(15,20,25,.05) !important;
+  transform:translateY(-1px);
+}
+
+.dck-front.dck-front .task-card .card-body { padding:12px 13px !important; }
+
+/* Titre de la tache : 12px d'origine, 14px dans la maquette. */
+.dck-front.dck-front .task-card .card-body > .d-flex:first-child a {
+  font-size:14px !important;
+  font-weight:600 !important;
+  line-height:1.4 !important;
+  color:var(--tx) !important;
+}
+
+/* Reference courte, a droite du titre */
+.dck-front.dck-front .task-card .card-body > .d-flex:first-child p {
+  font-family:var(--f-num);
+  font-size:11px !important;
+  font-weight:400 !important;
+  color:var(--tx-3) !important;
+  white-space:nowrap;
+  padding-left:8px;
+}
+
+/* Nom du projet */
+.dck-front.dck-front .task-card .projectNameSpan,
+.dck-front.dck-front .task-card .text-lightest {
+  font-size:12px !important;
+  color:var(--tx-3) !important;
+}
+
+/* Derniere rangee : avatars, sous-taches, echeance. La maquette la
+   detache par un filet, comme un pied de carte. */
+.dck-front.dck-front .task-card .card-body > .d-flex:last-child {
+  margin-top:11px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+  font-size:12px;
+  color:var(--tx-3);
+}
+
+.dck-front.dck-front .task-card .avatar-img img {
+  width:22px;
+  height:22px;
+  border-radius:var(--r-full);
+  border:1px solid var(--surface);
+  object-fit:cover;
+}
+
+/* Echeance depassee : rouge et gras, comme .due.over */
+.dck-front.dck-front .task-card .text-red {
+  color:var(--err) !important;
+  font-weight:600;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Etiquettes */
+.dck-front.dck-front .task-card .badge {
+  font-size:10.5px !important;
+  font-weight:500 !important;
+  padding:2px 7px !important;
+  border-radius:var(--r-sm) !important;
+}
+
+/* ── Bandeau d'information ──────────────────────────────────── */
+
+.dck-front.dck-front .alert-warning,
+.dck-front.dck-front .note-alert {
+  background:var(--warn-bg) !important;
+  border:1px solid var(--warn-line) !important;
+  color:var(--warn) !important;
+  border-radius:var(--r-sm) !important;
+  font-size:13px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   THEME SOMBRE
+   ──────────────────────────────────────────────────────────────
+   Le gabarit pose <body class="dark-theme"> selon user()->dark_theme.
+   main.css traite ainsi le theme d'origine, mais cette feuille n'en
+   savait rien : les ecrans refondus seraient restes clairs sur fond
+   sombre, donc illisibles.
+
+   Toute la feuille etant construite sur des jetons, il suffit de les
+   redefinir : cartes, tableaux, champs, boutons, indicateurs,
+   graphiques et modales suivent sans qu'une seule regle de composant
+   soit dupliquee.
+
+   Les valeurs ne sont pas une inversion mecanique du clair. Sur fond
+   sombre, un blanc pur vibre et les bordures claires se detachent
+   trop : les surfaces montent par paliers, les filets restent
+   discrets, et les couleurs de statut sont eclaircies pour garder
+   leur contraste sur un fond fonce.
+   ══════════════════════════════════════════════════════════════ */
+
+.dark-theme .dck-front,
+.dark-theme .dck-chrome {
+  /* Neutres inverses : n0 devient la surface la plus sombre. */
+  --n0:#161a20; --n50:#1c2128; --n100:#232931; --n200:#2f3742;
+  --n300:#3d4653; --n400:#78828f; --n500:#98a2ae;
+  --n600:#b4bcc6; --n700:#ccd2da; --n800:#e2e6eb; --n900:#f2f4f7;
+
+  --surface:var(--n0);
+  --surface-2:var(--n50);
+  --surface-3:var(--n100);
+  --line:var(--n200);
+  --line-strong:var(--n300);
+
+  --tx:var(--n900);
+  --tx-2:var(--n700);
+  --tx-3:var(--n500);
+  --tx-4:var(--n400);
+
+  /* L'action passe du noir au blanc : c'est elle qui doit ressortir. */
+  --act:#f2f4f7;
+  --act-hover:#ffffff;
+  --act-tx:#12161c;
+
+  /* Statuts eclaircis pour rester lisibles sur fond sombre. */
+  --ok:#86c98a;   --ok-bg:#16251a;   --ok-line:#2c4a31;
+  --warn:#dcb367; --warn-bg:#2a2214; --warn-line:#4c3f22;
+  --err:#e59083;  --err-bg:#2b1a17;  --err-line:#4d2f2a;
+  --info:#7ab6e8; --info-bg:#152634; --info-line:#28455f;
+}
+
+/* Le fond de page : le gabarit peint le corps, on accorde les
+   conteneurs de contenu pour eviter un bandeau clair residuel. */
+.dark-theme .dck-front.admin-dashboard,
+.dark-theme .dck-front.emp-dashboard,
+.dark-theme .dck-front.w-task-board-box,
+.dark-theme .dck-front.content-wrapper {
+  background:var(--surface-2) !important;
+}
+
+.dark-theme .dck-front.dck-front .bg-white,
+.dark-theme .dck-front.dck-front .card,
+.dark-theme .dck-front.dck-front .dck-c,
+.dark-theme .dck-front.dck-front .dck-k,
+.dark-theme .dck-front.dck-front .w-tables,
+.dark-theme .dck-front.dck-front .task-card {
+  background:var(--surface) !important;
+  color:var(--tx);
+}
+
+/* Le theme d'origine impose des couleurs de texte en dur : on les
+   ramene sur les jetons, sinon du gris fonce subsiste sur fond sombre. */
+.dark-theme .dck-front.dck-front .text-dark,
+.dark-theme .dck-front.dck-front .text-darkest-grey,
+.dark-theme .dck-chrome.dck-chrome .text-dark {
+  color:var(--tx) !important;
+}
+
+.dark-theme .dck-front.dck-front .text-dark-grey,
+.dark-theme .dck-front.dck-front .text-lightest,
+.dark-theme .dck-chrome.dck-chrome .text-dark-grey {
+  color:var(--tx-3) !important;
+}
+
+/* ── Barre laterale et bandeau ──────────────────────────────── */
+
+.dark-theme .dck-chrome.dck-chrome,
+.dark-theme aside.dck-chrome.is-dark {
+  background:var(--surface) !important;
+  border-color:var(--line) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .sidebar-brand-box {
+  background:var(--surface-2) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .dropdown-menu,
+.dark-theme .dck-front.dck-front .dropdown-menu {
+  background:var(--surface-2) !important;
+  border-color:var(--line) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .dropdown-item {
+  color:var(--tx-2) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .dropdown-item:hover {
+  background:var(--surface-3) !important;
+  color:var(--tx) !important;
+}
+
+/* ── Champs de saisie ───────────────────────────────────────── */
+
+.dark-theme .dck-front.dck-front .form-control,
+.dark-theme .dck-front.dck-front .select2-container--default .select2-selection--single,
+.dark-theme .dck-front.dck-front .bootstrap-select > .dropdown-toggle {
+  background-color:var(--surface-2) !important;
+  border-color:var(--line-strong) !important;
+  color:var(--tx) !important;
+}
+
+.dark-theme .dck-front.dck-front .form-control:focus {
+  box-shadow:0 0 0 3px rgba(242,244,247,.14);
+}
+
+.dark-theme .dck-front.dck-front .form-control:disabled,
+.dark-theme .dck-front.dck-front .form-control[readonly] {
+  background-color:var(--surface-3) !important;
+}
+
+/* ── Tableaux ───────────────────────────────────────────────── */
+
+.dark-theme .dck-front.dck-front table.dataTable thead th,
+.dark-theme .dck-front.dck-front .table thead th,
+.dark-theme .dck-front.dck-front .dck-tbl th {
+  background:var(--surface-2) !important;
+  color:var(--tx-3) !important;
+}
+
+.dark-theme .dck-front.dck-front table.dataTable tbody tr:hover,
+.dark-theme .dck-front.dck-front .table tbody tr:hover,
+.dark-theme .dck-front.dck-front .dck-tbl tbody tr:hover td {
+  background:var(--surface-2) !important;
+}
+
+/* ── Modales ────────────────────────────────────────────────── */
+
+.dark-theme .modal-content,
+.dark-theme .dck-front.dck-front .modal-content {
+  background:var(--surface, #161a20) !important;
+  border-color:var(--line, #2f3742) !important;
+  color:var(--tx, #f2f4f7);
+}
+
+/* ── Graphique du bloc de pilotage ──────────────────────────── */
+
+.dark-theme .dck-front.dck-front .dck-bar__v { fill:var(--act); }
+.dark-theme .dck-front.dck-front .dck-bar:hover .dck-bar__v { fill:#ffffff; }
+.dark-theme .dck-front.dck-front .dck-grid { stroke:var(--line); }
+.dark-theme .dck-front.dck-front .dck-zero { stroke:var(--line-strong); }
+
+/* La barre empilee separe ses segments par la couleur de surface :
+   elle doit suivre le theme, sinon des filets clairs subsistent. */
+.dark-theme .dck-front.dck-front .dck-stack { background:var(--surface); }
+
+/* ── Cartes du tableau des taches ───────────────────────────── */
+
+.dark-theme .dck-front.dck-front .board-panel {
+  background:var(--surface-2) !important;
+  border-color:var(--line) !important;
+}
+
+.dark-theme .dck-front.dck-front .b-p-badge {
+  background:var(--surface-3) !important;
+  color:var(--tx-2) !important;
+}
+
+.dark-theme .dck-front.dck-front .task-card:hover {
+  box-shadow:0 2px 10px rgba(0,0,0,.45) !important;
+}
+
+/* ── Squelettes de chargement ───────────────────────────────── */
+
+.dark-theme .dck-skel__line,
+.dark-theme .dck-skel__box,
+.dark-theme .dck-skel__card { background:#232931; }
+.dark-theme .dck-skel__sep { background:#2f3742; }
+.dark-theme .dck-skel-row td { border-bottom-color:#2f3742; }
+.dark-theme .dck-nav-bar { background:#f2f4f7; }
+
+/* ══════════════════════════════════════════════════════════════
+   FORMULAIRES — alignement fin sur l'atelier
+   ──────────────────────────────────────────────────────────────
+   L'atelier documente une proposition deja appliquee pour l'essentiel :
+   des champs de 40 px au lieu de 50, et une erreur explicite plutot
+   que decorative. Restent trois ecarts de detail.
+
+       .field           gap 6px entre libelle et champ
+       .field > label   13px / 500 (la feuille posait 600)
+       .input           14.5px, hauteur ferme a 40px
+       .hint            12.5px, gris
+       .hint.err        rouge, 500
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front .form-group > label,
+.dck-front.dck-front label {
+  font-weight:500;
+  margin-bottom:6px;
+}
+
+.dck-front.dck-front .form-control,
+.dck-front.dck-front .bootstrap-select > .dropdown-toggle,
+.dck-front.dck-front .select2-container--default .select2-selection--single {
+  font-size:14.5px;
+}
+
+/* Le libelle d'un champ obligatoire garde son marqueur discret */
+.dck-front.dck-front label .text-red,
+.dck-front.dck-front label .required {
+  color:var(--err) !important;
+  font-weight:500;
+}
+
+/* Message d'aide sous un champ */
+.dck-front.dck-front .form-text,
+.dck-front.dck-front small.text-muted {
+  font-size:12.5px;
+  color:var(--tx-3) !important;
+  margin-top:6px;
+}
+
+/* Message d'erreur : explicite, jamais un simple liseré rouge */
+.dck-front.dck-front .invalid-feedback,
+.dck-front.dck-front .error-message,
+.dck-front.dck-front label.error {
+  font-size:12.5px;
+  font-weight:500;
+  color:var(--err) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BANDEAU SUPERIEUR — conforme a dck-flow-task
+   ──────────────────────────────────────────────────────────────
+       .header    hauteur 64px, padding 0 22px
+       .crumb     display:flex, gap 7px — titre et chemin EN LIGNE
+       .crumb b   15,5px / 600, interlettrage -.02em
+       .crumb i   separateur, --tx-4
+       .crumb small 13px, --tx-3
+
+   Le titre reste donc devant le chemin, sur une seule ligne. Une
+   version anterieure de ce fichier les empilait, d'apres la maquette
+   de pilotage qui suit une autre disposition : c'est corrige.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-chrome.dck-chrome.main-header { height:64px; }
+
+.dck-chrome.dck-chrome .page-heading h2 {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:0;
+}
+
+/* Le titre */
+.dck-chrome.dck-chrome .page-heading h2 > span:first-child {
+  font-size:15.5px !important;
+  font-weight:600 !important;
+  letter-spacing:-.02em;
+  color:var(--tx) !important;
+}
+
+/* Le chemin, a la suite */
+.dck-chrome.dck-chrome .page-heading h2 > span:last-child {
+  margin:0 !important;
+  font-size:13px !important;
+  font-weight:400 !important;
+  color:var(--tx-3) !important;
+}
+
+.dck-chrome.dck-chrome .page-heading h2 > span:last-child a {
+  color:var(--tx-3) !important;
+  text-decoration:none;
+}
+
+.dck-chrome.dck-chrome .page-heading h2 > span:last-child a:hover {
+  color:var(--tx-2) !important;
+  text-decoration:underline;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BARRE LATERALE — conforme a dck-flow-task
+   ──────────────────────────────────────────────────────────────
+   La barre est CLAIRE : .sidebar prend var(--surface). C'est
+   l'entree courante qui s'inverse en noir — .sb-item.on pose
+   background:var(--act) et color:var(--act-tx).
+
+       .sb-brand   hauteur 64px, gap 10px, padding 0 18px
+       .sb-mark    32x32, rayon 9px, fond noir, sigle blanc
+       .sb-name    700 / 14,5px ; son <span> en 400 gris
+       .sb-sect    11px / 600, interlettrage .08em, --tx-4
+       .sb-item    gap 11px, padding 9px 10px, 2px d'ecart
+       .sb-count   pastille --surface-3, chasse fixe, rayon plein
+       .sb-foot    filet superieur, 10px 12px
+   ══════════════════════════════════════════════════════════════ */
+
+/* Titres de section */
+.dck-chrome.dck-chrome .dck-sect {
+  margin:18px 8px 6px !important;
+  font-size:11px !important;
+  font-weight:600 !important;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--tx-4) !important;
+}
+
+.dck-chrome.dck-chrome .dck-sect:first-child { margin-top:2px !important; }
+
+/* Entrees */
+.dck-chrome.dck-chrome .nav-item,
+.dck-chrome.dck-chrome .accordionItemHeading {
+  gap:11px;
+  padding:9px 10px !important;
+  margin-bottom:2px;
+  font-size:14px !important;
+}
+
+/* Compteurs : pastille discrete, chiffres alignes */
+.dck-chrome.dck-chrome .menu-item-count {
+  padding:1px 7px !important;
+  border-radius:var(--r-full) !important;
+  background:var(--surface-3) !important;
+  color:var(--tx-3) !important;
+  font-family:"IBM Plex Mono", ui-monospace, monospace;
+  font-size:11px !important;
+  font-weight:500 !important;
+  margin-left:auto;
+}
+
+/* Sur l'entree courante, la pastille s'eclaircit au lieu de disparaitre
+   sur le fond noir. */
+.dck-chrome.dck-chrome .nav-item.active .menu-item-count,
+.dck-chrome.dck-chrome .accordionItem.active .menu-item-count,
+.dck-chrome.dck-chrome .accordionItemHeading.active .menu-item-count {
+  background:rgba(255,255,255,.18) !important;
+  color:var(--act-tx) !important;
+}
+
+/* Sous-entrees : filet vertical, comme .sb-sub */
+.dck-chrome.dck-chrome .accordionItemContent {
+  margin:2px 0 6px 30px;
+  padding-left:11px;
+  border-left:1px solid var(--line);
+}
+
+.dck-chrome.dck-chrome .accordionItemContent a {
+  display:block;
+  padding:7px 10px;
+  margin-bottom:1px;
+  border-radius:var(--r-sm);
+  font-size:13.5px !important;
+  color:var(--tx-2) !important;
+}
+
+.dck-chrome.dck-chrome .accordionItemContent a:hover {
+  background:var(--surface-3);
+  color:var(--tx) !important;
+  text-decoration:none;
+}
+
+/* Bloc de marque : le sigle est un carre noir a coins arrondis */
+.dck-chrome.dck-chrome .sidebar-brand-box {
+  height:64px;
+  gap:10px;
+  padding:0 18px !important;
+}
+
+.dck-chrome.dck-chrome .sidebar-brand img {
+  max-height:32px;
+  width:auto;
+  border-radius:9px;
+}
+
+/* Pied : filet superieur, identite du collaborateur */
+.dck-chrome.dck-chrome .sidebarTogglerBox {
+  border-top:1px solid var(--line);
+  padding:10px 12px;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MON TABLEAU DE BORD — ecran mon-espace de dck-flow-task
+   ──────────────────────────────────────────────────────────────
+       .stack   colonne, 18px    .grid    grille, 16px
+       .g-4     4 colonnes       .g-23    2fr 1fr      .g-3  3 colonnes
+       .kpi     17px 18px, icone 30x30 rayon 8, valeur 29px mono
+       .tcard   12px, rayon 10, titre 13,5px/600, meta 12px
+       .bar     6px, rayon plein, remplissage anime
+       .note    13px 15px, variantes ok / err / warn / info
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front .dck-espace {
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  margin-bottom:22px;
+}
+
+.dck-front.dck-front .dck-grid { display:grid; gap:16px; }
+/* Cinq indicateurs cote a cote : le padding est resserre par rapport
+   aux cartes larges, sans quoi les libelles passent a la ligne. */
+.dck-front.dck-front .dck-g5  { grid-template-columns:repeat(5, 1fr); }
+.dck-front.dck-front .dck-g5 > .dck-kpi2 { padding:15px 14px; }
+.dck-front.dck-front .dck-g5 .dck-kpi2__lab {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-g5 .dck-kpi2__sub {
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-g4  { grid-template-columns:repeat(4, 1fr); }
+.dck-front.dck-front .dck-g3  { grid-template-columns:repeat(3, 1fr); }
+.dck-front.dck-front .dck-g23 { grid-template-columns:2fr 1fr; }
+
+/* Le total d'un rapport « en cours / total » : plus discret que la
+   valeur qu'il accompagne, sans rompre l'alignement des chiffres. */
+.dck-front.dck-front .dck-kpi2__tot {
+  font-size:.62em;
+  font-weight:500;
+  color:var(--tx-3);
+}
+
+/* ── Bandeau d'alerte ───────────────────────────────────────── */
+
+.dck-front.dck-front .dck-note {
+  display:flex;
+  gap:11px;
+  align-items:flex-start;
+  padding:13px 15px;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  background:var(--surface);
+}
+
+.dck-front.dck-front .dck-note.is-err {
+  background:var(--err-bg);
+  border-color:var(--err-line);
+  color:var(--err);
+}
+
+.dck-front.dck-front .dck-note b { display:block; font-size:13.5px; font-weight:600; }
+.dck-front.dck-front .dck-note p { margin:3px 0 0; font-size:13px; line-height:1.5; opacity:.86; }
+.dck-front.dck-front .dck-note__i { flex:0 0 auto; font-size:17px; line-height:1.2; }
+
+.dck-front.dck-front .dck-note__act {
+  margin-left:auto;
+  align-self:center;
+  flex:0 0 auto;
+  padding:5px 12px;
+  border:1px solid currentColor;
+  border-radius:var(--r-sm);
+  font-size:12.5px;
+  font-weight:600;
+  color:inherit;
+  text-decoration:none;
+}
+
+.dck-front.dck-front .dck-note__act:hover { background:rgba(0,0,0,.05); text-decoration:none; }
+
+/* ── Indicateurs ────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-kpi2 {
+  padding:17px 18px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  text-decoration:none;
+  display:block;
+  transition:border-color .15s ease, transform .15s ease;
+}
+
+.dck-front.dck-front a.dck-kpi2:hover {
+  border-color:var(--line-strong);
+  transform:translateY(-2px);
+  text-decoration:none;
+}
+
+.dck-front.dck-front .dck-kpi2__top {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  margin-bottom:12px;
+}
+
+.dck-front.dck-front .dck-kpi2__ico {
+  display:grid;
+  place-items:center;
+  width:30px; height:30px;
+  flex:0 0 auto;
+  border-radius:8px;
+  background:var(--surface-3);
+  color:var(--tx-3);
+  font-size:14px;
+}
+
+.dck-front.dck-front .dck-kpi2__lab {
+  font-size:12.5px;
+  font-weight:500;
+  color:var(--tx-3);
+}
+
+.dck-front.dck-front .dck-kpi2__val {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:29px;
+  font-weight:600;
+  letter-spacing:-.03em;
+  line-height:1;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-kpi2__sub {
+  margin-top:9px;
+  font-size:12.5px;
+  color:var(--tx-3);
+}
+
+/* ── Empilements dans les cartes ────────────────────────────── */
+
+.dck-front.dck-front .dck-pile   { display:flex; flex-direction:column; gap:9px; }
+.dck-front.dck-front .dck-pile-l { display:flex; flex-direction:column; gap:15px; }
+
+/* ── Carte de tache ─────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-tc {
+  display:block;
+  padding:12px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:10px;
+  text-decoration:none;
+  transition:border-color .15s ease, transform .15s ease;
+}
+
+.dck-front.dck-front .dck-tc:hover {
+  border-color:var(--line-strong);
+  transform:translateY(-1px);
+  text-decoration:none;
+}
+
+.dck-front.dck-front .dck-tc__top {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin-bottom:8px;
+}
+
+.dck-front.dck-front .dck-tc__id {
+  font-family:var(--f-num);
+  font-size:11px;
+  font-weight:600;
+  color:var(--tx-4);
+}
+
+.dck-front.dck-front .dck-tc__top .dck-pill { margin-left:auto; }
+
+.dck-front.dck-front .dck-tc h5 {
+  font-size:13.5px;
+  font-weight:600;
+  line-height:1.4;
+  margin:0 0 9px;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-tc__meta {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  font-size:12px;
+  color:var(--tx-3);
+}
+
+.dck-front.dck-front .dck-tc__ech {
+  margin-left:auto;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+}
+
+.dck-front.dck-front .dck-tc__ech.is-late { color:var(--err); font-weight:600; }
+
+/* ── Barres de progression ──────────────────────────────────── */
+
+.dck-front.dck-front .dck-bar {
+  display:block;
+  height:6px;
+  border-radius:var(--r-full);
+  background:var(--surface-3);
+  overflow:hidden;
+}
+
+.dck-front.dck-front .dck-bar > i {
+  display:block;
+  height:100%;
+  border-radius:var(--r-full);
+  background:var(--tx);
+}
+
+.dck-front.dck-front .dck-bar.is-ok   > i { background:var(--ok); }
+.dck-front.dck-front .dck-bar.is-warn > i { background:var(--warn); }
+
+/* ── Ma semaine ─────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-bl {
+  display:flex;
+  align-items:center;
+  gap:11px;
+  margin-bottom:11px;
+}
+
+.dck-front.dck-front .dck-bl__j {
+  flex:0 0 74px;
+  font-size:12.5px;
+  color:var(--tx-3);
+  text-transform:capitalize;
+}
+
+.dck-front.dck-front .dck-bl .dck-bar { flex:1 1 auto; }
+
+.dck-front.dck-front .dck-bl__v {
+  flex:0 0 auto;
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:12.5px;
+  color:var(--tx-2);
+}
+
+.dck-front.dck-front .dck-total {
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  margin-top:16px;
+  padding-top:14px;
+  border-top:1px solid var(--line);
+  font-size:13px;
+  color:var(--tx-3);
+}
+
+.dck-front.dck-front .dck-total b {
+  margin-left:auto;
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:17px;
+  color:var(--tx);
+}
+
+/* ── Mes diligences ─────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-dl2 {
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  margin-bottom:6px;
+}
+
+.dck-front.dck-front .dck-lien2 {
+  font-size:13.5px;
+  color:var(--tx);
+  text-decoration:none;
+}
+
+.dck-front.dck-front .dck-lien2:hover { text-decoration:underline; }
+
+.dck-front.dck-front .dck-dl2 b {
+  margin-left:auto;
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:12.5px;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-dl2__sub {
+  font-size:11.5px;
+  color:var(--tx-4);
+  margin-top:5px;
+}
+
+/* ── Annonces ───────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-an { display:flex; gap:9px; }
+
+.dck-front.dck-front .dck-an__p {
+  flex:0 0 auto;
+  width:7px; height:7px;
+  border-radius:50%;
+  margin-top:6px;
+  background:var(--info);
+}
+
+.dck-front.dck-front .dck-an b {
+  font-size:13.5px;
+  font-weight:600;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-an__d {
+  font-family:var(--f-num);
+  font-size:11.5px;
+  color:var(--tx-4);
+  margin-top:2px;
+}
+
+/* ── Ma presence ────────────────────────────────────────────── */
+
+.dck-front.dck-front .dck-pres {
+  display:flex;
+  flex-direction:column;
+  gap:11px;
+}
+
+.dck-front.dck-front .dck-pres__l {
+  font-size:12.5px;
+  color:var(--tx-3);
+}
+
+.dck-front.dck-front .dck-pres b {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:17px;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-vide2 {
+  font-size:13px;
+  color:var(--tx-3);
+  margin:0;
+  padding:14px 0;
+}
+
+/* ── Adaptation aux petits ecrans ───────────────────────────── */
+
+/* Cinq indicateurs ne tiennent pas cote a cote sous 1400 px : la rangee
+   passe a trois, puis a deux, puis a une seule colonne. */
+@media (max-width:1280px) {
+  .dck-front.dck-front .dck-g5 { grid-template-columns:repeat(3, 1fr); }
+}
+
+@media (max-width:1200px) {
+  .dck-front.dck-front .dck-g23,
+  .dck-front.dck-front .dck-g3 { grid-template-columns:1fr; }
+  .dck-front.dck-front .dck-g4,
+  .dck-front.dck-front .dck-g5 { grid-template-columns:repeat(2, 1fr); }
+}
+
+@media (max-width:560px) {
+  .dck-front.dck-front .dck-g4,
+  .dck-front.dck-front .dck-g5 { grid-template-columns:1fr; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TABLEAU DE BORD DU CABINET — complements
+   ──────────────────────────────────────────────────────────────
+   Reprend les composants deja poses pour l'espace collaborateur
+   (.dck-grid, .dck-kpi2, .dck-bar, .dck-note) et ajoute ce que
+   PAGES.dashboard demande en propre : le graphique en aires a deux
+   series, sa legende, et le taux de cloture.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front .dck-g2 { grid-template-columns:repeat(2, 1fr); }
+
+/* Graphique a deux series */
+.dck-front.dck-front .dck-aires { display:block; width:100%; height:auto; }
+
+.dck-front.dck-front .dck-serie {
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.dck-front.dck-front .dck-serie--1 { stroke:#175CD3; }
+.dck-front.dck-front .dck-serie--2 { stroke:#0E7C5A; }
+
+.dck-front.dck-front .dck-legende2 {
+  display:flex;
+  gap:18px;
+  margin-top:14px;
+  font-size:12.5px;
+  color:var(--tx-2);
+}
+
+.dck-front.dck-front .dck-legende2 span {
+  display:flex;
+  align-items:center;
+  gap:7px;
+}
+
+.dck-front.dck-front .dck-legende2 i {
+  width:9px; height:9px;
+  border-radius:2.5px;
+  display:inline-block;
+  flex:0 0 auto;
+}
+
+/* Barre courte, dans une cellule de tableau */
+.dck-front.dck-front .dck-bar--min {
+  width:70px;
+  display:inline-block;
+  vertical-align:middle;
+  margin-right:8px;
+}
+
+.dck-front.dck-front .dck-av {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:12px;
+  color:var(--tx-3);
+}
+
+.dck-front.dck-front .dck-date.is-late { color:var(--err); font-weight:600; }
+
+/* Taux de cloture */
+.dck-front.dck-front .dck-taux {
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.dck-front.dck-front .dck-taux b {
+  font-family:var(--f-num);
+  font-variant-numeric:tabular-nums;
+  font-size:34px;
+  font-weight:600;
+  letter-spacing:-.03em;
+  line-height:1;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-taux .dck-bar { flex:1 1 auto; }
+
+.dck-front.dck-front .dck-note.is-warn {
+  background:var(--warn-bg);
+  border-color:var(--warn-line);
+  color:var(--warn);
+}
+
+@media (max-width:1200px) {
+  .dck-front.dck-front .dck-g2 { grid-template-columns:1fr; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ADAPTATION AUX PETITS ECRANS
+   ──────────────────────────────────────────────────────────────
+   Regle de conduite : la page ne defile jamais horizontalement.
+   Ce qui est large — tableaux, colonnes du tableau des taches,
+   graphiques — defile DANS son propre conteneur.
+
+   Les grilles des deux tableaux de bord ont deja leurs points de
+   rupture plus haut ; ce bloc traite ce qui restait : les tableaux
+   du theme, le tableau des taches, les en-tetes et les cartes.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Garde-fou : aucun element ne pousse la page au-dela de sa largeur. */
+.dck-front.dck-front { min-width:0; }
+.dck-front.dck-front img { max-width:100%; height:auto; }
+
+/* ── Tableaux du theme ──────────────────────────────────────────
+   .w-tables portait overflow:hidden pour respecter son rayon. Sur un
+   petit ecran, cela COUPAIT les colonnes de droite au lieu de les
+   laisser defiler : elles devenaient inaccessibles. Le defilement
+   horizontal est retabli — le rayon reste applique, un conteneur
+   defilant clippe aussi ses coins. */
+
+.dck-front.dck-front .w-tables {
+  overflow-x:auto;
+  overflow-y:visible;
+  -webkit-overflow-scrolling:touch;
+}
+
+.dck-front.dck-front .table-responsive,
+.dck-front.dck-front .dataTables_wrapper {
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Les barres d'outils DataTables s'empilent au lieu de se serrer. */
+@media (max-width:768px) {
+  .dck-front.dck-front .dataTables_wrapper > .row > [class^="col"],
+  .dck-front.dck-front .dataTables_wrapper > .row > [class*=" col"] {
+    width:100%;
+    max-width:100%;
+    flex:0 0 100%;
+  }
+
+  .dck-front.dck-front .dataTables_paginate { justify-content:center; display:flex; }
+  .dck-front.dck-front .dataTables_info { text-align:center; }
+}
+
+/* ── Tableau des taches ─────────────────────────────────────────
+   Les colonnes restent cote a cote et l'ensemble defile : les
+   empiler ferait perdre la lecture par statut, qui est tout
+   l'interet de cet ecran. */
+
+.dck-front.dck-front .w-task-board-panel {
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  padding-bottom:8px;
+}
+
+@media (max-width:768px) {
+  .dck-front.dck-front .board-panel {
+    min-width:270px;
+    flex:0 0 270px;
+  }
+
+  .dck-front.dck-front .w-task-board-box { padding:12px !important; }
+}
+
+/* ── En-tetes de page ───────────────────────────────────────── */
+
+@media (max-width:768px) {
+  .dck-chrome.dck-chrome .page-heading h2 {
+    flex-wrap:wrap;
+    gap:2px 7px;
+  }
+
+  .dck-chrome.dck-chrome .page-heading h2 > span:first-child {
+    font-size:15px !important;
+    max-width:100%;
+  }
+
+  /* Le chemin passe sous le titre quand la ligne ne suffit plus. */
+  .dck-chrome.dck-chrome .page-heading h2 > span:last-child {
+    flex:1 0 100%;
+    font-size:11.5px !important;
+  }
+}
+
+/* ── Cartes et blocs de contenu ─────────────────────────────── */
+
+@media (max-width:768px) {
+  .dck-front.dck-front .dck-c__head {
+    flex-wrap:wrap;
+    gap:6px 10px;
+  }
+
+  .dck-front.dck-front .dck-c__right {
+    margin-left:0;
+    width:100%;
+  }
+
+  .dck-front.dck-front .dck-c__body { padding:14px; }
+
+  /* Les indicateurs gagnent en hauteur ce qu'ils perdent en largeur. */
+  .dck-front.dck-front .dck-kpi2__val,
+  .dck-front.dck-front .dck-k__val { font-size:25px; }
+
+  .dck-front.dck-front .dck-taux b { font-size:28px; }
+}
+
+/* ── Barres de la semaine et de repartition ─────────────────── */
+
+@media (max-width:560px) {
+  .dck-front.dck-front .dck-bl { gap:8px; }
+  .dck-front.dck-front .dck-bl__j { flex:0 0 62px; font-size:11.5px; }
+  .dck-front.dck-front .dck-bl__v { font-size:11.5px; }
+}
+
+/* ── Bandeaux d'alerte ──────────────────────────────────────── */
+
+@media (max-width:640px) {
+  .dck-front.dck-front .dck-note { flex-wrap:wrap; }
+
+  .dck-front.dck-front .dck-note__act {
+    margin-left:0;
+    width:100%;
+    text-align:center;
+  }
+}
+
+/* ── Formulaires ────────────────────────────────────────────── */
+
+@media (max-width:768px) {
+  /* Les boutons d'un pied de formulaire prennent toute la largeur
+     plutot que de se chevaucher. */
+  .dck-front.dck-front .modal-footer,
+  .dck-front.dck-front .form-actions {
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
+  }
+
+  .dck-front.dck-front .modal-footer > .btn,
+  .dck-front.dck-front .form-actions > .btn {
+    width:100%;
+    margin:0 !important;
+  }
+}
+
+/* ── Panneau lateral ────────────────────────────────────────── */
+
+@media (max-width:768px) {
+  .dck-front.dck-front .right-modal,
+  .dck-front.dck-front #right-modal-content { width:100% !important; }
+}
+
+/* ── Cartes de fichiers ─────────────────────────────────────── */
+
+@media (max-width:560px) {
+  .dck-front.dck-front .file-card {
+    width:100% !important;
+    margin-right:0 !important;
+  }
+}
+
+/* ── Fiches de detail ───────────────────────────────────────── */
+
+@media (max-width:900px) {
+  .dck-detail-head .dck-grid { grid-template-columns:repeat(2, 1fr); }
+}
+
+@media (max-width:560px) {
+  .dck-detail-head .dck-grid { grid-template-columns:1fr; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   MENU DU PROFIL — conforme a dck-flow-task
+   ──────────────────────────────────────────────────────────────
+       .pop-menu        196px mini, 6px de marge interne
+       .pop-lab         11px / 600, interlettrage .06em, majuscules
+       .pop-sep         filet de 1px, 5px 4px de marge
+       .pop-menu button gap 9px, padding 8px 10px
+       .danger          rouge, fond rouge pale au survol
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-chrome.dck-chrome .sidebar-brand-dropdown {
+  min-width:216px;
+  padding:6px !important;
+  border:1px solid var(--line) !important;
+  border-radius:var(--r-sm) !important;
+  box-shadow:0 8px 28px rgba(15,20,25,.12) !important;
+}
+
+/* Intitule de section */
+.dck-chrome.dck-chrome .dck-pop__lab {
+  padding:7px 10px 4px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  color:var(--tx-4);
+}
+
+/* Adresse du compte : elle peut etre longue, elle se coupe proprement */
+.dck-chrome.dck-chrome .dck-pop__mail {
+  padding:0 10px 8px;
+  font-size:12.5px;
+  color:var(--tx-3);
+  word-break:break-all;
+  line-height:1.4;
+}
+
+.dck-chrome.dck-chrome .dck-pop__sep {
+  height:1px;
+  margin:5px 4px;
+  background:var(--line);
+}
+
+/* Entrees */
+.dck-chrome.dck-chrome .dck-pop__item {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  width:100%;
+  margin:0;
+  padding:8px 10px;
+  border:0;
+  background:none;
+  border-radius:var(--r-sm);
+  font-size:13.5px;
+  font-weight:400;
+  color:var(--tx-2);
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.dck-chrome.dck-chrome .dck-pop__item:hover {
+  background:var(--surface-3);
+  color:var(--tx);
+  text-decoration:none;
+}
+
+.dck-chrome.dck-chrome .dck-pop__item i {
+  font-size:15px;
+  opacity:.75;
+  flex:0 0 auto;
+  line-height:1;
+}
+
+/* Deconnexion : la seule action destructrice du menu */
+.dck-chrome.dck-chrome .dck-pop__item.is-danger { color:var(--err); }
+
+.dck-chrome.dck-chrome .dck-pop__item.is-danger:hover {
+  background:var(--err-bg);
+  color:var(--err);
+}
+
+/* L'interrupteur de theme reste dans le document — le libelle
+   « Changer de theme » l'actionne — mais il ne s'affiche plus. */
+.dck-chrome.dck-chrome .dck-pop__bascule {
+  position:absolute;
+  width:1px;
+  height:1px;
+  padding:0;
+  margin:-1px;
+  overflow:hidden;
+  clip:rect(0, 0, 0, 0);
+  white-space:nowrap;
+  border:0;
+}
+
+/* Il doit rester atteignable au clavier : le focus se voit sur
+   l'entree qui lui sert de libelle. */
+.dck-chrome.dck-chrome .dck-pop__bascule:focus-visible + * ,
+.dck-chrome.dck-chrome .dck-pop__item:focus-visible {
+  outline:2px solid var(--act);
+  outline-offset:-2px;
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   PIED DE LA BARRE LATERALE — identite du collaborateur
+   ──────────────────────────────────────────────────────────────
+       .sb-foot       filet superieur, 10px 12px
+       .sb-user       pleine largeur, gap 10px, padding 8px
+       .avatar        34x34, rond, initiales sur fond clair
+       .sb-user-txt b 13,5px / 600, coupe par des points de suspension
+       small          12px, --tx-3
+
+   La barre devient une colonne : le menu occupe la place restante et
+   defile, le pied reste colle en bas. Le menu du profil remonte, la
+   place manquant sous lui.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-chrome.dck-chrome .main-sidebar {
+  display:flex;
+  flex-direction:column;
+  height:100%;
+}
+
+.dck-chrome.dck-chrome .sidebar-brand-box { flex:0 0 auto; }
+
+.dck-chrome.dck-chrome .sidebar-menu {
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+}
+
+.dck-chrome.dck-chrome .dck-foot {
+  flex:0 0 auto;
+  border-top:1px solid var(--line);
+  padding:10px 12px;
+  /* Le bouton de repli occupe le bas de la barre : on lui laisse la place. */
+  margin-bottom:38px;
+}
+
+/* Le declencheur */
+.dck-chrome.dck-chrome .dck-user {
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px;
+  border:0;
+  background:none;
+  border-radius:var(--r-sm);
+  text-align:left;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.dck-chrome.dck-chrome .dck-user:hover {
+  background:var(--surface-3);
+  text-decoration:none;
+}
+
+.dck-chrome.dck-chrome .dck-user__av {
+  flex:0 0 auto;
+  display:grid;
+  place-items:center;
+  width:34px;
+  height:34px;
+  border-radius:var(--r-full);
+  background:var(--surface-3);
+  border:1px solid var(--line);
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--tx-2);
+  letter-spacing:.02em;
+}
+
+.dck-chrome.dck-chrome .dck-user__txt {
+  flex:1 1 auto;
+  min-width:0;
+}
+
+.dck-chrome.dck-chrome .dck-user__txt b {
+  display:block;
+  font-size:13.5px;
+  font-weight:600;
+  color:var(--tx);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.dck-chrome.dck-chrome .dck-user__txt small {
+  display:block;
+  font-size:12px;
+  color:var(--tx-3);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+/* Le menu s'ouvre vers le haut et s'aligne sur le bord gauche. */
+.dck-chrome.dck-chrome .dck-foot .dropdown-menu {
+  bottom:100%;
+  top:auto;
+  left:0;
+  right:auto;
+  margin:0 0 6px !important;
+  transform:none !important;
+}
+
+/* En mode reduit, seul l'avatar reste : le nom et la fonction
+   n'auraient plus la place de s'afficher. */
+body.sidebar-toggled .dck-chrome.dck-chrome .dck-user__txt,
+.mini-sidebar .dck-chrome.dck-chrome .dck-user__txt { display:none; }
+
+body.sidebar-toggled .dck-chrome.dck-chrome .dck-user,
+.mini-sidebar .dck-chrome.dck-chrome .dck-user { justify-content:center; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   CORRECTIFS DU PIED DE BARRE ET DES MENUS
+   ──────────────────────────────────────────────────────────────
+   Deux defauts constates a l'ecran :
+
+   1. Le menu du profil se superposait au bloc utilisateur. Son
+      conteneur n'etait pas positionne : le menu, en absolu, se calait
+      donc sur un ancetre quelconque au lieu du pied.
+
+   2. En theme sombre, ce menu et les sous-menus du volet restaient
+      blancs. Les jetons sombres couvrent .dck-chrome, mais ces deux
+      elements recoivent un fond en dur depuis main.css, avec une
+      specificite superieure.
+   ══════════════════════════════════════════════════════════════ */
+
+/* 1. Le pied sert de repere au menu qu'il ouvre. */
+.dck-chrome.dck-chrome .dck-foot { position:relative; }
+
+.dck-chrome.dck-chrome .dck-foot .dropdown-menu {
+  /* Le declencheur porte data-display="static" : Bootstrap n'appelle
+     donc pas Popper et n'ecrit aucun style inline. Le positionnement
+     de .dropup s'applique, il suffit de l'ajuster. */
+  bottom:calc(100% + 6px);
+  left:12px;
+  right:auto;
+  margin:0 !important;
+}
+
+/* 2. Theme sombre — menu du profil */
+
+.dark-theme .dck-chrome.dck-chrome .sidebar-brand-dropdown {
+  background:var(--surface-2) !important;
+  border-color:var(--line) !important;
+  box-shadow:0 8px 28px rgba(0,0,0,.5) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .dck-pop__lab { color:var(--tx-4) !important; }
+.dark-theme .dck-chrome.dck-chrome .dck-pop__mail { color:var(--tx-3) !important; }
+.dark-theme .dck-chrome.dck-chrome .dck-pop__sep { background:var(--line) !important; }
+
+.dark-theme .dck-chrome.dck-chrome .dck-pop__item { color:var(--tx-2) !important; }
+
+.dark-theme .dck-chrome.dck-chrome .dck-pop__item:hover {
+  background:var(--surface-3) !important;
+  color:var(--tx) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .dck-pop__item.is-danger { color:var(--err) !important; }
+
+.dark-theme .dck-chrome.dck-chrome .dck-pop__item.is-danger:hover {
+  background:var(--err-bg) !important;
+}
+
+/* 2b. Theme sombre — sous-menus du volet
+   Le panneau qui liste Contrats, Diligences et Taches sortait en blanc
+   sur fond sombre. */
+
+.dark-theme .dck-chrome.dck-chrome .accordionItemContent,
+.dark-theme .dck-chrome.dck-chrome .accordionItemContent > div {
+  background:transparent !important;
+  border-left-color:var(--line) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .accordionItemContent a {
+  background:transparent !important;
+  color:var(--tx-2) !important;
+}
+
+.dark-theme .dck-chrome.dck-chrome .accordionItemContent a:hover,
+.dark-theme .dck-chrome.dck-chrome .accordionItemContent a.active {
+  background:var(--surface-3) !important;
+  color:var(--tx) !important;
+}
+
+/* 2c. Theme sombre — identite du pied */
+
+.dark-theme .dck-chrome.dck-chrome .dck-foot { border-top-color:var(--line); }
+
+.dark-theme .dck-chrome.dck-chrome .dck-user__av {
+  background:var(--surface-3);
+  border-color:var(--line);
+  color:var(--tx-2);
+}
+
+.dark-theme .dck-chrome.dck-chrome .dck-user__txt b { color:var(--tx); }
+.dark-theme .dck-chrome.dck-chrome .dck-user__txt small { color:var(--tx-3); }
+.dark-theme .dck-chrome.dck-chrome .dck-user:hover { background:var(--surface-3); }
+
+/* 2d. Theme sombre — bloc de marque et bouton de repli */
+
+.dark-theme .dck-chrome.dck-chrome .sidebar-brand-box {
+  background:var(--surface) !important;
+  border-bottom-color:var(--line);
+}
+
+.dark-theme .dck-chrome.dck-chrome .sidebarTogglerBox {
+  background:var(--surface) !important;
+  border-top-color:var(--line);
+}
+
+
+/* Les declencheurs du pied et du menu sont des boutons : on neutralise
+   les styles propres au bouton natif (police heritee, alignement,
+   apparence systeme) pour qu'ils se lisent comme les entrees voisines. */
+.dck-chrome.dck-chrome button.dck-user,
+.dck-chrome.dck-chrome button.dck-pop__item {
+  font-family:inherit;
+  font-size:inherit;
+  line-height:inherit;
+  text-align:left;
+  appearance:none;
+  -webkit-appearance:none;
+}
+
+.dck-chrome.dck-chrome button.dck-pop__item { font-size:13.5px; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   3. PIECES HERITEES NON COUVERTES
+   Cinq familles de classes que main.css habille encore a sa
+   facon et qu'aucune regle dck- ne rattrapait. Elles n'ont pas
+   de classe dck-, elles etaient donc passees au travers de
+   l'audit precedent — mais elles s'affichent bien a l'ecran.
+
+   La double classe .dck-front.dck-front porte la specificite a
+   (0,2,1), au-dessus des (0,1,0) de main.css. Les couleurs sont
+   ecrites en jetons, qui sont redefinis sous .dark-theme : le
+   theme sombre suit donc sans regle supplementaire.
+   ══════════════════════════════════════════════════════════════ */
+
+/* 3a. Petits boutons — maquette .btn-sm
+   Presents dans les barres d'action des listes et des onglets. */
+
+.dck-front.dck-front .btn-sm,
+.dck-front.dck-front .btn-group-sm > .btn {
+  padding:6px 11px;
+  font-size:12.5px;
+  line-height:1.35;
+  border-radius:var(--r-sm);
+}
+
+.dck-front.dck-front .btn-sm svg,
+.dck-front.dck-front .btn-sm i { width:13px; height:13px; font-size:13px; }
+
+/* 3b. Pagination — maquette .pager
+   Bootstrap rend une <ul class="pagination"> avec des .page-item /
+   .page-link ; la maquette utilise des boutons. On transpose la
+   facture sans toucher au balisage produit par Laravel. */
+
+.dck-front.dck-front .pagination {
+  display:flex;
+  gap:4px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+
+.dck-front.dck-front .pagination .page-item { margin:0; }
+
+.dck-front.dck-front .pagination .page-link {
+  display:grid;
+  place-items:center;
+  min-width:31px;
+  height:31px;
+  padding:0 8px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--surface);
+  font-family:var(--f-num);
+  font-size:12.5px;
+  color:var(--tx-2);
+  box-shadow:none;
+}
+
+.dck-front.dck-front .pagination .page-link:hover {
+  background:var(--surface-3);
+  border-color:var(--line);
+  color:var(--tx);
+}
+
+.dck-front.dck-front .pagination .page-link:focus-visible {
+  outline:2px solid var(--act);
+  outline-offset:2px;
+  box-shadow:none;
+}
+
+.dck-front.dck-front .pagination .page-item.active .page-link {
+  background:var(--act);
+  border-color:var(--act);
+  color:var(--act-tx);
+  font-weight:600;
+}
+
+.dck-front.dck-front .pagination .page-item.disabled .page-link {
+  opacity:.4;
+  cursor:not-allowed;
+  background:var(--surface);
+  color:var(--tx-4);
+}
+
+/* 3c. Barres de progression — maquette .bar
+   Visibles sur l'avancement des diligences et le temps de la
+   semaine. Bootstrap empile .progress (rail) et .progress-bar
+   (remplissage), ce qui correspond au .bar > i de la maquette. */
+
+.dck-front.dck-front .progress {
+  height:6px;
+  border-radius:var(--r-full);
+  background:var(--surface-3);
+  overflow:hidden;
+  box-shadow:none;
+}
+
+.dck-front.dck-front .progress-bar {
+  height:100%;
+  border-radius:var(--r-full);
+  background:var(--tx);
+  box-shadow:none;
+  transition:width .6s cubic-bezier(.2,.7,.3,1);
+}
+
+/* Les variantes de couleur de Bootstrap sont ramenees aux jetons
+   de statut, pour que l'avancement se lise comme les pastilles. */
+.dck-front.dck-front .progress-bar.bg-success { background:var(--ok); }
+.dck-front.dck-front .progress-bar.bg-warning { background:var(--warn); }
+.dck-front.dck-front .progress-bar.bg-danger  { background:var(--err); }
+.dck-front.dck-front .progress-bar.bg-primary { background:var(--tx); }
+.dck-front.dck-front .progress-bar.bg-grey    { background:var(--line-strong); }
+
+/* 3d. Boutons d'appreciation des commentaires
+   Deux boutons pouce leve / pouce baisse sous chaque commentaire
+   de tache. Aucun style ne les couvrait : ils sortaient en bouton
+   Bootstrap brut. */
+
+.dck-front.dck-front .comment-like {
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:3px 9px;
+  border:1px solid var(--line);
+  border-radius:var(--r-full);
+  background:var(--surface);
+  font-size:12px;
+  color:var(--tx-3);
+  transition:background .15s, color .15s, border-color .15s;
+}
+
+.dck-front.dck-front .comment-like:hover {
+  background:var(--surface-3);
+  border-color:var(--line-strong);
+  color:var(--tx);
+}
+
+.dck-front.dck-front .comment-like.active {
+  background:var(--surface-3);
+  border-color:var(--line-strong);
+  color:var(--tx);
+  font-weight:600;
+}
+
+/* 3e. Rangee des widgets historiques du tableau de bord
+   collaborateur. Ces widgets ne s'affichent que si l'un d'eux
+   reste actif dans les reglages ; sans cette regle, leur rangee
+   n'avait aucun espacement propre sous le bloc de pilotage. */
+
+.dck-front.dck-front .emp-dash-detail { margin-top:14px; }
+
+.dck-front.dck-front .emp-dash-detail .card,
+.dck-front.dck-front .emp-dash-detail .bg-white {
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  background:var(--surface);
+  box-shadow:none;
+}
+
+/* ── Fiche collaborateur ────────────────────────────────────────
+   Les quatre indicateurs de l'en-tete, puis le repli qui contient
+   les informations administratives. */
+
+.dck-front.dck-front .dck-emp-kpi {
+  padding:14px 0 4px !important;
+  background:transparent !important;
+}
+
+/* Une grille plutot qu'un « justify-content:between » : les quatre
+   colonnes gardent la meme largeur quel que soit le nombre de
+   chiffres, et se replient a deux sur les petits ecrans. */
+.dck-front.dck-front .dck-emp-kpi__row {
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:10px;
+}
+
+.dck-front.dck-front .dck-emp-kpi__c {
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  min-width:0;
+  padding:9px 11px;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  background:var(--surface-2);
+}
+
+.dck-front.dck-front .dck-emp-kpi__c label {
+  margin:0;
+  font-size:11px;
+  line-height:1.3;
+  color:var(--tx-4);
+  overflow-wrap:anywhere;
+}
+
+.dck-front.dck-front .dck-emp-kpi__c p {
+  margin:0;
+  font-family:var(--f-num);
+  font-size:21px;
+  font-weight:600;
+  line-height:1.1;
+  color:var(--tx);
+}
+
+.dck-front.dck-front .dck-emp-kpi__u {
+  font-size:13px;
+  font-weight:500;
+  color:var(--tx-4);
+}
+
+.dck-front.dck-front .dck-emp-kpi__vide { color:var(--tx-4); }
+
+/* Un retard se signale, il ne se devine pas. */
+.dck-front.dck-front .dck-emp-kpi__c.is-alerte {
+  border-color:var(--err-line);
+  background:var(--err-bg);
+}
+.dck-front.dck-front .dck-emp-kpi__c.is-alerte p { color:var(--err); }
+
+.dck-front.dck-front .dck-emp-kpi__note {
+  margin:9px 0 0;
+  font-size:11.5px;
+  color:var(--tx-4);
+}
+
+@media (max-width:640px) {
+  .dck-front.dck-front .dck-emp-kpi__row {
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ── Repli des informations complementaires ─────────────────── */
+
+.dck-front.dck-front .dck-emp-plus {
+  margin:2px 0 10px;
+  border-top:1px solid var(--line);
+  padding-top:10px;
+}
+
+.dck-front.dck-front .dck-emp-plus > summary {
+  cursor:pointer;
+  list-style:none;
+  display:flex;
+  align-items:center;
+  gap:7px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--tx-3);
+  user-select:none;
+}
+
+.dck-front.dck-front .dck-emp-plus > summary::-webkit-details-marker { display:none; }
+
+/* Chevron dessine en CSS : pas de dependance a une police d'icones
+   pour un simple indicateur d'ouverture. */
+.dck-front.dck-front .dck-emp-plus > summary::before {
+  content:"";
+  width:6px;
+  height:6px;
+  border-right:1.6px solid currentColor;
+  border-bottom:1.6px solid currentColor;
+  transform:rotate(-45deg);
+  transition:transform .15s ease;
+}
+
+.dck-front.dck-front .dck-emp-plus[open] > summary::before {
+  transform:rotate(45deg);
+}
+
+.dck-front.dck-front .dck-emp-plus > summary:hover { color:var(--act); }
+
+.dck-front.dck-front .dck-emp-plus__corps { padding-top:12px; }
+
+
+/* ══════════════════════════════════════════════════════════════
+   Rapport hebdomadaire des taches
+   ────────────────────────────────────────────────────────────
+   Reprend les jetons de la charte : aucune couleur en dur, tout
+   passe par les variables de .dck-front.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front .dck-hebdo { padding:20px 22px 26px; }
+
+/* ── En-tete et navigation de semaine ───────────────────────── */
+.dck-front.dck-front .dck-hebdo__tete {
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:18px;
+}
+.dck-front.dck-front .dck-hebdo__tete h1 {
+  margin:0 0 3px;
+  font-size:21px;
+  font-weight:600;
+  letter-spacing:-.01em;
+}
+.dck-front.dck-front .dck-hebdo__tete p { margin:0; font-size:13px; color:var(--tx-3); }
+
+.dck-front.dck-front .dck-hebdo__sem { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.dck-front.dck-front .dck-hebdo__b {
+  display:inline-flex;
+  align-items:center;
+  height:36px;
+  padding:0 12px;
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  background:var(--surface);
+  color:var(--tx-2);
+  font-size:13px;
+  font-weight:500;
+  white-space:nowrap;
+  text-decoration:none;
+  cursor:pointer;
+}
+.dck-front.dck-front .dck-hebdo__b:hover {
+  background:var(--surface-3);
+  color:var(--tx);
+  text-decoration:none;
+}
+.dck-front.dck-front .dck-hebdo__b.is-actif {
+  background:var(--act);
+  border-color:var(--act);
+  color:var(--act-tx);
+}
+
+/* ── Indicateurs ────────────────────────────────────────────── */
+.dck-front.dck-front .dck-hebdo__grille {
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:12px;
+  margin-bottom:18px;
+}
+.dck-front.dck-front .dck-hebdo__k {
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+  padding:13px 15px;
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  background:var(--surface);
+  text-align:left;
+  font:inherit;
+  color:inherit;
+}
+.dck-front.dck-front button.dck-hebdo__k {
+  cursor:pointer;
+  transition:border-color .14s ease, box-shadow .14s ease;
+}
+.dck-front.dck-front button.dck-hebdo__k:hover {
+  border-color:var(--line-strong);
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.dck-front.dck-front button.dck-hebdo__k.is-selectionne {
+  border-color:var(--act);
+  box-shadow:0 0 0 1px var(--act);
+}
+.dck-front.dck-front .dck-hebdo__kl { font-size:11.5px; color:var(--tx-4); }
+.dck-front.dck-front .dck-hebdo__kv {
+  font-family:var(--f-num);
+  font-size:26px;
+  font-weight:600;
+  line-height:1.1;
+}
+.dck-front.dck-front .dck-hebdo__ks { font-size:11.5px; color:var(--tx-4); }
+
+.dck-front.dck-front .dck-hebdo__k.is-ok { background:var(--ok-bg); border-color:var(--ok-line); }
+.dck-front.dck-front .dck-hebdo__k.is-ok .dck-hebdo__kv { color:var(--ok); }
+.dck-front.dck-front .dck-hebdo__k.is-err { background:var(--err-bg); border-color:var(--err-line); }
+.dck-front.dck-front .dck-hebdo__k.is-err .dck-hebdo__kv { color:var(--err); }
+
+/* ── Note d'avertissement ───────────────────────────────────── */
+.dck-front.dck-front .dck-hebdo__note {
+  display:flex;
+  gap:11px;
+  padding:13px 15px;
+  margin-bottom:18px;
+  background:var(--warn-bg);
+  border:1px solid var(--warn-line);
+  border-radius:var(--r);
+  font-size:13px;
+}
+.dck-front.dck-front .dck-hebdo__note b { display:block; margin-bottom:2px; }
+.dck-front.dck-front .dck-hebdo__note p { margin:0; color:var(--tx-2); }
+
+/* ── Blocs ──────────────────────────────────────────────────── */
+.dck-front.dck-front .dck-hebdo__bloc {
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  margin-bottom:18px;
+  overflow:hidden;
+}
+.dck-front.dck-front .dck-hebdo__bt {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+}
+.dck-front.dck-front .dck-hebdo__bt h2 { margin:0; font-size:14.5px; font-weight:600; }
+.dck-front.dck-front .dck-hebdo__bt span { font-size:12px; color:var(--tx-4); }
+
+/* ── Filtres ────────────────────────────────────────────────── */
+.dck-front.dck-front .dck-hebdo__filtres {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  padding:12px 16px;
+  border-bottom:1px solid var(--line);
+  background:var(--surface-2);
+}
+.dck-front.dck-front .dck-hebdo__filtres select,
+.dck-front.dck-front .dck-hebdo__filtres input {
+  height:34px;
+  padding:0 10px;
+  font-size:13px;
+  font-family:inherit;
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  background:var(--surface);
+  color:var(--tx);
+  min-width:0;
+}
+.dck-front.dck-front .dck-hebdo__filtres input[type=search] { flex:1; min-width:170px; }
+.dck-front.dck-front .dck-hebdo__exp { margin-left:auto; display:flex; gap:8px; }
+.dck-front.dck-front .dck-hebdo__exp button {
+  height:34px;
+  padding:0 12px;
+  font-size:12.5px;
+  font-weight:500;
+  font-family:inherit;
+  border:1px solid var(--line);
+  border-radius:var(--r-sm);
+  background:var(--surface);
+  color:var(--tx-2);
+  cursor:pointer;
+}
+.dck-front.dck-front .dck-hebdo__exp button:hover { background:var(--surface-3); }
+
+/* ── Bandeau du filtre actif ────────────────────────────────── */
+.dck-front.dck-front .dck-hebdo__actif {
+  display:none;
+  align-items:center;
+  gap:10px;
+  padding:10px 16px;
+  background:var(--info-bg);
+  border-bottom:1px solid var(--info-line);
+  font-size:13px;
+}
+.dck-front.dck-front .dck-hebdo__actif.is-visible { display:flex; }
+.dck-front.dck-front .dck-hebdo__actif b { color:var(--info); }
+.dck-front.dck-front .dck-hebdo__actif button {
+  margin-left:auto;
+  height:28px;
+  padding:0 10px;
+  font-size:12px;
+  font-family:inherit;
+  border:1px solid var(--info-line);
+  border-radius:var(--r-sm);
+  background:var(--surface);
+  color:var(--tx-2);
+  cursor:pointer;
+}
+
+/* ── Tableaux ───────────────────────────────────────────────── */
+.dck-front.dck-front .dck-hebdo__scroll { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.dck-front.dck-front .dck-hebdo__tbl { width:100%; border-collapse:collapse; font-size:13px; }
+.dck-front.dck-front .dck-hebdo__tbl th {
+  text-align:left;
+  padding:9px 12px;
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+  color:var(--tx-4);
+  background:var(--surface-2);
+  border-bottom:1px solid var(--line);
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-hebdo__tbl td {
+  padding:10px 12px;
+  border-bottom:1px solid var(--line);
+  vertical-align:top;
+}
+.dck-front.dck-front .dck-hebdo__tbl tbody tr:last-child td { border-bottom:0; }
+.dck-front.dck-front .dck-hebdo__tbl tbody tr:hover { background:var(--surface-2); }
+
+.dck-front.dck-front .dck-hebdo__n {
+  font-family:var(--f-num);
+  font-size:12px;
+  white-space:nowrap;
+  color:var(--tx-2);
+}
+.dck-front.dck-front .dck-hebdo__ref {
+  font-family:var(--f-num);
+  font-size:11px;
+  color:var(--tx-4);
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-hebdo__ttl {
+  display:block;
+  max-width:290px;
+  font-weight:600;
+  color:var(--tx);
+  text-decoration:none;
+  overflow-wrap:anywhere;
+}
+.dck-front.dck-front .dck-hebdo__ttl:hover { color:var(--act); text-decoration:underline; }
+.dck-front.dck-front .dck-hebdo__sous {
+  max-width:290px;
+  margin-top:2px;
+  font-size:11.5px;
+  color:var(--tx-4);
+  overflow-wrap:anywhere;
+}
+
+/* Compteurs cliquables du tableau par collaborateur */
+.dck-front.dck-front .dck-hebdo__cpt {
+  padding:2px 7px;
+  border:0;
+  border-radius:var(--r-sm);
+  background:none;
+  font-family:var(--f-num);
+  font-size:12.5px;
+  font-weight:600;
+  color:var(--tx);
+  cursor:pointer;
+  text-decoration:underline;
+  text-decoration-color:var(--line-strong);
+  text-underline-offset:3px;
+}
+.dck-front.dck-front .dck-hebdo__cpt:hover {
+  background:var(--surface-3);
+  text-decoration-color:var(--tx);
+}
+.dck-front.dck-front .dck-hebdo__cpt[disabled] {
+  color:var(--tx-4);
+  cursor:default;
+  text-decoration:none;
+  background:none;
+}
+.dck-front.dck-front .dck-hebdo__cpt.est-retard:not([disabled]) { color:var(--err); }
+
+/* Pastilles */
+.dck-front.dck-front .dck-hebdo__p {
+  display:inline-block;
+  padding:2px 8px;
+  border:1px solid;
+  border-radius:var(--r-full);
+  font-size:11px;
+  font-weight:600;
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-hebdo__p.is-ok { background:var(--ok-bg); border-color:var(--ok-line); color:var(--ok); }
+.dck-front.dck-front .dck-hebdo__p.is-info { background:var(--info-bg); border-color:var(--info-line); color:var(--info); }
+.dck-front.dck-front .dck-hebdo__p.is-warn { background:var(--warn-bg); border-color:var(--warn-line); color:var(--warn); }
+.dck-front.dck-front .dck-hebdo__p.is-err { background:var(--err-bg); border-color:var(--err-line); color:var(--err); }
+.dck-front.dck-front .dck-hebdo__p.is-neutre { background:var(--surface-3); border-color:var(--line); color:var(--tx-2); }
+
+/* Collaborateurs */
+.dck-front.dck-front .dck-hebdo__gens { display:flex; flex-wrap:wrap; gap:4px; max-width:210px; }
+.dck-front.dck-front .dck-hebdo__g {
+  display:inline-flex;
+  align-items:center;
+  height:22px;
+  padding:0 8px;
+  border:1px solid var(--line);
+  border-radius:var(--r-full);
+  background:var(--surface-3);
+  font-size:11.5px;
+  white-space:nowrap;
+}
+.dck-front.dck-front .dck-hebdo__vide { color:var(--tx-4); font-style:italic; font-size:12px; }
+
+.dck-front.dck-front .dck-hebdo__rien {
+  display:none;
+  padding:34px 16px;
+  text-align:center;
+  color:var(--tx-4);
+  font-size:13px;
+}
+.dck-front.dck-front .dck-hebdo__rien.is-visible { display:block; }
+
+/* ── Petits ecrans ──────────────────────────────────────────── */
+@media (max-width:1100px) {
+  .dck-front.dck-front .dck-hebdo__grille { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width:640px) {
+  .dck-front.dck-front .dck-hebdo { padding:14px 12px 20px; }
+  .dck-front.dck-front .dck-hebdo__grille { gap:9px; }
+  .dck-front.dck-front .dck-hebdo__kv { font-size:21px; }
+  .dck-front.dck-front .dck-hebdo__exp { margin-left:0; width:100%; }
+}
+
+/* ── Impression ─────────────────────────────────────────────── */
+@media print {
+  .dck-hebdo__sem,
+  .dck-hebdo__filtres,
+  .dck-hebdo__actif,
+  .main-sidebar,
+  .filter-box { display:none !important; }
+
+  .dck-hebdo__bloc { break-inside:avoid; border-color:#999; }
+  .dck-hebdo__scroll { overflow:visible !important; }
+}
+
+
+/* ══════════════════════════════════════════════════════════════
+   Barre laterale repliee : bascule vers la marque carree
+   ────────────────────────────────────────────────────────────
+   Replier ramene la barre a 3.77rem. Le logo horizontal, qui
+   porte le nom, y serait ecrase et illisible : on lui substitue
+   la marque carree, puis on revient a l'horizontal des que la
+   barre se redeploie au survol.
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-chrome.dck-chrome .dck-marque {
+  display:none;
+  max-width:34px;
+  line-height:0;
+}
+
+.dck-chrome.dck-chrome .dck-marque img {
+  width:34px;
+  height:34px;
+  object-fit:contain;
+}
+
+/* Theme sombre : le favicon est noir et disparaitrait sur la barre.
+   Le filtre le ramene a une silhouette blanche — la meme operation
+   fonctionnera avec n'importe quel logo futur, quelle que soit sa
+   couleur, sans reglage supplementaire a maintenir. */
+body.dark-theme .dck-chrome.dck-chrome .dck-marque img {
+  filter:brightness(0) invert(1);
+}
+
+/* Replie : la marque carree prend la place du logo horizontal. */
+.sidebar-toggled .dck-chrome.dck-chrome .sidebar-brand-name { display:none; }
+.sidebar-toggled .dck-chrome.dck-chrome .dck-marque { display:block; }
+
+/* Au survol, la barre se redeploie : on rend la main a l'horizontal. */
+.sidebar-toggled .dck-chrome.dck-chrome .main-sidebar:hover .sidebar-brand-name { display:block; }
+.sidebar-toggled .dck-chrome.dck-chrome .main-sidebar:hover .dck-marque { display:none; }
+
+/* ══════════════════════════════════════════════════════════════
+   Importation massive de taches
+   ══════════════════════════════════════════════════════════════ */
+
+.dck-front.dck-front .dck-import { padding:20px 22px 26px; max-width:1000px; }
+
+.dck-front.dck-front .dck-import__tete { margin-bottom:20px; }
+.dck-front.dck-front .dck-import__tete h2 { margin:0 0 3px; font-size:20px; font-weight:600; }
+.dck-front.dck-front .dck-import__tete p { margin:0; font-size:13px; color:var(--tx-3); }
+
+.dck-front.dck-front .dck-import__etape {
+  display:flex; gap:14px; padding:18px;
+  background:var(--surface); border:1px solid var(--line);
+  border-radius:var(--r); margin-bottom:14px;
+}
+.dck-front.dck-front .dck-import__num {
+  flex:0 0 28px; width:28px; height:28px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:50%; background:var(--act); color:var(--act-tx);
+  font-family:var(--f-num); font-size:13px; font-weight:600;
+}
+.dck-front.dck-front .dck-import__corps { flex:1; min-width:0; }
+.dck-front.dck-front .dck-import__corps h3 { margin:2px 0 4px; font-size:14.5px; font-weight:600; }
+.dck-front.dck-front .dck-import__corps > p { margin:0 0 12px; font-size:13px; color:var(--tx-3); }
+
+.dck-front.dck-front .dck-import__b {
+  display:inline-flex; align-items:center; height:36px; padding:0 14px;
+  border:1px solid var(--line); border-radius:var(--r-sm);
+  background:var(--surface); color:var(--tx-2);
+  font-size:13px; font-weight:500; text-decoration:none; cursor:pointer;
+}
+.dck-front.dck-front .dck-import__b:hover { background:var(--surface-3); text-decoration:none; }
+.dck-front.dck-front .dck-import__b.is-principal {
+  background:var(--act); border-color:var(--act); color:var(--act-tx);
+}
+.dck-front.dck-front .dck-import__b.is-principal:hover { background:var(--act-hover); color:var(--act-tx); }
+.dck-front.dck-front .dck-import__b[disabled] { opacity:.6; cursor:default; }
+
+.dck-front.dck-front .dck-import__cols { width:100%; border-collapse:collapse; margin-top:14px; font-size:12.5px; }
+.dck-front.dck-front .dck-import__cols th {
+  text-align:left; padding:7px 9px; font-size:10.5px; text-transform:uppercase;
+  letter-spacing:.03em; color:var(--tx-4); background:var(--surface-2);
+  border-bottom:1px solid var(--line);
+}
+.dck-front.dck-front .dck-import__cols td { padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+
+.dck-front.dck-front .dck-import__depot { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.dck-front.dck-front .dck-import__depot input[type=file] {
+  flex:1; min-width:200px; padding:7px 10px; font-size:13px;
+  border:1px solid var(--line); border-radius:var(--r-sm); background:var(--surface-2);
+}
+
+.dck-front.dck-front .dck-import__note { margin:12px 0 0; font-size:12px; color:var(--tx-4); }
+
+.dck-front.dck-front .dck-import__bilan {
+  display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin-bottom:14px;
+}
+.dck-front.dck-front .dck-import__k {
+  display:flex; flex-direction:column; gap:3px; padding:11px 13px;
+  border:1px solid var(--line); border-radius:var(--r); background:var(--surface-2);
+}
+.dck-front.dck-front .dck-import__kl { font-size:11px; color:var(--tx-4); }
+.dck-front.dck-front .dck-import__kv { font-family:var(--f-num); font-size:22px; font-weight:600; }
+.dck-front.dck-front .dck-import__k.is-ok { background:var(--ok-bg); border-color:var(--ok-line); }
+.dck-front.dck-front .dck-import__k.is-ok .dck-import__kv { color:var(--ok); }
+.dck-front.dck-front .dck-import__k.is-err { background:var(--err-bg); border-color:var(--err-line); }
+.dck-front.dck-front .dck-import__k.is-err .dck-import__kv { color:var(--err); }
+
+.dck-front.dck-front .dck-import__msg {
+  padding:13px 15px; border-radius:var(--r); font-size:13px; margin-bottom:14px;
+  background:var(--surface-2); border:1px solid var(--line);
+}
+.dck-front.dck-front .dck-import__msg.is-err { background:var(--err-bg); border-color:var(--err-line); }
+.dck-front.dck-front .dck-import__msg p { margin:4px 0 0; color:var(--tx-2); }
+
+.dck-front.dck-front .dck-import__erreurs { margin:9px 0 0; padding-left:18px; }
+.dck-front.dck-front .dck-import__erreurs li { margin-bottom:3px; font-size:12.5px; }
+
+.dck-front.dck-front .dck-import__scroll { overflow-x:auto; border:1px solid var(--line); border-radius:var(--r); }
+.dck-front.dck-front .dck-import__tbl { width:100%; border-collapse:collapse; font-size:12.5px; }
+.dck-front.dck-front .dck-import__tbl th {
+  text-align:left; padding:8px 10px; font-size:10.5px; text-transform:uppercase;
+  letter-spacing:.03em; color:var(--tx-4); background:var(--surface-2);
+  border-bottom:1px solid var(--line); white-space:nowrap;
+}
+.dck-front.dck-front .dck-import__tbl td { padding:8px 10px; border-bottom:1px solid var(--line); }
+.dck-front.dck-front .dck-import__tbl tr:last-child td { border-bottom:0; }
+.dck-front.dck-front .dck-import__tbl tr.est-erreur { background:var(--err-bg); }
+.dck-front.dck-front .dck-import__n { font-family:var(--f-num); font-size:11.5px; white-space:nowrap; }
+
+.dck-front.dck-front .dck-import__p {
+  display:inline-block; padding:2px 8px; border-radius:var(--r-full);
+  font-size:11px; font-weight:600; border:1px solid var(--line); background:var(--surface-3);
+}
+.dck-front.dck-front .dck-import__p.is-ok { background:var(--ok-bg); border-color:var(--ok-line); color:var(--ok); }
+.dck-front.dck-front .dck-import__p.is-err { background:var(--err-bg); border-color:var(--err-line); color:var(--err); }
+.dck-front.dck-front .dck-import__p.is-req { background:var(--warn-bg); border-color:var(--warn-line); color:var(--warn); }
+
+.dck-front.dck-front .dck-import__valider {
+  display:flex; flex-wrap:wrap; gap:12px; align-items:center; margin-top:16px;
+}
+
+@media (max-width:640px) {
+  .dck-front.dck-front .dck-import { padding:14px 12px 20px; }
+  .dck-front.dck-front .dck-import__bilan { grid-template-columns:1fr; }
+}

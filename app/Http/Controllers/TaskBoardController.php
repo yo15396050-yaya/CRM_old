@@ -42,7 +42,9 @@ class TaskBoardController extends AccountBaseController
     // @codingStandardsIgnoreLine
     public function index(Request $request)
     {
-        $this->userRole = in_array('admin', user_roles()) ? 'yes' : 'no';
+        /* « yes » signifie ici : peut cloturer une tache sans passer par la
+           demande d'approbation. Les arbitres, pas les seuls admins. */
+        $this->userRole = est_arbitre() ? 'yes' : 'no';
         $this->startDate = now()->subDays(15)->format($this->company->date_format);
         $this->endDate = now()->addDays(15)->format($this->company->date_format);
         $this->projects = Project::allProjects();
@@ -186,7 +188,7 @@ class TaskBoardController extends AccountBaseController
                     $q->select(DB::raw('count(distinct tasks.id)'));
                 }])
                 ->with(['tasks' => function ($q) use ($startDate, $endDate, $request) {
-                    $q->withCount(['subtasks', 'completedSubtasks', 'comments'])
+                    $q->withCount(['subtasks', 'completedSubtasks', 'comments', 'files'])
                         ->leftJoin('projects', 'projects.id', '=', 'tasks.project_id')
                         ->leftJoin('users as client', 'client.id', '=', 'projects.client_id');
 
@@ -426,6 +428,7 @@ class TaskBoardController extends AccountBaseController
             ->select('tasks.*')
             ->where('tasks.board_column_id', $request->columnId)
             ->orderBy('column_priority', 'asc')
+            ->orderBy('tasks.id', 'desc')
             ->groupBy('tasks.id');
 
         if (!in_array('admin', user_roles())) {

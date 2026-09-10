@@ -32,11 +32,12 @@ class ProjectInitNotification extends BaseNotification
 
     public function toMail($notifiable): MailMessage
     {
-        // Attendre 10 secondes pour les fichiers
-        sleep(10);
+        $this->waitForUploads();
 
         // Recharger le projet
-        $reloadedProject = Project::withoutGlobalScopes()->with(['client', 'company', 'members', 'files'])->find($this->projectId);
+        $reloadedProject = Project::withoutGlobalScopes()
+            ->with(['client', 'company', 'members', 'files', 'category', 'projectAdmin', 'projectMembersWithoutScope'])
+            ->find($this->projectId);
         if ($reloadedProject) {
             $this->project = $reloadedProject;
             $this->company = $reloadedProject->company;
@@ -47,7 +48,7 @@ class ProjectInitNotification extends BaseNotification
         $isClient = $notifiable->hasRole('client');
         $subject = $isClient 
             ? $this->company->company_name . ' – Ouverture de votre dossier : ' . $this->project->project_name 
-            : 'Assignation Diligence : ' . $this->project->project_name;
+            : 'Assignation Projet : ' . $this->project->project_name;
 
         $attachments = [];
         if ($this->project->files) {
@@ -75,18 +76,52 @@ class ProjectInitNotification extends BaseNotification
                     'attachments' => $attachments,
                 ]);
         } else {
+            $format = $this->company->date_format;
+
+            // Periode couverte : les deux bornes du projet quand elles existent.
+            $periodLabel = null;
+            if ($this->project->start_date && $this->project->deadline) {
+                $periodLabel = $this->project->start_date->format($format) . ' – ' . $this->project->deadline->format($format);
+            } elseif ($this->project->start_date) {
+                $periodLabel = 'À partir du ' . $this->project->start_date->format($format);
+            }
+
+            $teamMembers = $this->project->projectMembersWithoutScope
+                ? $this->project->projectMembersWithoutScope->pluck('name')->filter()->take(8)->values()->all()
+                : [];
+
+            $clientName = null;
+            if ($this->project->client) {
+                $clientName = $this->project->client->name;
+            } elseif ($this->project->clientdetails) {
+                $clientName = $this->project->clientdetails->company_name;
+            }
+
+            $data = [
+                'companyName' => $this->company->company_name,
+                'logoUrlDark' => $this->emailLogoUrl(),
+                'logoPath' => $this->emailLogoPath(),
+                'date' => now($this->company->timezone)->format($format),
+                'heure' => now($this->company->timezone)->format('H:i'),
+                'projectName' => $this->project->project_name,
+                'projectCode' => $this->project->project_short_code,
+                'natureName' => $this->project->category ? $this->project->category->category_name : null,
+                'periodLabel' => $periodLabel,
+                'deadline' => $this->project->deadline ? $this->project->deadline->format($format) : null,
+                'clientName' => $clientName,
+                'adminName' => $this->project->projectAdmin ? $this->project->projectAdmin->name : null,
+                'teamMembers' => $teamMembers,
+                'summary' => $this->project->project_summary,
+                'recipientName' => $notifiable->name,
+                'url' => $url,
+                'company' => $this->company,
+                'attachments' => $attachments,
+            ];
+
             $build = $this->build($notifiable)
                 ->subject($subject)
-                ->view('emails.collab_project_init', [
-                    'companyName' => $this->company->company_name,
-                    'date' => now($this->company->timezone)->format($this->company->date_format),
-                    'heure' => now($this->company->timezone)->format('H:i'),
-                    'projectName' => $this->project->project_name,
-                    'recipientName' => $notifiable->name,
-                    'url' => $url,
-                    'company' => $this->company,
-                    'attachments' => $attachments,
-                ]);
+                ->view('emails.collab_project_init', $data)
+                ->text('emails.txt.collab_project_init', $data);
         }
 
         // Physiquement attacher les fichiers
@@ -125,6 +160,6 @@ class ProjectInitNotification extends BaseNotification
      */
     public function toWhatsAppCollabContent($notifiable)
     {
-        return "Vous avez été assigné à la diligence '{$this->project->project_name}'. Connectez-vous au CRM pour commencer.";
+        return "Vous avez été assigné à le projet '{$this->project->project_name}'. Connectez-vous au CRM pour commencer.";
     }
 }

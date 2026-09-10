@@ -216,83 +216,97 @@ $viewUnassignedTasksPermission = user()->permission('view_unassigned_tasks');
 @endsection
 
 @section('content')
-    <!-- CONTENT WRAPPER START -->
-    <div class="content-wrapper">
-        <!-- Add Task Export Buttons Start -->
-        <div class="d-grid d-lg-flex d-md-flex action-bar">
-            <div id="table-actions" class="flex-grow-1 align-items-center">
+    <div class="content-wrapper dck-front">
+
+        <x-dck.page-head :titre="__('app.menu.tasks')"
+                         :description="$waitingApprovalCount > 0
+                            ? $waitingApprovalCount . ' ' . __('app.menu.waiting-approval')
+                            : null">
+            <x-slot name="actions">
                 @if ($addTaskPermission == 'all' || $addTaskPermission == 'added')
-                    <x-forms.link-primary :link="route('tasks.create')" class="mr-3 openRightModal float-left" icon="plus">
+                    <x-forms.link-primary :link="route('tasks.create')" class="openRightModal" icon="plus">
                         @lang('app.addTask')
                     </x-forms.link-primary>
                 @endif
 
                 @if (!in_array('client', user_roles()))
-                    <x-forms.button-secondary id="filter-my-task" class="mr-3 float-left" icon="user">
+                    <x-forms.button-secondary id="filter-my-task" icon="user">
                         @lang('modules.tasks.myTask')
                     </x-forms.button-secondary>
                 @endif
 
-            </div>
-
-            <x-datatable.actions>
-                <div class="select-status mr-3 pl-lg-3">
-                    <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
-                        <option value="">@lang('app.selectAction')</option>
-                        <option value="change-status">@lang('modules.tasks.changeStatus')</option>
-                        <option value="delete">@lang('app.delete')</option>
-                    </select>
-                </div>
-                <div class="select-status mr-3 d-none quick-action-field" id="change-status-action">
-                    <select name="status" class="form-control select-picker">
-                        @foreach ($taskBoardStatus as $status)
-                            <option value="{{ $status->id }}">{{ $status->slug == 'completed' || $status->slug == 'incomplete' ? __('app.' . $status->slug) : $status->column_name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            </x-datatable.actions>
-
-            <div class="btn-group mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3" role="group">
-                <a href="{{ route('tasks.index') }}" class="btn btn-secondary f-14 btn-active task" data-toggle="tooltip"
-                    data-original-title="@lang('app.menu.tasks')"><i class="side-icon bi bi-list-ul"></i></a>
-
-                <a href="{{ route('taskboards.index') }}" class="btn btn-secondary f-14" data-toggle="tooltip"
-                    data-original-title="@lang('modules.tasks.taskBoard')"><i class="side-icon bi bi-kanban"></i></a>
-
-                <a href="{{ route('task-calendar.index') }}" class="btn btn-secondary f-14" data-toggle="tooltip"
-                    data-original-title="@lang('app.menu.calendar')"><i class="side-icon bi bi-calendar"></i></a>
-
-                <a href="javascript:;" class="btn btn-secondary f-14 show-pinned" data-toggle="tooltip"
-                    data-original-title="@lang('app.pinned')"><i class="side-icon bi bi-pin-angle"></i></a>
-
-                @if(in_array('admin', user_roles()) || in_array('employee', user_roles()))
-                    <a href="{{ route('tasks.waiting-approval') }}" class="btn btn-secondary f-14 show-waiting-approval-task" data-toggle="tooltip"
-                        data-original-title="@lang('app.menu.waiting-approval')">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="#000000" width="18" height="18">
-                            <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-                            <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-                            <g id="SVGRepo_iconCarrier">
-                                <path d="m 7 0 c -0.554688 0 -1 0.445312 -1 1 h -2 c -1.644531 0 -3 1.355469 -3 3 v 9 c 0 1.644531 1.355469 3 3 3 h 2 c 0.550781 0 1 -0.449219 1 -1 s -0.449219 -1 -1 -1 h -2 c -0.570312 0 -1 -0.429688 -1 -1 v -9 c 0 -0.570312 0.429688 -1 1 -1 h 1 v 1 c 0 0.554688 0.445312 1 1 1 h 4 c 0.554688 0 1 -0.445312 1 -1 v -1 h 1 c 0.570312 0 1 0.429688 1 1 v 2 c 0 0.550781 0.449219 1 1 1 s 1 -0.449219 1 -1 v -2 c 0 -1.644531 -1.355469 -3 -3 -3 h -2 c 0 -0.554688 -0.445312 -1 -1 -1 z m 0 0" fill="#2e3436"></path>
-                                <path d="m 8.875 8 c -0.492188 0 -0.875 0.382812 -0.875 0.875 v 6.25 c 0 0.492188 0.382812 0.875 0.875 0.875 h 6.25 c 0.492188 0 0.875 -0.382812 0.875 -0.875 v -6.25 c 0 -0.492188 -0.382812 -0.875 -0.875 -0.875 z m 2.125 1 h 2 v 2.5 s 0 0.5 -0.5 0.5 h -1 c -0.5 0 -0.5 -0.5 -0.5 -0.5 z m 0.5 4 h 1 c 0.277344 0 0.5 0.222656 0.5 0.5 v 1 c 0 0.277344 -0.222656 0.5 -0.5 0.5 h -1 c -0.277344 0 -0.5 -0.222656 -0.5 -0.5 v -1 c 0 -0.277344 0.222656 -0.5 0.5 -0.5 z m 0 0" class="warning" fill="#ff7800"></path>
-                            </g>
-                        </svg>
-                        @if($waitingApprovalCount > 0)<span class="badge badge-pill badge-danger position-absolute">{{ $waitingApprovalCount }}</span>@endif
-                    </a>
+                {{-- Importation massive. Reservee aux droits complets :
+                     l'ecran cree des taches en nombre, et un compte
+                     limite a « added » ne doit pas contourner sa
+                     restriction par ce biais. --}}
+                @if ($addTaskPermission == 'all')
+                    <x-forms.link-secondary :link="route('tasks.import')" icon="upload">
+                        @lang('Importer')
+                    </x-forms.link-secondary>
                 @endif
+            </x-slot>
+        </x-dck.page-head>
+
+        <div class="dck-card">
+
+            <div class="dck-card__bar">
+                {{-- Conteneur d'injection du bouton d'export (initComplete) --}}
+                <div id="table-actions" class="d-flex align-items-center"></div>
+
+                {{-- Selecteur de vue --}}
+                <div class="btn-group dck-seg" role="group">
+                    <a href="{{ route('tasks.index') }}" class="btn btn-secondary f-14 btn-active task"
+                       data-toggle="tooltip" data-original-title="@lang('app.menu.tasks')"><i class="side-icon bi bi-list-ul"></i></a>
+
+                    <a href="{{ route('taskboards.index') }}" class="btn btn-secondary f-14"
+                       data-toggle="tooltip" data-original-title="@lang('modules.tasks.taskBoard')"><i class="side-icon bi bi-kanban"></i></a>
+
+                    <a href="{{ route('task-calendar.index') }}" class="btn btn-secondary f-14"
+                       data-toggle="tooltip" data-original-title="@lang('app.menu.calendar')"><i class="side-icon bi bi-calendar"></i></a>
+
+                    <a href="javascript:;" class="btn btn-secondary f-14 show-pinned"
+                       data-toggle="tooltip" data-original-title="@lang('app.pinned')"><i class="side-icon bi bi-pin-angle"></i></a>
+
+                    @if (in_array('admin', user_roles()) || in_array('employee', user_roles()))
+                        <a href="{{ route('tasks.waiting-approval') }}" class="btn btn-secondary f-14 show-waiting-approval-task"
+                           data-toggle="tooltip" data-original-title="@lang('app.menu.waiting-approval')">
+                            <i class="side-icon bi bi-hourglass-split"></i>
+                            @if ($waitingApprovalCount > 0)
+                                <span class="badge badge-pill badge-danger position-absolute">{{ $waitingApprovalCount }}</span>
+                            @endif
+                        </a>
+                    @endif
+                </div>
+
+                <x-datatable.actions>
+                    <div class="select-status mr-3 pl-lg-3">
+                        <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
+                            <option value="">@lang('app.selectAction')</option>
+                            <option value="change-status">@lang('modules.tasks.changeStatus')</option>
+                            <option value="delete">@lang('app.delete')</option>
+                        </select>
+                    </div>
+                    <div class="select-status mr-3 d-none quick-action-field" id="change-status-action">
+                        <select name="status" class="form-control select-picker">
+                            @foreach ($taskBoardStatus as $status)
+                                {{-- « En attente d'approbation » est reserve a l'administrateur :
+                                     l'option est retiree de l'action groupee. Le controleur refuse
+                                     de toute facon la transition, l'interface ne fait que l'annoncer. --}}
+                                @continue($status->slug == 'waiting_approval' && !in_array('admin', user_roles()))
+                                <option value="{{ $status->id }}">{{ $status->slug == 'completed' || $status->slug == 'incomplete' ? __('app.' . $status->slug) : $status->column_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </x-datatable.actions>
             </div>
-        </div>
 
-        <!-- Add Task Export Buttons End -->
-        <!-- Task Box Start -->
-        <div class="d-flex flex-column w-tables rounded mt-3 bg-white table-responsive">
-
-            {!! $dataTable->table(['class' => 'table table-hover border-0 w-100']) !!}
+            <div class="table-responsive">
+                {!! $dataTable->table(['class' => 'table table-hover border-0 w-100']) !!}
+            </div>
 
         </div>
-        <!-- Task Box End -->
+
     </div>
-    <!-- CONTENT WRAPPER END -->
-
 @endsection
 
 @push('scripts')

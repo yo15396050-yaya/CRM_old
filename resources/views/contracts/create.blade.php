@@ -3,7 +3,7 @@
 
 @section('content')
     
-<div class="content-wrapper">
+<div class="content-wrapper dck-front">
     @include($view)
 </div>
 

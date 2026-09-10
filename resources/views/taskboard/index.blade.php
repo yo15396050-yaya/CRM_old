@@ -183,7 +183,7 @@ $addTaskPermission = user()->permission('add_tasks');
 @section('content')
 
     <!-- CONTENT WRAPPER START -->
-    <div class="w-task-board-box px-4 py-2 bg-white">
+    <div class="w-task-board-box px-4 py-2 bg-white dck-front">
         <!-- Add Task Export Buttons Start -->
         <div class="d-grid d-lg-flex d-md-flex action-bar my-3">
 
@@ -208,6 +208,15 @@ $addTaskPermission = user()->permission('add_tasks');
                     <x-forms.button-secondary id="filter-my-task" icon="user">
                         @lang('modules.tasks.myTask')
                     </x-forms.button-primary>
+                @endif
+
+                {{-- Importation massive, presente ici comme sur la liste :
+                     les deux ecrans montrent les memes taches, le bouton
+                     doit se trouver au meme endroit dans les deux. --}}
+                @if (user()->permission('add_tasks') == 'all')
+                    <x-forms.link-secondary :link="route('tasks.import')" icon="upload">
+                        @lang('Importer')
+                    </x-forms.link-secondary>
                 @endif
 
             </div>

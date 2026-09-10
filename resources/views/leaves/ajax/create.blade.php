@@ -8,13 +8,15 @@
 <link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">
 <link rel="stylesheet" href="{{ asset('vendor/css/daterangepicker.css') }}">
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <x-form id="save-lead-data-form">
             <div class="add-client bg-white rounded">
                 <h4 class="mb-0 p-20 f-21 font-weight-normal  border-bottom-grey">    
                     @lang('modules.leaves.assignLeave')</h4>
                 <div class="row p-20">
+
+                    <x-dck.form-section :titre="__('app.dckSection.identification')" />
 
                     <div class="col-lg-4 col-md-6">
                         @if (isset($defaultAssign))
@@ -96,6 +98,8 @@
                         </div>
                     </div>
 
+                    <x-dck.form-section :titre="__('app.dckSection.period')" />
+
                     <div class="col-lg-4 col-md-6 single_date_div">
                         <x-forms.text :fieldLabel="__('app.date')" fieldName="leave_date" fieldId="single_date" :fieldPlaceholder="__('app.date')"
                             :fieldValue="now(company()->timezone)->translatedFormat(company()->date_format)" />
@@ -109,6 +113,8 @@
                         <p id="users" class="mt-2 badge badge-secondary"></p>
 
                     </div>
+                    <x-dck.form-section :titre="__('app.dckSection.description')" />
+
                     <div class="col-md-12">
                         <div class="form-group my-3">
                             <x-forms.textarea class="mr-0 mr-lg-2 mr-md-2" :fieldLabel="__('modules.leaves.reason')" fieldName="reason"

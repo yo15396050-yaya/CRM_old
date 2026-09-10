@@ -58,6 +58,8 @@ class ClientController extends AccountBaseController
 
     use ImportExcel;
     use EmployeeActivityTrait;
+    use \App\Traits\PilotageClients;
+    use \App\Traits\PilotageClient;
 
     public function __construct()
     {
@@ -108,6 +110,7 @@ class ClientController extends AccountBaseController
                 ->join('contracts', 'users.id', '=', 'contracts.client_id')
                 ->select('users.*', 'contracts.*')
                 ->first();
+            $this->cliKpis = $this->clientsIndicateurs();
         }
 
         return $dataTable->render('clients.index', $this->data);
@@ -897,16 +900,12 @@ class ClientController extends AccountBaseController
 
         $this->pageTitle = $this->client->name;
 
-        $this->clientStats = $this->clientStats($id);
-        $this->projectChart = $this->projectChartData($id);
-        $this->invoiceChart = $this->invoiceChartData($id);
+        /* Indicateurs du dossier : diligences, taches, retards et
+           contrats. Ils remplacent les chiffres de facturation, que le
+           cabinet n'utilise pas pour piloter ses clients. */
+        $this->k = $this->clientIndicateurs((int) $id);
 
-        $this->earningTotal = Payment::leftJoin('invoices', 'invoices.id', '=', 'payments.invoice_id')
-            ->leftJoin('projects', 'projects.id', '=', 'payments.project_id')
-            ->where(function ($q) use ($id) {
-                $q->where('invoices.client_id', $id);
-                $q->orWhere('projects.client_id', $id);
-            })->sum('amount');
+        $this->projectChart = $this->projectChartData($id);
 
         $this->view = 'clients.ajax.profile';
 
@@ -981,24 +980,6 @@ class ClientController extends AccountBaseController
 
     }
 
-    public function clientStats($id)
-    {
-        return DB::table('users')
-            ->select(
-                DB::raw('(select count(projects.id) from `projects` WHERE projects.client_id = ' . $id . ' and deleted_at IS NULL) as totalProjects'),
-                DB::raw('(select count(invoices.id) from `invoices` left join projects on projects.id=invoices.project_id WHERE invoices.status != "paid" and invoices.status != "canceled" and (projects.client_id = ' . $id . ' or invoices.client_id = ' . $id . ')) as totalUnpaidInvoices'),
-                DB::raw('(select sum(payments.amount) from `payments` left join projects on projects.id=payments.project_id WHERE payments.status = "complete" and projects.client_id = ' . $id . ') as projectPayments'),
-                DB::raw('(select sum(payments.amount) from `payments` inner join invoices on invoices.id=payments.invoice_id  WHERE payments.status = "complete" and invoices.client_id = ' . $id . ') as invoicePayments'),
-                DB::raw('(select count(contracts.id) from `contracts` WHERE contracts.client_id = ' . $id . ') as totalContracts')
-            )
-            ->first();
-    }
-
-    /**
-     * XXXXXXXXXXX
-     *
-     * @return array
-     */
     public function projectChartData($id)
     {
         // Fetch active project status settings
@@ -1029,47 +1010,6 @@ class ClientController extends AccountBaseController
         return $data;
     }
 
-    /**
-     * XXXXXXXXXXX
-     *
-     * @return array
-     */
-    public function invoiceChartData($id)
-    {
-        // Define labels, translations, and colors
-        $labels = ['paid', 'unpaid', 'partial', 'canceled', 'draft'];
-        $translations = [__('app.paid'), __('app.unpaid'), __('app.partial'), __('app.canceled'), __('app.draft')];
-        $colors = ['#2CB100', '#FCBD01', '#1d82f5', '#D30000', '#616e80'];
-
-        // Construct the query to count invoices for each status
-        $query = Invoice::selectRaw('COUNT(*) as count, status')
-            ->where('client_id', $id)
-            ->whereIn('status', $labels)
-            ->groupBy('status');
-
-        // Execute the query and fetch counts for each status
-        $statusCounts = $query->pluck('count', 'status');
-
-        // Initialize data array
-        $data = [
-            'labels' => $translations,
-            'colors' => $colors,
-            'values' => []
-        ];
-
-        // Populate the values array with counts for each status
-        foreach ($labels as $label) {
-            $data['values'][] = $statusCounts[$label] ?? 0;
-        }
-
-        return $data;
-    }
-
-    /**
-     * XXXXXXXXXXX
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function projectList($id)
     {
         if ($id != 0) {

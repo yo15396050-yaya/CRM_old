@@ -2,7 +2,7 @@
 
     <h3 class="heading-h1 mb-3">{{ $task->heading }}</h3>
     <div class="row">
-        <div class="col-sm-9">
+        <div class="col-lg-9">
             <div class="card bg-white border-0 b-shadow-4">
 
                 <div class="card-body">
@@ -161,7 +161,7 @@
             <!-- TASK TABS END -->
         </div>
 
-        <div class="col-sm-3">
+        <div class="col-lg-3">
             <x-cards.data>
                 <p class="f-w-500"><i class="fa fa-circle mr-1 text-yellow"
                                       style="color: {{ $task->boardColumn->label_color }}"></i>{{ $task->boardColumn->slug == 'completed' || $task->boardColumn->slug == 'incomplete' ? __('app.' . $task->boardColumn->slug) : $task->boardColumn->column_name }}

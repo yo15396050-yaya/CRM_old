@@ -10,7 +10,7 @@ $editMilestonePermission = user()->permission('edit_project_milestones');
 
 <link rel="stylesheet" href="{{ asset('vendor/css/dropzone.min.css') }}">
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <x-form id="save-task-data-form" method="PUT">
             <div class="add-client bg-white rounded">

@@ -41,6 +41,15 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        // Journal de diagnostic des performances (voir MeasurePerformance).
+        'perf' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/perf.log'),
+            'level' => 'info',
+            'days' => 7,
+            'replace_placeholders' => true,
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

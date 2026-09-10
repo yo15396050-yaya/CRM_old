@@ -22,7 +22,7 @@
 
         @php
             $userRoles = user_roles();
-            $isAdmin = in_array('admin', $userRoles);
+            $isAdmin = est_arbitre();
             $isEmployee = in_array('employee', $userRoles);
         @endphp
 

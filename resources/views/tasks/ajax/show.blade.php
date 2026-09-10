@@ -1,5 +1,6 @@
 @php
     $editTaskPermission = user()->permission('edit_tasks');
+    $deleteTaskPermission = user()->permission('delete_tasks');
     $sendReminderPermission = user()->permission('send_reminder');
     $changeStatusPermission = user()->permission('change_status');
     $viewProjectPermission = user()->permission('view_projects');
@@ -10,8 +11,8 @@
 
 
     <h3 class="heading-h1 mb-3">{{ $task->heading }}</h3>
-    <div class="row">
-        <div class="col-sm-9">
+    <div class="row dck-front">
+        <div class="col-lg-9">
             <div class="card bg-white border-0 b-shadow-4">
                 <div class="card-header bg-white  border-bottom-grey  justify-content-between p-20">
                     <div class="row">
@@ -25,7 +26,7 @@
                             {{-- approval_send --}}
                                 @php
                                     $userRoles = user_roles();
-                                    $isAdmin = in_array('admin', $userRoles);
+                                    $isAdmin = est_arbitre();
                                     $isEmployee = in_array('employee', $userRoles);
                                 @endphp
 
@@ -155,6 +156,22 @@
                                         <hr class="my-1">
                                         <a class="dropdown-item send-task-notifications" href="javascript:;" data-task-id="{{ $task->id }}">
                                             <i class="fa fa-paper-plane mr-2"></i> Informer les bénéficiaires
+                                        </a>
+                                    @endif
+
+                                    {{-- Suppression : la condition reprend a l'identique celle de
+                                         TaskController@destroy, pour ne jamais proposer une action
+                                         que le controleur refusera par abort_403. --}}
+                                    @if ($deleteTaskPermission == 'all'
+                                        || ($deleteTaskPermission == 'owned' && in_array(user()->id, $taskUsers))
+                                        || ($task->project && $task->project->project_admin == user()->id)
+                                        || ($deleteTaskPermission == 'added' && $task->added_by == user()->id)
+                                        || ($deleteTaskPermission == 'both' && (in_array(user()->id, $taskUsers) || $task->added_by == user()->id))
+                                        || ($deleteTaskPermission == 'owned' && in_array('client', user_roles()) && $task->project && $task->project->client_id == user()->id))
+                                        <hr class="my-1">
+                                        <a class="dropdown-item text-danger delete-task-detail" href="javascript:;"
+                                           data-task-id="{{ $task->id }}">
+                                            <i class="fa fa-trash mr-2"></i>@lang('app.delete') @lang('app.task')
                                         </a>
                                     @endif
                                 </div>
@@ -410,7 +427,7 @@
 
         </div>
 
-        <div class="col-sm-3">
+        <div class="col-lg-3">
             <x-cards.data>
                 @if (($taskSettings->status == 'yes' && in_array('client', user_roles())) || in_array('admin', user_roles()) || in_array('employee', user_roles()))
                     <p class="f-w-500"><i class="fa fa-circle mr-1 text-yellow"
@@ -1172,6 +1189,49 @@
                             success: function(response) {
                                 if (response.status == "success") {
                                     // Succès
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
+            /* Suppression depuis la fiche : confirmation puis retour a la liste,
+               la fiche courante n'ayant plus d'objet une fois la tache supprimee. */
+            $('body').on('click', '.delete-task-detail', function () {
+                var id = $(this).data('task-id');
+
+                Swal.fire({
+                    title: "@lang('messages.sweetAlertTitle')",
+                    text: "@lang('messages.recoverRecord')",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    focusConfirm: false,
+                    confirmButtonText: "@lang('messages.confirmDelete')",
+                    cancelButtonText: "@lang('app.cancel')",
+                    customClass: {
+                        confirmButton: 'btn btn-primary mr-3',
+                        cancelButton: 'btn btn-secondary'
+                    },
+                    showClass: {
+                        popup: 'swal2-noanimation',
+                        backdrop: 'swal2-noanimation'
+                    },
+                    buttonsStyling: false
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        var url = "{{ route('tasks.destroy', ':id') }}".replace(':id', id);
+
+                        $.easyAjax({
+                            type: 'POST',
+                            url: url,
+                            data: {
+                                '_token': "{{ csrf_token() }}",
+                                '_method': 'DELETE'
+                            },
+                            success: function (response) {
+                                if (response.status == "success") {
+                                    window.location.href = "{{ route('tasks.index') }}";
                                 }
                             }
                         });

@@ -21,6 +21,44 @@
 </IfModule>
 
 
+# ══════════════════════════════════════════════════════════════
+# COMPRESSION HTTP
+# --------------------------------------------------------------
+# Sans ce bloc, chaque premiere visite telecharge 4,9 Mo d'assets
+# non compresses (main.js 4,4 Mo + main.css 0,5 Mo).
+# Mesure sur ces deux fichiers : 74 % de gain sur le JS,
+# 85 % sur le CSS, soit environ 3,7 Mo economises par visiteur.
+#
+# Les deux modules sont testes : si l'hebergeur n'en propose
+# aucun, ce bloc reste sans effet et rien ne casse.
+# ══════════════════════════════════════════════════════════════
+
+<IfModule mod_brotli.c>
+  AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css
+  AddOutputFilterByType BROTLI_COMPRESS application/javascript text/javascript
+  AddOutputFilterByType BROTLI_COMPRESS application/json application/xml
+  AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json application/xml
+  AddOutputFilterByType DEFLATE image/svg+xml
+  AddOutputFilterByType DEFLATE font/ttf font/otf
+
+  # Les polices woff/woff2 sont deja compressees : ne pas les recompresser
+  <IfModule mod_setenvif.c>
+    SetEnvIfNoCase Request_URI \.(?:woff2?|gif|jpe?g|png|webp|zip|gz|rar|pdf)$ no-gzip dont-vary
+  </IfModule>
+
+  # Les proxys doivent distinguer les versions compressees ou non
+  <IfModule mod_headers.c>
+    Header append Vary Accept-Encoding
+  </IfModule>
+</IfModule>
+
+
 # 1 YEAR
 <FilesMatch "\.(flv|ico|pdf|avi|mov|ppt|doc|mp3|wmv|wav)$">
 Header set Cache-Control "max-age=31536000, public"

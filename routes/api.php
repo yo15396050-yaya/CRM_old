@@ -110,4 +110,14 @@ Route::get('/documents/{id}/download', [AuthController::class, 'documentsDownloa
 // PROFIL
 Route::post('/change-password', [AuthController::class, 'changePassword']);
 
+// --- MODULE NOTES ---
+Route::prefix('notes')->group(function () {
+    Route::get('/', [AuthController::class, 'getNotes']);
+    Route::post('/', [AuthController::class, 'createNote']);
+    Route::get('/{id}', [AuthController::class, 'getNoteDetails']);
+    Route::put('/{id}', [AuthController::class, 'updateNote']);
+    Route::post('/{id}/sync-blocks', [AuthController::class, 'syncNoteBlocks']);
+    Route::delete('/{id}', [AuthController::class, 'deleteNote']);
+});
+
 

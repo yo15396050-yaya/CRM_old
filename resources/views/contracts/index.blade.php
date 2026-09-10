@@ -86,57 +86,77 @@
 @endphp
 
 @section('content')
-    <!-- CONTENT WRAPPER START -->
-    <div class="content-wrapper">
-        <!-- Add Task Export Buttons Start -->
-        <div class="d-flex justify-content-between action-bar">
+    <div class="content-wrapper dck-front">
 
-            <div id="table-actions" class="d-flex align-items-center">
+        {{-- En-tete de page : titre, resume et actions principales --}}
+        <x-dck.page-head :titre="__('app.menu.contracts')"
+                         :description="__('modules.contracts.totalContracts') . ' : ' . $contractCounts">
+            <x-slot name="actions">
                 @if (in_array('clients', user_modules()) && ($addContractPermission == 'all' || $addContractPermission == 'added'))
-                    <x-forms.link-primary :link="route('contracts.create')" class="mr-3 openRightModal" icon="plus">
+                    <x-forms.link-primary :link="route('contracts.create')" class="openRightModal" icon="plus">
                         @lang('modules.contracts.createContract')
                     </x-forms.link-primary>
                 @endif
 
                 @if ($manageContractTemplatePermission == 'all' || $manageContractTemplatePermission == 'added')
-                    <x-forms.link-secondary :link="route('contract-template.index')" class="mr-3 mb-2 mb-lg-0 mb-md-0 float-left"
-                        icon="layer-group">
+                    <x-forms.link-secondary :link="route('contract-template.index')" icon="layer-group">
                         @lang('app.menu.contractTemplate')
                     </x-forms.link-secondary>
                 @endif
+            </x-slot>
+        </x-dck.page-head>
+
+        {{-- Indicateurs. Les trois compteurs sont deja calcules par
+             ContractController::index() : aucune requete n'est ajoutee. --}}
+        <div class="dck-grid dck-grid--4">
+            <x-dck.kpi icone="bi-file-earmark-text" cle="total"
+                       :libelle="__('modules.contracts.totalContracts')"
+                       :valeur="$contractCounts"
+                       :sous="__('app.all')" />
+
+            <x-dck.kpi icone="bi-check2-circle" ton="ok" cle="actifs"
+                       :libelle="__('modules.contracts.active')"
+                       :valeur="max($contractCounts - $expiredCounts, 0)"
+                       :sous="__('app.active')" />
+
+            <x-dck.kpi icone="bi-hourglass-split" ton="warn" cle="bientot"
+                       :libelle="__('modules.contracts.aboutToExpire')"
+                       :valeur="$aboutToExpireCounts"
+                       :sous="__('app.days') . ' : 7'" />
+
+            <x-dck.kpi icone="bi-exclamation-triangle" ton="err" cle="expires"
+                       :libelle="__('modules.contracts.expired')"
+                       :valeur="$expiredCounts"
+                       :sous="__('modules.contracts.expired')" />
+        </div>
+
+        {{-- Tableau. Le rendu des lignes reste produit par
+             ContractsDataTable cote serveur. --}}
+        <div class="dck-card">
+
+            <div class="dck-card__bar">
+                {{-- Conteneur historique conserve : le CSS s'y appuie --}}
+                <div id="table-actions" class="d-flex align-items-center"></div>
+
+                @if (!in_array('client', user_roles()))
+                    <x-datatable.actions>
+                        <div class="select-status mr-3 pl-3">
+                            <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
+                                <option value="">@lang('app.selectAction')</option>
+                                <option value="delete">@lang('app.delete')</option>
+                            </select>
+                        </div>
+                    </x-datatable.actions>
+                @endif
             </div>
 
-            @if (!in_array('client', user_roles()))
-                <x-datatable.actions>
-                    <div class="select-status mr-3 pl-3">
-                        <select name="action_type" class="form-control select-picker" id="quick-action-type" disabled>
-                            <option value="">@lang('app.selectAction')</option>
-                            <option value="delete">@lang('app.delete')</option>
-                        </select>
-                    </div>
-                </x-datatable.actions>
-            @endif
-            {{--
-            <div id="sign-modals" class="modal fade sign-modal" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog d-flex justify-content-center align-items-center modal-xl">
-                    <div class="modal-content">
-                        @include('contracts.a
-                    </div>
-                </div>
-            </div> --}}
+            <div class="table-responsive">
+                {!! $dataTable->table(['class' => 'table table-hover border-0 w-100']) !!}
+            </div>
 
         </div>
-        <!-- Add Task Export Buttons End -->
 
-        <!-- Task Box Start -->
-        <div class="d-flex flex-column w-tables rounded mt-3 bg-white table-responsive">
-
-            {!! $dataTable->table(['class' => 'table table-hover border-0 w-100']) !!}
-
-        </div>
-        <!-- Task Box End -->
     </div>
-    <!-- CONTENT WRAPPER END -->
 @endsection
 
 @push('scripts')
@@ -285,12 +305,27 @@
                         success: function(response) {
                             if (response.status == "success") {
                                 showTable();
+                                majCompteurs(response.compteurs);
                             }
                         }
                     });
                 }
             });
         });
+
+        /* Met a jour les cartes de comptage sans recharger l'ecran.
+           Le controleur renvoie les nouvelles valeurs avec la reponse de
+           suppression ; sans cela le total restait fige jusqu'au prochain
+           chargement de la page. */
+        function majCompteurs(compteurs) {
+            if (!compteurs) { return; }
+
+            Object.keys(compteurs).forEach(function (cle) {
+                const cible = document.querySelector('[data-kpi="' + cle + '"]');
+
+                if (cible) { cible.textContent = compteurs[cle]; }
+            });
+        }
 
         const applyQuickAction = () => {
             var rowdIds = $("#contracts-table input:checkbox:checked").map(function() {

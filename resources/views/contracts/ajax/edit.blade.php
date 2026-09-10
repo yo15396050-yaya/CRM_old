@@ -3,7 +3,7 @@ $manageContractTypePermission = user()->permission('manage_contract_type');
 $addClientPermission = user()->permission('add_clients');
 @endphp
 
-<div class="row">
+<div class="row dck-front">
     <div class="col-sm-12">
         <x-form id="save-contract-data-form">
             @method('PUT')

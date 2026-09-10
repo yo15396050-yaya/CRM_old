@@ -9,7 +9,7 @@
 @section('content')
 
     <!-- CONTENT WRAPPER START -->
-    <div class="w-task-board-box p-4 bg-white">
+    <div class="w-task-board-box p-4 bg-white dck-front">
         <!-- Add Task Export Buttons Start -->
 
         <div class="d-flex">

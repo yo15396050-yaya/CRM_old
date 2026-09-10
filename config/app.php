@@ -79,6 +79,12 @@ return [
     'debug' => (bool)env('APP_DEBUG', false),
 
     /*
+    | Journalise le temps de reponse et les requetes SQL de chaque page.
+    | A n'activer que le temps d'un diagnostic : PERF_LOG=true
+    */
+    'perf_log' => (bool)env('PERF_LOG', false),
+
+    /*
         |--------------------------------------------------------------------------
         | API Debug Mode
         |--------------------------------------------------------------------------
