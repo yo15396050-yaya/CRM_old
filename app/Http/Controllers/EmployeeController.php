@@ -364,9 +364,21 @@ class EmployeeController extends AccountBaseController
     {
         abort_403(user()->permission('edit_employees') != 'all');
 
+        abort_if(!in_array($request->status, ['active', 'deactive']), 422);
+
         $inactiveDate = $request->status == 'deactive' ? now() : null;
 
-        User::withoutGlobalScope(ActiveScope::class)->whereIn('id', explode(',', $request->row_ids))->update(['status' => $request->status, 'inactive_date' => $inactiveDate]);
+        // Jamais son propre compte ; un administrateur n'est modifie que par
+        // un administrateur.
+        $ids = User::withoutGlobalScope(ActiveScope::class)
+            ->with('roles')
+            ->whereIn('id', explode(',', $request->row_ids))
+            ->where('id', '<>', user()->id)
+            ->get()
+            ->filter(fn ($u) => !in_array('admin', $u->roles->pluck('name')->toArray()) || in_array('admin', user_roles()))
+            ->pluck('id');
+
+        User::withoutGlobalScope(ActiveScope::class)->whereIn('id', $ids)->update(['status' => $request->status, 'inactive_date' => $inactiveDate]);
     }
 
     /**

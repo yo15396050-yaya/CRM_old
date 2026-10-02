@@ -442,6 +442,53 @@
             });
         });
 
+        // Activer / desactiver un employe depuis le menu « Action » de sa ligne.
+        $('body').on('click', '.change-employee-status', function () {
+            var id = $(this).data('user-id');
+            var status = $(this).data('status');
+            var desactiver = status == 'deactive';
+
+            Swal.fire({
+                title: "@lang('messages.sweetAlertTitle')",
+                text: desactiver
+                    ? "Le compte sera désactivé : l'employé ne pourra plus se connecter."
+                    : "Le compte sera réactivé : l'employé pourra de nouveau se connecter.",
+                icon: 'warning',
+                showCancelButton: true,
+                focusConfirm: false,
+                confirmButtonText: desactiver ? "@lang('app.deactivate')" : "@lang('app.activate')",
+                cancelButtonText: "@lang('app.cancel')",
+                customClass: {
+                    confirmButton: 'btn btn-primary mr-3',
+                    cancelButton: 'btn btn-secondary'
+                },
+                showClass: {
+                    popup: 'swal2-noanimation',
+                    backdrop: 'swal2-noanimation'
+                },
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.easyAjax({
+                        url: "{{ route('employees.apply_quick_action') }}",
+                        type: 'POST',
+                        blockUI: true,
+                        data: {
+                            '_token': "{{ csrf_token() }}",
+                            action_type: 'change-status',
+                            status: status,
+                            row_ids: id
+                        },
+                        success: function (response) {
+                            if (response.status == 'success') {
+                                showTable();
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
         const applyQuickAction = () => {
             var rowdIds = $("#employees-table input:checkbox:checked").map(function () {
                 return $(this).val();

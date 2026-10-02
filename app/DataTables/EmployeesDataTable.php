@@ -129,6 +129,20 @@ class EmployeesDataTable extends BaseDataTable
                 }
             }
 
+            /* Activer / desactiver le compte depuis la ligne : meme regle que
+               l'action groupee (droit « all » sur la modification des
+               employes), jamais sur son propre compte, et un administrateur
+               ne peut etre desactive que par un administrateur. */
+            if ($this->editEmployeePermission == 'all' && user()->id !== $row->id
+                && (!in_array('admin', $userRole) || in_array('admin', user_roles()))) {
+                $desactiver = $row->status == 'active';
+                $action .= '<a class="dropdown-item change-employee-status" href="javascript:;" data-user-id="' . $row->id . '"
+                                data-status="' . ($desactiver ? 'deactive' : 'active') . '">
+                                <i class="fa ' . ($desactiver ? 'fa-ban' : 'fa-check-circle') . ' mr-2"></i>
+                                ' . ($desactiver ? __('app.deactivate') : __('app.activate')) . '
+                            </a>';
+            }
+
             if ($this->deleteEmployeePermission == 'all' || ($this->deleteEmployeePermission == 'added' && user()->id == $row->added_by)) {
                 if ((!in_array('admin', $userRole) && user()->id !== $row->id) || (user()->id !== $row->id && in_array('admin', $userRole) && in_array('admin', user_roles()))) {
                     $action .= '<a class="dropdown-item delete-table-row" href="javascript:;" data-user-id="' . $row->id . '">

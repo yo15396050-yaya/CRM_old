@@ -50,6 +50,8 @@ return [
     'status' => 'Statut',
     'active' => 'Actif',
     'inactive' => 'Inactif',
+    'activate' => 'Activer',
+    'deactivate' => 'Désactiver',
     'open' => 'Ouvert',
     'closed' => 'Fermé',
     'complete' => 'Terminer',

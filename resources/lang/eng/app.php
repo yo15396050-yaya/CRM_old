@@ -65,6 +65,8 @@ return [
     'employeeId' => 'Employee Id',
     'logout' => 'Logout',
     'active' => 'Active',
+    'activate' => 'Activate',
+    'deactivate' => 'Deactivate',
     'license_expired' => 'License Expired',
     'clientName' => 'Client Name',
     'lead' => 'Lead',

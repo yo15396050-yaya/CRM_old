@@ -220,7 +220,7 @@ trait RapportHebdomadaire
             'semaineIso'     => $debut->format('o-\WW'),
             'taches'         => $lignes,
             'synthese'       => $this->syntheseHebdomadaire($lignes),
-            'collaborateurs' => $this->activiteParCollaborateur($lignes),
+            'collaborateurs' => $this->activiteParCollaborateur($lignes, $limiteA),
         ];
     }
 
@@ -247,9 +247,40 @@ trait RapportHebdomadaire
         ];
     }
 
-    private function activiteParCollaborateur($lignes)
+    /**
+     * Tous les collaborateurs actifs du cabinet, meme sans tache sur la
+     * semaine : sans eux, la liste « Collaborateurs » du rapport ne
+     * proposait que les personnes ayant eu une tache dans la periode.
+     */
+    private function collaborateursActifs()
+    {
+        return DB::table('users')
+            ->join('employee_details', 'employee_details.user_id', '=', 'users.id')
+            ->join('role_user', 'role_user.user_id', '=', 'users.id')
+            ->join('roles', 'roles.id', '=', 'role_user.role_id')
+            ->where('roles.name', 'employee')
+            ->where('users.company_id', company()->id)
+            ->where('users.status', 'active')
+            ->select('users.id', 'users.name')
+            ->distinct()
+            ->orderBy('users.name')
+            ->get();
+    }
+
+    private function activiteParCollaborateur($lignes, ?int $limiteA = null)
     {
         $par = [];
+
+        /* Rapport de tout le cabinet : chacun part d'une ligne a zero, les
+           taches de la semaine viennent ensuite la remplir. Un rapport
+           limite a une personne reste limite a elle. */
+        foreach ($limiteA ? [] : $this->collaborateursActifs() as $u) {
+            $par[$u->id] = (object) [
+                'id' => $u->id, 'nom' => $u->name,
+                'total' => 0, 'termines' => 0, 'enCours' => 0,
+                'aFaire' => 0, 'retards' => 0, 'delais' => [], 'pointe' => 0,
+            ];
+        }
 
         foreach ($lignes as $t) {
             foreach ($t->gens as $g) {
@@ -280,7 +311,8 @@ trait RapportHebdomadaire
 
                 return $l;
             })
-            ->sortByDesc('total')
+            // Les plus actifs d'abord, puis par ordre alphabetique.
+            ->sortBy([['total', 'desc'], ['nom', 'asc']])
             ->values();
     }
 

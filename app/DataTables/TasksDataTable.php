@@ -315,7 +315,7 @@ class TasksDataTable extends BaseDataTable
 
                     foreach ($taskBoardColumns as $item) {
                         if ($item->id != $taskBoardColumn->id) {
-                            if ($item->slug == 'completed' && !in_array(user()->id, $taskUsers) && $item->id != $row->board_column_id) {
+                            if ($item->slug == 'completed' && !est_assigne_tache($row) && $item->id != $row->board_column_id) {
                                 continue;
                             }
                             $status .= '<option ';
