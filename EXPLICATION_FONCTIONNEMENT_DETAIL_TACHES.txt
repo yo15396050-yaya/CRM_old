@@ -1,0 +1,132 @@
+================================================================================
+          FONCTIONNEMENT DU MODULE DE CONSULTATION DES TACHES (CRM)
+================================================================================
+
+Ce document explique en détail et pas a pas comment fonctionne l'ouverture
+et l'affichage de la page de detail d'une tache ("Voir / Consulter"), ce qui
+provoquait l'erreur HTTP 500 et comment le systeme est securise.
+
+--------------------------------------------------------------------------------
+1. LE PARCOURS COMPLET DU CLIC "VOIR / CONSULTER"
+--------------------------------------------------------------------------------
+
+Lorsque vous etes dans la liste des taches et que vous cliquez sur "Voir",
+"Consulter" ou le titre d'une tache :
+
+1. LE FRONT-END (DataTable / Interface) :
+   - Le bouton "Voir" ou le lien sur le titre declenche une requete HTTP GET.
+   - L'URL cible est de la forme : /account/tasks/{id}
+   - La classe CSS "openRightModal" intercepte l'evenement en JavaScript (AJAX)
+     pour ouvrir le tiroir lateral droit (Right Modal).
+
+2. LA ROUTE LARAVEL :
+   - Fichier : routes/web.php
+   - Route : Route::resource('tasks', TaskController::class);
+   - Nom de route : tasks.show
+   - Methode HTTP : GET
+
+3. LE CONTROLEUR :
+   - Fichier : app/Http/Controllers/TaskController.php
+   - Methode : show($id)
+   - L'ID de la tache est recupere en parametre.
+
+4. RECUPERATION EN BASE DE DONNEES (Eloquent) :
+   - Le controleur execute la requete Eloquent :
+     Task::with([
+         'boardColumn', 'project', 'users', 'label', 'approvedTimeLogs',
+         'mentionTask', 'comments', 'subtasks.files', 'userActiveTimer',
+         'files', 'subtasks'
+     ])->findOrFail($id);
+   - "findOrFail($id)" garantit que si la tache n'existe pas en base,
+     Laravel retourne proprement une erreur 404 (Page non trouvee), sans crash 500.
+
+5. VERIFICATION DES AUTORISATIONS DE SECURITE (Backend) :
+   - Le controleur verifie les droits de l'utilisateur connecte :
+     * Est-il ADMIN ou Arbitre ? -> OUI -> Acces autorise.
+     * Est-il le CREATEUR de la tache (added_by ou created_by) ? -> OUI -> Acces autorise.
+     * Est-il l'ASSIGNE de la tache (dans la table pivot task_users) ? -> OUI -> Acces autorise.
+     * Est-il chef du projet ou client concerne ? -> OUI -> Acces autorise.
+     * Si l'utilisateur n'est rien de tout cela -> abort_403() bloque l'acces
+       avec un code HTTP 403 propre ("Acces refuse"), sans provoquer d'erreur 500.
+
+6. CHARGEMENT ET RENDU DE LA VUE BLADE :
+   - Le controleur injecte les donnees de la tache dans la vue :
+     resources/views/tasks/ajax/show.blade.php
+   - Si la requete est faite en AJAX, Laravel renvoie le HTML de la vue au format AJAX
+     qui s'injecte directement dans la modal droite de votre ecran.
+
+--------------------------------------------------------------------------------
+2. QUELLE ETAIT LA CAUSE EXACTE DE L'ERREUR HTTP 500 ?
+--------------------------------------------------------------------------------
+
+L'erreur HTTP 500 n'etait ni un probleme de base de donnees, ni un probleme serveur,
+mais une ERREUR DE SYNTAXE dans le fichier de vue Blade :
+resources/views/tasks/ajax/show.blade.php
+
+Dans ce fichier, la directive de condition Blade etait dupliquee a la ligne 21 et 24 :
+
+   Ligne 21 : @if (peut_changer_statut_tache($task))
+   Ligne 22 : {{-- Commentaire --}}
+   Ligne 23 : {{-- Commentaire --}}
+   Ligne 24 : @if (peut_changer_statut_tache($task))
+
+Il y avait donc DEUX balises "@if" ouvertes pour UNE SEULE balise "@endif" fermee.
+
+Conséquence technique :
+1. Laravel compile les fichiers .blade.php en fichiers PHP mis en cache
+   dans storage/framework/views/.
+2. A cause du @if en trop, le fichier PHP genere contenait un "if (" qui n'etait
+   jamais ferme par "}".
+3. PHP rencontrait alors une erreur fatale d'analyse :
+   "Parse error: syntax error, unexpected end of file, expecting elseif or else or endif"
+4. Comme PHP ne pouvait pas interpreter le fichier, Laravel capturait l'exception
+   et affichait l'ecran generique d'erreur serveur : "500 | Something Went Wrong".
+
+--------------------------------------------------------------------------------
+3. COMMENT LES REGLES DE SECURITE FONCTIONNENT MAINTENANT ?
+--------------------------------------------------------------------------------
+
+L'application respecte rigoureusement la matrice des droits :
+
+1. Profil ADMIN / Arbitre (roles: admin, dg-dck, dga-dck) :
+   - Peut ouvrir, consulter et modifier n'importe quelle tache du CRM.
+
+2. Profil Collaborateur A (Createur) :
+   - A cree une tache pour B.
+   - A peut consulter la tache (HTTP 200).
+
+3. Profil Collaborateur B (Assigne) :
+   - B est affecte a la tache de A.
+   - B peut consulter la tache (HTTP 200).
+
+4. Profil Collaborateur C (Autre collaborateur) :
+   - C n'est ni le createur, ni l'assigne de la tache.
+   - Si C tente d'ouvrir l'URL /account/tasks/{id}, le systeme bloque l'acces
+     via "abort_403" qui repond par un code HTTP 403 propre ("Permission Denied"),
+     sans jamais declencher d'erreur 500.
+
+5. Tache inexistante (Ex: ID invalide /account/tasks/99999999) :
+   - findOrFail() repond avec un code HTTP 404 propre ("Not Found").
+
+6. Tache avec donnees incompletes :
+   - Une tache sans projet, sans categorie, sans description ou sans dates
+     s'affiche correctement sans planter grace aux verifications d'existence
+     (optional / operateurs null-safe ??).
+
+--------------------------------------------------------------------------------
+4. FICHIERS CONCERNES PAR LE CORRECTIF
+--------------------------------------------------------------------------------
+
+1. resources/views/tasks/ajax/show.blade.php :
+   - Suppression du @if duplique pour retablir une syntaxe Blade / PHP 100% valide.
+
+2. app/Http/Controllers/TaskController.php :
+   - Alignement du controle d'autorisation dans show() pour que seuls l'ADMIN,
+     le createur, l'assigne (ou les ayants droit) puissent afficher le detail,
+     et que les autres profils soient bloques en HTTP 403 sans erreur 500.
+
+3. Cache des vues Blade :
+   - Reinitialise avec "php artisan view:clear" pour regenerer des fichiers
+     compiles propres et a jour.
+
+================================================================================

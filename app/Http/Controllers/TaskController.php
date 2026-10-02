@@ -1472,9 +1472,7 @@ class TaskController extends AccountBaseController
             && $this->task->project_id
             && !is_null($this->task->project)
             && $this->task->project->client_id == user()->id;
-
-        // Outil collaboratif : tout collaborateur peut consulter le détail des tâches non privées
-        $isCollaborativeView = ($this->task->is_private == 0 && (in_array('employee', user_roles()) || in_array($viewTaskPermission, ['all', 'both', 'owned', 'added'])));
+        $hasAllPermission = ($viewTaskPermission == 'all' && $this->task->is_private == 0);
 
         abort_403(
             !(
@@ -1485,7 +1483,7 @@ class TaskController extends AccountBaseController
             || $isTaskMentioned
             || $isProjectAdmin
             || $isClientOfProject
-            || $isCollaborativeView
+            || $hasAllPermission
             )
         );
 

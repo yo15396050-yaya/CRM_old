@@ -19,9 +19,6 @@
                             {{-- Seul l'employe assigne peut changer le statut de la tache
                                  (l'arbitre garde la main sur une tache en attente d'approbation). --}}
                             @if (peut_changer_statut_tache($task))
-                            {{-- Seul l'employe assigne peut changer le statut de la tache
-                                 (l'arbitre garde la main sur une tache en attente d'approbation). --}}
-                            @if (peut_changer_statut_tache($task))
                             {{-- approval_send --}}
                                 @php
                                     $userRoles = user_roles();
