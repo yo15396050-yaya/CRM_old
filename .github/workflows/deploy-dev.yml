@@ -1,0 +1,181 @@
+# Déploiement automatique de la branche `dev` vers l'environnement de développement
+#
+# Déclenchement : chaque push sur `dev`, ou manuellement (onglet Actions > Run workflow).
+#
+# Secrets à créer dans GitHub (Settings > Secrets and variables > Actions > Secrets) :
+#   DEV_SFTP_HOST      ex. ftp.dc-knowing.com
+#   DEV_SFTP_PORT      ex. 22
+#   DEV_SFTP_USER      identifiant SFTP
+#   DEV_SFTP_PASSWORD  mot de passe SFTP
+#   DEV_REMOTE_PATH    dossier de DEV sur le serveur, ex. /htdocs/CRM_DEV
+#                      (JAMAIS le dossier de production /htdocs/CRM)
+#
+# Variable optionnelle (Settings > Secrets and variables > Actions > Variables) :
+#   DEV_SSH_ARTISAN = true   -> lance `php artisan migrate` et `optimize:clear`
+#                               en SSH après l'envoi (seulement si l'hébergement
+#                               autorise SSH avec les mêmes identifiants).
+#
+# Ce qui n'est jamais envoyé ni écrasé sur le serveur :
+#   .env, .git, node_modules, tests, sync_config.jsonc, les logs, les sessions,
+#   les fichiers de storage/app et public/user-uploads (fichiers des utilisateurs).
+# Rien n'est supprimé côté serveur (pas de --delete).
+
+name: Déploiement DEV
+
+on:
+  push:
+    branches: [dev]
+  workflow_dispatch:
+    inputs:
+      envoyer_vendor:
+        description: "Réinstaller et renvoyer tout le dossier vendor (cocher au 1er déploiement)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: deploy-dev
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Envoi sur le serveur de dev
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      SFTP_HOST: ${{ secrets.DEV_SFTP_HOST }}
+      SFTP_PORT: ${{ secrets.DEV_SFTP_PORT }}
+      SFTP_USER: ${{ secrets.DEV_SFTP_USER }}
+      LFTP_PASSWORD: ${{ secrets.DEV_SFTP_PASSWORD }}
+      REMOTE_PATH: ${{ secrets.DEV_REMOTE_PATH }}
+
+    steps:
+      - name: Vérifier la configuration
+        id: config
+        run: |
+          manquants=""
+          [ -z "$SFTP_HOST" ]     && manquants="$manquants DEV_SFTP_HOST"
+          [ -z "$SFTP_USER" ]     && manquants="$manquants DEV_SFTP_USER"
+          [ -z "$LFTP_PASSWORD" ] && manquants="$manquants DEV_SFTP_PASSWORD"
+          [ -z "$REMOTE_PATH" ]   && manquants="$manquants DEV_REMOTE_PATH"
+          if [ -n "$manquants" ]; then
+            echo "::warning::Déploiement ignoré : secrets manquants :$manquants"
+            echo "ok=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          case "$REMOTE_PATH" in
+            /htdocs/CRM|/htdocs/CRM/)
+              echo "::error::DEV_REMOTE_PATH pointe vers le dossier de PRODUCTION. Déploiement bloqué."
+              exit 1 ;;
+          esac
+          echo "ok=true" >> "$GITHUB_OUTPUT"
+
+      - name: Récupérer le code
+        if: steps.config.outputs.ok == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Remettre les dates des fichiers à celles des commits
+        if: steps.config.outputs.ok == 'true'
+        # Permet de n'envoyer que les fichiers réellement modifiés.
+        uses: chetan/git-restore-mtime-action@v2
+
+      - name: Le dossier vendor doit-il être renvoyé ?
+        if: steps.config.outputs.ok == 'true'
+        id: vendor
+        run: |
+          avant="${{ github.event.before }}"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "envoyer=${{ inputs.envoyer_vendor }}" >> "$GITHUB_OUTPUT"
+          elif [ -z "$avant" ] || [ "$avant" = "0000000000000000000000000000000000000000" ] \
+               || ! git cat-file -e "$avant" 2>/dev/null; then
+            echo "envoyer=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "$avant" "${{ github.sha }}" | grep -qE '^composer\.(json|lock)$'; then
+            echo "envoyer=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "envoyer=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Installer PHP
+        if: steps.config.outputs.ok == 'true' && steps.vendor.outputs.envoyer == 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.1"
+          extensions: mbstring, intl, gd, zip, bcmath, exif, pdo_mysql, curl, fileinfo, soap
+          tools: composer:v2
+          coverage: none
+
+      - name: Installer les dépendances Composer (production)
+        if: steps.config.outputs.ok == 'true' && steps.vendor.outputs.envoyer == 'true'
+        run: |
+          composer install --no-dev --prefer-dist --no-interaction \
+            --no-progress --no-scripts --optimize-autoloader
+
+      - name: Installer lftp
+        if: steps.config.outputs.ok == 'true'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
+      - name: Envoyer les fichiers en SFTP
+        if: steps.config.outputs.ok == 'true'
+        run: |
+          PORT="${SFTP_PORT:-22}"
+          if [ "${{ steps.vendor.outputs.envoyer }}" = "true" ]; then
+            EXCLURE_VENDOR=""
+          else
+            EXCLURE_VENDOR="-x ^vendor/"
+          fi
+
+          lftp -c "
+            set sftp:auto-confirm yes;
+            set net:max-retries 3;
+            set net:timeout 30;
+            set net:reconnect-interval-base 5;
+            open --env-password -u '$SFTP_USER' sftp://$SFTP_HOST:$PORT;
+            mkdir -p -f '$REMOTE_PATH';
+            mirror --reverse --only-newer --parallel=6 --verbose=1 \
+              -x '^\.git/' \
+              -x '^\.github/' \
+              -x '^node_modules/' \
+              -x '^\.env' \
+              -x '^sync_config\.jsonc$' \
+              -x '^tests/' \
+              -x '^docs/' \
+              -x '^Documents/' \
+              -x '^storage/(logs|app|framework/(sessions|cache|views))/.*[^/]$' \
+              -x '^public/user-uploads/.*[^/]$' \
+              -x '^public/storage' \
+              -x '^bootstrap/cache/.*\.php$' \
+              $EXCLURE_VENDOR \
+              ./ '$REMOTE_PATH';
+            set cmd:fail-exit no;
+            rm -f '$REMOTE_PATH/bootstrap/cache/config.php';
+            rm -f '$REMOTE_PATH/bootstrap/cache/routes-v7.php';
+            rm -f '$REMOTE_PATH/bootstrap/cache/events.php';
+            rm -f '$REMOTE_PATH/bootstrap/cache/services.php';
+            rm -f '$REMOTE_PATH/bootstrap/cache/packages.php';
+            bye
+          "
+
+      - name: Migrations et vidage des caches (SSH, optionnel)
+        if: steps.config.outputs.ok == 'true' && vars.DEV_SSH_ARTISAN == 'true'
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DEV_SFTP_HOST }}
+          port: ${{ secrets.DEV_SFTP_PORT }}
+          username: ${{ secrets.DEV_SFTP_USER }}
+          password: ${{ secrets.DEV_SFTP_PASSWORD }}
+          script: |
+            cd "${{ secrets.DEV_REMOTE_PATH }}"
+            php artisan migrate --force
+            php artisan optimize:clear
+
+      - name: Résumé
+        if: steps.config.outputs.ok == 'true'
+        run: |
+          {
+            echo "### Déploiement DEV terminé"
+            echo "- Commit : \`${{ github.sha }}\`"
+            echo "- Dossier vendor renvoyé : ${{ steps.vendor.outputs.envoyer }}"
+            echo "- Migrations SSH : ${{ vars.DEV_SSH_ARTISAN == 'true' && 'oui' || 'non (à lancer à la main si besoin)' }}"
+          } >> "$GITHUB_STEP_SUMMARY"
