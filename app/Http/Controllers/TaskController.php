@@ -17,6 +17,7 @@ use App\Http\Requests\Tasks\ActionTask;
 use App\Models\TaskComment;
 
 use App\Models\BaseModel;
+use App\Models\Team;
 
 use App\Models\TaskLabel;
 use App\Models\SubTaskFile;
@@ -112,6 +113,7 @@ class TaskController extends AccountBaseController
             $this->taskCategories = TaskCategory::all();
             $this->taskLabels = TaskLabelList::all();
             $this->milestones = ProjectMilestone::all();
+            $this->departments = Team::orderBy('team_name')->get();
 
             $taskBoardColumn = TaskboardColumn::waitingForApprovalColumn();
 
@@ -1822,7 +1824,9 @@ class TaskController extends AccountBaseController
 
     public function clientDetail(Request $request)
     {
-        $project = Project::with('client')->findOrFail($request->id);
+        if (empty($request->id)) { return Reply::dataOnly(['data' => '']); }
+        $project = Project::with('client')->find($request->id);
+        if (is_null($project)) { return Reply::dataOnly(['data' => '']); }
 
         if (!is_null($project->client)) {
             $data = '<h5 class= "mb-2 f-13"> ' . __('modules.projects.projectClient') . '</h5>';

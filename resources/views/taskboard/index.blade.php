@@ -214,18 +214,21 @@ $addTaskPermission = user()->permission('add_tasks');
                      les deux ecrans montrent les memes taches, le bouton
                      doit se trouver au meme endroit dans les deux. --}}
                 @if (in_array(user()->permission('add_tasks'), ['all', 'added']))
-                    <x-forms.link-secondary :link="route('tasks.import')" icon="upload">
+                    <x-forms.link-secondary :link="route('tasks.import')" icon="upload" class="mr-lg-3 mr-1">
                         @lang('Importer')
                     </x-forms.link-secondary>
                 @endif
 
+                {{-- Filtre Département --}}
+                @include('tasks.filters.department', ['wrapperClass' => 'my-1 mr-lg-3 mr-1'])
+
             </div>
 
             <div class="btn-group mt-2 mt-lg-0 mt-md-0 ml-0 ml-lg-3 ml-md-3" role="group">
-                <a href="{{ route('tasks.index') }}" class="btn btn-secondary f-14" data-toggle="tooltip"
+                <a href="{{ route('tasks.index') . (request('department') ? '?department=' . request('department') : '') }}" class="btn btn-secondary f-14 view-list-link" data-toggle="tooltip"
                     data-original-title="@lang('app.menu.tasks')"><i class="side-icon bi bi-list-ul"></i></a>
 
-                <a href="{{ route('taskboards.index') }}" class="btn btn-secondary f-14 btn-active" data-toggle="tooltip"
+                <a href="{{ route('taskboards.index') . (request('department') ? '?department=' . request('department') : '') }}" class="btn btn-secondary f-14 btn-active" data-toggle="tooltip"
                     data-original-title="@lang('modules.tasks.taskBoard')"><i class="side-icon bi bi-kanban"></i></a>
 
                 <a href="{{ route('task-calendar.index') }}" class="btn btn-secondary f-14" data-toggle="tooltip"
@@ -285,9 +288,21 @@ $addTaskPermission = user()->permission('add_tasks');
             ...datepickerConfig
         });
 
-        $('#billable_task, #status, #clientID, #category_id, #assignedBY, #assignedTo, #label, #project_id')
+        function updateViewLinks() {
+            var deptVal = $('#department').val();
+            var listBtn = $('.view-list-link');
+            var baseListUrl = "{{ route('tasks.index') }}";
+            if (deptVal && deptVal !== 'all') {
+                listBtn.attr('href', baseListUrl + '?department=' + encodeURIComponent(deptVal));
+            } else {
+                listBtn.attr('href', baseListUrl);
+            }
+        }
+
+        $('#billable_task, #status, #clientID, #category_id, #assignedBY, #assignedTo, #label, #project_id, #department')
             .on('change keyup',
                 function() {
+                    updateViewLinks();
                     if ($('#status').val() != "not finished") {
                         $('#reset-filters').removeClass('d-none');
                         loadData();
@@ -312,6 +327,9 @@ $addTaskPermission = user()->permission('add_tasks');
                     } else if ($('#billable_task').val() != "all") {
                         $('#reset-filters').removeClass('d-none');
                         loadData();
+                    } else if ($('#department').val() != "all") {
+                        $('#reset-filters').removeClass('d-none');
+                        loadData();
                     } else {
                         $('#reset-filters').addClass('d-none');
                         loadData();
@@ -330,6 +348,9 @@ $addTaskPermission = user()->permission('add_tasks');
 
             $('.filter-box #status').val('not finished');
             $('.filter-box .select-picker').selectpicker("refresh");
+            $('#department').val('all');
+            $('#department').selectpicker("refresh");
+            updateViewLinks();
             $('#reset-filters').addClass('d-none');
             loadData();
         });
@@ -356,11 +377,12 @@ $addTaskPermission = user()->permission('add_tasks');
             var labelId = $('#label').val();
             var searchText = $('#search-text-field').val();
             var billable = $('#billable_task').val();
+            var department = $('#department').val();
 
             var url = "{{ route('taskboards.index') }}?startDate=" + encodeURIComponent(startDate) + '&endDate=' +
                 encodeURIComponent(endDate) + '&clientID=' + clientID + '&assignedBY=' + assignedBY + '&assignedTo=' +
                 assignedTo + '&projectID=' + projectID + '&category_id=' + categoryId + '&label_id=' + labelId +
-                '&searchText=' + searchText + '&billable=' + billable;
+                '&searchText=' + searchText + '&billable=' + billable + '&department=' + encodeURIComponent(department);
 
             $.easyAjax({
                 url: url,
@@ -399,13 +421,15 @@ $addTaskPermission = user()->permission('add_tasks');
             var categoryId = $('#category_id').val();
             var labelId = $('#label').val();
             var searchText = $('#search-text-field').val();
+            var department = $('#department').val();
 
             var url = "{{ route('taskboards.load_more') }}?startDate=" + encodeURIComponent(startDate) +
                 '&endDate=' +
                 encodeURIComponent(endDate) + '&clientID=' + clientID + '&assignedBY=' + assignedBY +
                 '&assignedTo=' +
                 assignedTo + '&projectID=' + projectID + '&category_id=' + categoryId + '&label_id=' + labelId +
-                '&searchText=' + searchText + '&columnId=' + columnId + '&currentTotalTasks=' + currentTotalTasks +
+                '&searchText=' + searchText + '&department=' + encodeURIComponent(department) +
+                '&columnId=' + columnId + '&currentTotalTasks=' + currentTotalTasks +
                 '&totalTasks=' + totalTasks;
 
             $.easyAjax({
@@ -544,6 +568,11 @@ $addTaskPermission = user()->permission('add_tasks');
                 channel.bind('task-updated', function (data) {
                 loadData()
             });
+        }
+
+        updateViewLinks();
+        if ($('#department').val() && $('#department').val() !== 'all') {
+            $('#reset-filters').removeClass('d-none');
         }
 
         loadData();

@@ -85,7 +85,7 @@
                                             :popover="__('modules.tasks.notFinishedProjects')"
                                             search="true">
                                 <option value="">--</option>
-                                @if($viewProjectPermission != 'none' && in_array('employee', user_roles()))
+                                @if($viewProjectPermission != 'none')
                                 @foreach ($projects as $data)
                                     <option
                                         data-content="{!! '<strong>'.$data->project_short_code."</strong> ".$data->project_name !!}"
@@ -867,9 +867,19 @@
                     var atValues = data.userData;
                     destory_editor('#description')
                     quillMention(atValues, '#description');
+                    $('#selectAssignee').selectpicker('destroy');
                     $('#selectAssignee').html(data.data);
                     $('.projectId').text(data.unique_id + '-');
-                    $('#selectAssignee').selectpicker('refresh');
+                    $('#selectAssignee').selectpicker({
+                        actionsBox: true,
+                        selectAllText: "{{ __('modules.permission.selectAll') }}",
+                        deselectAllText: "{{ __('modules.permission.deselectAll') }}",
+                        multipleSeparator: " ",
+                        selectedTextFormat: "count > 8",
+                        countSelectedText: function (selected, total) {
+                            return selected + " {{ __('app.membersSelected') }} ";
+                        }
+                    });
                 }
             })
         });

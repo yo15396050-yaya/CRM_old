@@ -26,7 +26,8 @@
 <!--@endphp-->
 
 @php
-function addWatermark($text, $angle = -45) {
+if (!function_exists('addWatermark')) {
+    function addWatermark($text, $angle = -45) {
     $a4Width = 596;
     $a4Height = 842;
 
@@ -37,6 +38,7 @@ function addWatermark($text, $angle = -45) {
     $style .= 'position: absolute; top: '.$y.'px; left: '.$x.'px; transform: rotate('.$angle.'deg); pointer-events: none;';
 
     return '<div style="'.$style.'">'.htmlspecialchars($text).'</div>';
+    }
 }
 
 $watermarkText = date('Y');
@@ -436,7 +438,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     <li>&#8211; CDI de rattachement : <strong>{{$contract->client->clientDetails->imp_centre}}</strong></li>
                     <li>&#8211; Tel : <strong>{{$contract->client->mobile}}</strong><strong></strong></li>
                     </ol>
-                    <table border="0" style="width:100%; border-collapse: collapse;">
+                    <table border="0" style="width:100%; border-collapse: collapse; page-break-inside: avoid;">
                         <tbody>
                             <tr style="height:10px;">
                                 <td style="width:33.3333%;height:10px; border: none;"></td>
@@ -522,7 +524,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     <p></p>
                 </div>
                 <p><br></p>
-                <p pagebreak="true"></p>
+                <div class="page_break"></div>
                 <div class="">
                     {!! $watermark !!}
                     <p><br></p>
@@ -558,7 +560,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     <li>&#8211; CDI de rattachement : <strong>{{$contract->client->clientDetails->imp_centre}}</strong></li>
                     <li>&#8211; Tel : <strong>{{$contract->client->mobile}}</strong><strong></strong></li>
                     </ol>
-                    <table border="0" style="width:100%; border-collapse: collapse; margin: 0 auto;">
+                    <table border="0" style="width:100%; border-collapse: collapse; margin: 0 auto; page-break-inside: avoid;">
                         <tbody>
                             <tr style="height:15px;">
                                 <td style="width:33.3333%; height:15px; border: none;"></td>
@@ -585,7 +587,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     </table>
                 </div>
                 <p><br></p>
-                <p pagebreak="true"></p>
+                <div class="page_break"></div>
                 <div class="">
                     {!! $watermark !!}
                     <p><strong><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">Entre les soussign&#233;s</span></strong><br><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">1.-Nom du Centre de Gestion Agr&#233;&#233; (CGA) : <strong>DC-KNOWING CGA </strong></span><br><span style="font-size:8pt;font-family:helvetica, arial, sans-serif;">Forme juridique&#160;: <strong>SARL</strong></span><br><span style="font-size:8pt;font-family:helvetica, arial, sans-serif;">Montant du capital social&#160;: <strong>1.000.000&#160; FCFA</strong></span><br><span style="font-size:8pt;font-family:helvetica, arial, sans-serif;">Adresse du si&#232;ge social : <strong>ABIDJAN, Cocody, II Plateaux 7<sup>&#232;me</sup> tranche </strong></span></p>
@@ -611,11 +613,11 @@ $numadh = $contract->client->clientDetails->company_name;
                     <p><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;"><strong><u>ARTICLE 1<sup>er</sup></u></strong><strong> : OBJET </strong></span><br><span style="font-size:8pt;font-family:helvetica, arial, sans-serif;">Le pr&#233;sent contrat a pour objet de confier au Centre de Gestion Agr&#233;&#233;, DC-KNOWING, la mission d'assister l'Adh&#233;rent en mati&#232;re de gestion et de formation dans les domaines financier, comptable, juridique, commercial et fiscal et de d&#233;finir les obligations devant &#234;tre remplies par l'adh&#233;rent pour permettre au Centre d'accomplir pleinement sa mission. A ce titre, le pr&#233;sent contrat :</span></p>
                     <ul>
                     <li><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">d&#233;finit les relations entre le Centre et l'Adh&#233;rent au plan de leurs obligations et droits r&#233;ciproques,</span></li>
-                    <li><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">pr&#233;cise les modalit&#233;s de fonctionnement de ces relations.</span><p pagebreak="true"></p></li> 
+                    <li><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">pr&#233;cise les modalit&#233;s de fonctionnement de ces relations.</span></li> 
                     </ul>
                 </div>
                 <p><br></p>
-                <p pagebreak="true"></p>
+                <div class="page_break"></div>
                 <div class="">
                     {!! $watermark !!}
                     <p><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;"><strong><u>ARTICLE 2</u></strong><strong> : CADRE LEGAL ET REGLEMENTAIRE </strong></span><br><span style="font-size:8pt;font-family:helvetica, arial, sans-serif;">Le pr&#233;sent contrat s'ex&#233;cute dans le respect des dispositions l&#233;gales et r&#233;glementaires en vigueur, en particulier :</span></p>
@@ -656,7 +658,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     <p><span style="font-size:8pt;font-family:helvetica, arial, sans-serif;">&#160;Ainsi que tous les renseignements utiles aux bonnes relations entre l'Adh&#233;rent et le Centre.</span></p>
                 </div>
                 <p><br></p>
-                <p pagebreak="true"></p>
+                <div class="page_break"></div>
                 <div >
                     {!! $watermark !!}
                     <ul>
@@ -691,7 +693,7 @@ $numadh = $contract->client->clientDetails->company_name;
                     </ul>
                     <p><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">La r&#233;siliation peut intervenir &#224; l'initiative de l'Adh&#233;rent. Elle r&#233;sultera notamment de la cessation d'activit&#233;, de la vente du fonds de commerce ou de la d&#233;faillance du Centre dans l'accomplissement de sa mission.</span> <br><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">La r&#233;siliation &#224; l'initiative de l'Adh&#233;rent doit &#234;tre signifi&#233;e par &#233;crit au Centre, quel qu&#8217;en soit le motif.</span> <br><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">Lorsque l'Adh&#233;rent ne pr&#233;cise pas la date de prise d'effet de la r&#233;siliation du contrat, celle-ci est r&#233;put&#233;e valoir pour l'exercice en cours, &#224; la date de r&#233;ception de sa notification au Centre.</span> <br><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;">La r&#233;siliation ne peut en aucun cas entra&#238;ner le remboursement de la cotisation.</span> <br><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;"><u>_________________________</u></span><br><span style="font-size:8pt;"><sup>4</sup>Cette disposition ne concerne que les entreprises qui, au moment o&#249; elles contractent avec le Centre, viennent de d&#233;marrer leurs activit&#233;s.</span></p>
                 </div>
-                <p></p><p pagebreak="true"></p>
+                <div class="page_break"></div>
                 <div >
                     {!! $watermark !!}
                     <ul>
@@ -725,7 +727,7 @@ $numadh = $contract->client->clientDetails->company_name;
                         </tr>
                     </table>
 
-                    <table border="0" style="height:64px;width:100%;">
+                    <table border="0" style="height:64px;width:100%; page-break-inside: avoid;">
                     <tbody>
                     <tr style="height:16px;">
                     <td style="width:25%;height:16px;"><span style="font-family:helvetica, arial, sans-serif;font-size:8pt;"><strong><u>Pour&#160; l'Adh&#233;rent&#160;</u></strong></span></td>

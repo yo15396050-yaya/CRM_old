@@ -26,9 +26,8 @@ $content = "<div class='d-flex align-items-center text-left'>
     @endphp
 
     <option @selected($selected) 
+        title="{{ trim($user->name_salutation ?? $user->name) }}"
         data-content="{!! $content !!}" 
         data-email="{{ $user->email }}" 
         data-mobile="{{ $user->mobile }}" 
-        value="{{ $userID ?? $user->id }}">
-        {{ $user->name_salutation }}
-    </option>
+        value="{{ $userID ?? $user->id }}">{{ trim($user->name_salutation) }}</option>

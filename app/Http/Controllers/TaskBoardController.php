@@ -11,6 +11,7 @@ use App\Models\TaskboardColumn;
 use App\Models\TaskCategory;
 use App\Models\TaskLabelList;
 use App\Models\User;
+use App\Models\Team;
 use App\Models\UserTaskboardSetting;
 use App\Traits\ApprobationTache;
 use App\Traits\pusherConfigTrait;
@@ -55,6 +56,7 @@ class TaskBoardController extends AccountBaseController
         $this->publicTaskboardLink = encrypt($this->companyName);
         $this->taskCategories = TaskCategory::all();
         $this->taskLabels = TaskLabelList::all();
+        $this->departments = Team::orderBy('team_name')->get();
         $this->taskBoardColumn = TaskboardColumn::waitingForApprovalColumn();
 
         if (request()->ajax()) {
@@ -142,6 +144,8 @@ class TaskBoardController extends AccountBaseController
                     if ($request->billable != '' && $request->billable != null && $request->billable != 'all') {
                         $q->where('tasks.billable', '=', $request->billable);
                     }
+
+                    $this->applyDepartmentFilter($q, $request);
 
                     if ($request->searchText != '') {
                         $q->where(function ($query) {
@@ -268,6 +272,8 @@ class TaskBoardController extends AccountBaseController
                     if ($request->billable != '' && $request->billable != null && $request->billable != 'all') {
                         $q->where('tasks.billable', '=', $request->billable);
                     }
+
+                    $this->applyDepartmentFilter($q, $request);
 
                     if (($request->has('project_admin') && $request->project_admin != 1) || !$request->has('project_admin')) {
                         if ($this->viewTaskPermission == 'owned') {
@@ -486,6 +492,8 @@ class TaskBoardController extends AccountBaseController
         if ($request->label_id != '' && $request->label_id != null && $request->label_id != 'all') {
             $tasks->where('task_labels.label_id', '=', $request->label_id);
         }
+
+        $this->applyDepartmentFilter($tasks, $request);
 
         if (($request->has('project_admin') && $request->project_admin != 1) || !$request->has('project_admin')) {
             if ($this->viewTaskPermission == 'owned') {
@@ -765,6 +773,34 @@ class TaskBoardController extends AccountBaseController
 
         $currentSequence->priority = $request->priority;
         $currentSequence->save();
+    }
+
+    private function applyDepartmentFilter($query, $request)
+    {
+        $departmentId = $request->department ?? $request->department_id;
+        if ($departmentId != '' && $departmentId != null && $departmentId != 'all') {
+            $query->where(function ($subQ) use ($departmentId) {
+                $subQ->whereExists(function ($sub) use ($departmentId) {
+                    $sub->select(DB::raw(1))
+                        ->from('task_users')
+                        ->join('employee_details', 'employee_details.user_id', '=', 'task_users.user_id')
+                        ->whereColumn('task_users.task_id', 'tasks.id')
+                        ->where('employee_details.department_id', $departmentId);
+                })
+                ->orWhereExists(function ($sub) use ($departmentId) {
+                    $sub->select(DB::raw(1))
+                        ->from('project_departments')
+                        ->whereColumn('project_departments.project_id', 'tasks.project_id')
+                        ->where('project_departments.team_id', $departmentId);
+                })
+                ->orWhereExists(function ($sub) use ($departmentId) {
+                    $sub->select(DB::raw(1))
+                        ->from('projects')
+                        ->whereColumn('projects.id', 'tasks.project_id')
+                        ->where('projects.team_id', $departmentId);
+                });
+            });
+        }
     }
 
 }

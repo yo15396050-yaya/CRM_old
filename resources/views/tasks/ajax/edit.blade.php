@@ -65,7 +65,7 @@ $editMilestonePermission = user()->permission('edit_project_milestones');
                                     title="@lang('modules.tasks.notFinishedProjects')"
                                 data-live-search="true" data-size="8">
                                 <option value="">--</option>
-                                @if($viewProjectPermission != 'none' && in_array('employee', user_roles()))
+                                @if($viewProjectPermission != 'none')
                                 @foreach ($projects as $project)
                                     <option @selected($project->id == $task->project_id) value="{{ $project->id }}"
                                             data-content="{!! '<strong>'.$project->project_short_code."</strong> ".$project->project_name !!}"
@@ -973,9 +973,19 @@ $editMilestonePermission = user()->permission('edit_project_milestones');
                 blockUI: true,
                 redirect: true,
                 success: function (data) {
+                    $('#selectAssignee').selectpicker('destroy');
                     $('#selectAssignee').html(data.data);
                     $('.projectId').text(data.unique_id);
-                    $('#selectAssignee').selectpicker('refresh');
+                    $('#selectAssignee').selectpicker({
+                        actionsBox: true,
+                        selectAllText: "{{ __('modules.permission.selectAll') }}",
+                        deselectAllText: "{{ __('modules.permission.deselectAll') }}",
+                        multipleSeparator: " ",
+                        selectedTextFormat: "count > 8",
+                        countSelectedText: function (selected, total) {
+                            return selected + " {{ __('app.membersSelected') }} ";
+                        }
+                    });
                 }
             })
         });

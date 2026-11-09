@@ -1183,13 +1183,13 @@ class ProjectController extends AccountBaseController
         $project = Project::select('id', 'public')->find($id);
         $checkPublic = ($project) ? $project->public : 0;
 
-        if ($id == 0 || $checkPublic == 1) {
+        if ($id == 0 || is_null($project) || $checkPublic == 1) {
             $members = User::allEmployees(null, true);
 
             foreach ($members as $item) {
                 $self_select = (user() && user()->id == $item->id) ? '<span class=\'ml-2 badge badge-secondary\'>' . __('app.itsYou') . '</span>' : '';
 
-                $options .= '<option  data-content="<span class=\'badge badge-pill badge-light border\'><div class=\'d-inline-block mr-1\'><img class=\'taskEmployeeImg rounded-circle\' src=' . $item->image_url . ' ></div> ' . $item->name . '' . $self_select . '</span>" value="' . $item->id . '"> ' . $item->name . '</option>';
+                $options .= '<option title="' . e($item->name) . '" data-content="<span class=\'badge badge-pill badge-light border\'><div class=\'d-inline-block mr-1\'><img class=\'taskEmployeeImg rounded-circle\' src=' . $item->image_url . ' ></div> ' . $item->name . '' . $self_select . '</span>" value="' . $item->id . '">' . $item->name . '</option>';
             }
 
             $projectShortCode = '--';
@@ -1207,9 +1207,9 @@ class ProjectController extends AccountBaseController
                 $content = ( $item->user->status == 'deactive') ? "<span class='badge badge-pill badge-danger border align-center ml-2 px-2'>Inactive</span>" : '';
                 $self_select = (user() && user()->id == $item->user->id) ? '<span class=\'ml-2 badge badge-secondary\'>' . __('app.itsYou') . '</span>' : '';
 
-                $options .= '<option
+                $options .= '<option title="' . e($item->user->name) . '"
                 data-content="<span class=\'badge badge-pill badge-light border\'><div class=\'d-inline-block mr-1\'><img class=\'taskEmployeeImg rounded-circle\' src=' . $item->user->image_url . ' ></div> ' . $item->user->name . '' . $self_select . '' . $content .'</span>"
-                value="' . $item->user->id . '"> ' . $item->user->name . ' </option>';
+                value="' . $item->user->id . '">' . $item->user->name . '</option>';
 
                 $url = route('employees.show', [$item->user->id]);
 

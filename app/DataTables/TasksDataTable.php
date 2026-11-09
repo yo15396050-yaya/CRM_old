@@ -694,6 +694,31 @@ class TasksDataTable extends BaseDataTable
             $model->where('tasks.milestone_id', $request->milestone_id);
         }
 
+        $departmentId = $request->department ?? $request->department_id;
+        if ($departmentId != '' && $departmentId != null && $departmentId != 'all') {
+            $model->where(function ($q) use ($departmentId) {
+                $q->whereExists(function ($sub) use ($departmentId) {
+                    $sub->select(DB::raw(1))
+                        ->from('task_users')
+                        ->join('employee_details', 'employee_details.user_id', '=', 'task_users.user_id')
+                        ->whereColumn('task_users.task_id', 'tasks.id')
+                        ->where('employee_details.department_id', $departmentId);
+                })
+                ->orWhereExists(function ($sub) use ($departmentId) {
+                    $sub->select(DB::raw(1))
+                        ->from('project_departments')
+                        ->whereColumn('project_departments.project_id', 'tasks.project_id')
+                        ->where('project_departments.team_id', $departmentId);
+                })
+                ->orWhereExists(function ($sub) use ($departmentId) {
+                    $sub->select(DB::raw(1))
+                        ->from('projects')
+                        ->whereColumn('projects.id', 'tasks.project_id')
+                        ->where('projects.team_id', $departmentId);
+                });
+            });
+        }
+
         if ($request->searchText != '') {
             $model->where(
                 function ($query) {

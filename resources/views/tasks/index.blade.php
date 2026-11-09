@@ -251,15 +251,20 @@ $viewUnassignedTasksPermission = user()->permission('view_unassigned_tasks');
         <div class="dck-card">
 
             <div class="dck-card__bar">
-                {{-- Conteneur d'injection du bouton d'export (initComplete) --}}
-                <div id="table-actions" class="d-flex align-items-center"></div>
+                <div class="d-flex align-items-center flex-wrap">
+                    {{-- Conteneur d'injection du bouton d'export (initComplete) --}}
+                    <div id="table-actions" class="d-flex align-items-center mr-3"></div>
+
+                    {{-- Filtre Département --}}
+                    @include('tasks.filters.department', ['wrapperClass' => 'mr-3 my-1'])
+                </div>
 
                 {{-- Selecteur de vue --}}
                 <div class="btn-group dck-seg" role="group">
-                    <a href="{{ route('tasks.index') }}" class="btn btn-secondary f-14 btn-active task"
+                    <a href="{{ route('tasks.index') . (request('department') ? '?department=' . request('department') : '') }}" class="btn btn-secondary f-14 btn-active task"
                        data-toggle="tooltip" data-original-title="@lang('app.menu.tasks')"><i class="side-icon bi bi-list-ul"></i></a>
 
-                    <a href="{{ route('taskboards.index') }}" class="btn btn-secondary f-14"
+                    <a href="{{ route('taskboards.index') . (request('department') ? '?department=' . request('department') : '') }}" class="btn btn-secondary f-14 view-kanban-link"
                        data-toggle="tooltip" data-original-title="@lang('modules.tasks.taskBoard')"><i class="side-icon bi bi-kanban"></i></a>
 
                     <a href="{{ route('task-calendar.index') }}" class="btn btn-secondary f-14"
@@ -319,6 +324,9 @@ $viewUnassignedTasksPermission = user()->permission('view_unassigned_tasks');
             if(assignedVal){
                 $('.filter-box #assignedTo').val(assignedVal);
             }
+            if ($('#department').val() && $('#department').val() !== 'all') {
+                $('#reset-filters').removeClass('d-none');
+            }
         });
 
         $('#allTasks-table').on('preXhr.dt', function(e, settings, data) {
@@ -352,10 +360,11 @@ $viewUnassignedTasksPermission = user()->permission('view_unassigned_tasks');
             var searchText = $('#search-text-field').val();
             var milestone_id = $('#milestone_id').val();
 
+            var department = $('#department').val();
+
             data['clientID'] = clientID;
             data['assignedBY'] = assignedBY;
             data['assignedTo'] = assignedTo;
-            data['status'] = status;
             data['status'] = status;
             data['label'] = label;
             data['category_id'] = category_id;
@@ -367,14 +376,27 @@ $viewUnassignedTasksPermission = user()->permission('view_unassigned_tasks');
             data['endDate'] = endDate;
             data['searchText'] = searchText;
             data['milestone_id'] = milestone_id;
+            data['department'] = department;
         });
         const showTable = () => {
             window.LaravelDataTables["allTasks-table"].draw(true);
         }
 
-        $('#milestone_id, #billable_task, #status, #clientID, #category_id, #assignedBY, #assignedTo, #label, #project_id_filter, #pinned, #date_filter_on')
+        function updateViewLinks() {
+            var deptVal = $('#department').val();
+            var kanbanBtn = $('.view-kanban-link');
+            var baseKanbanUrl = "{{ route('taskboards.index') }}";
+            if (deptVal && deptVal !== 'all') {
+                kanbanBtn.attr('href', baseKanbanUrl + '?department=' + encodeURIComponent(deptVal));
+            } else {
+                kanbanBtn.attr('href', baseKanbanUrl);
+            }
+        }
+
+        $('#milestone_id, #billable_task, #status, #clientID, #category_id, #assignedBY, #assignedTo, #label, #project_id_filter, #pinned, #date_filter_on, #department')
             .on('change keyup',
                 function() {
+                    updateViewLinks();
                     if ($('#status').val() != "not finished") {
                         $('#reset-filters').removeClass('d-none');
                         showTable();
@@ -406,6 +428,9 @@ $viewUnassignedTasksPermission = user()->permission('view_unassigned_tasks');
                         $('#reset-filters').removeClass('d-none');
                         showTable();
                     }  else if ($('#date_filter_on').val() != "start_date") {
+                        $('#reset-filters').removeClass('d-none');
+                        showTable();
+                    } else if ($('#department').val() != "all") {
                         $('#reset-filters').removeClass('d-none');
                         showTable();
                     } else {
@@ -443,6 +468,9 @@ $viewUnassignedTasksPermission = user()->permission('view_unassigned_tasks');
             $('.filter-box #date_filter_on').val('start_date');
             $('.filter-box #assignedTo').val('all');
             $('.filter-box .select-picker').selectpicker("refresh");
+            $('#department').val('all');
+            $('#department').selectpicker('refresh');
+            updateViewLinks();
             $('#reset-filters').addClass('d-none');
             showTable();
         });
